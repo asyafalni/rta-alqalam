@@ -31,6 +31,12 @@ input::placeholder,textarea::placeholder{color:#a99f86;}
 @media(min-width:620px){.dur-grid{grid-template-columns:repeat(4,1fr);}}
 .amt-grid{grid-template-columns:repeat(2,1fr);}
 @media(min-width:700px){.amt-grid{grid-template-columns:repeat(5,1fr);}}
+@media(max-width:479px){
+  .dur-grid > div{padding:14px 10px!important;}
+  .dur-grid > div > div:first-child{font-size:22px!important;}
+  .amt-grid > div{padding:14px 10px!important;}
+  .amt-grid > div > div:first-child{font-size:16px!important;}
+}
 </style>
 </helmet>
 <div style="background:#f6efe0;font-family:'Plus Jakarta Sans',sans-serif;color:#26302a;overflow-x:hidden;">
