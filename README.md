@@ -14,8 +14,8 @@ admin who fields their questions.
 
 ## About the Production File
 `index.html` is the production page (renamed from `Program Orang Tua Asuh.dc.html`). It contains
-the full template and logic class and is served directly. `support.js` is the original prototype
-runtime — it is **not** part of the production build and should not be referenced.
+the full template and logic class and is served directly. `support.js` is the DC framework runtime
+that `index.html` loads and depends on — both files must be served together.
 
 ## Fidelity
 **High-fidelity (hifi).** Final colors, typography, spacing, copy, and interactions are all
@@ -32,7 +32,7 @@ production is the *implementation* (framework/components), not the visual design
   (`this.state`), event handlers, and a `renderVals()` method that returns every value the template
   consumes. Port `state` to your component state and `renderVals()` logic to derived values/handlers.
 
-Ignore `support.js` — it is the prototype runtime and is not used in production.
+`support.js` is the DC framework runtime — it must be present alongside `index.html` in production.
 
 ## Screens / Views
 This is a single scrolling page with anchored sections. Top to bottom:
@@ -194,6 +194,6 @@ All assets were provided by the client (RTA Al-Qalam). Keep them; do not regener
 
 ## Files
 - `index.html` — the production page (template + logic class). Renamed from `Program Orang Tua Asuh.dc.html`.
-- `support.js` — prototype runtime; **not used in production**.
+- `support.js` — DC framework runtime; **required in production** (loaded by `index.html`).
 - `assets/` — images listed above.
 - `CLAUDE.md` — working notes / guardrails for Claude Code.
