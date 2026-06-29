@@ -27,6 +27,10 @@ input::placeholder,textarea::placeholder{color:#a99f86;}
 }
 .trust-strip{grid-template-columns:repeat(4,1fr);}
 @media(max-width:574px){.trust-strip{grid-template-columns:repeat(2,1fr);}}
+.dur-grid{grid-template-columns:repeat(2,1fr);}
+@media(min-width:620px){.dur-grid{grid-template-columns:repeat(4,1fr);}}
+.amt-grid{grid-template-columns:repeat(2,1fr);}
+@media(min-width:700px){.amt-grid{grid-template-columns:repeat(5,1fr);}}
 </style>
 </helmet>
 <div style="background:#f6efe0;font-family:'Plus Jakarta Sans',sans-serif;color:#26302a;overflow-x:hidden;">
@@ -165,7 +169,7 @@ input::placeholder,textarea::placeholder{color:#a99f86;}
 
       <!-- Step 1: durasi -->
       <div style="display:flex;align-items:center;gap:11px;margin-bottom:16px;"><span style="width:26px;height:26px;border-radius:50%;background:#0c6240;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;">1</span><h3 style="font-family:Marcellus,serif;font-weight:400;font-size:21px;margin:0;color:#0d3a28;">Pilih jangka waktu</h3></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:13px;margin-bottom:34px;">
+      <div class="dur-grid" style="display:grid;gap:13px;margin-bottom:34px;">
         <sc-for list="{{ durations }}" as="d" hint-placeholder-count="4">
           <div style="{{ d.cardStyle }}" onClick="{{ d.onClick }}" style-hover="transform:translateY(-3px)">
             <div style="font-family:Marcellus,serif;font-size:27px;line-height:1;">{{ d.label }}</div>
@@ -177,7 +181,7 @@ input::placeholder,textarea::placeholder{color:#a99f86;}
 
       <!-- Step 2: nominal -->
       <div style="display:flex;align-items:center;gap:11px;margin-bottom:16px;"><span style="width:26px;height:26px;border-radius:50%;background:#0c6240;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;">2</span><h3 style="font-family:Marcellus,serif;font-weight:400;font-size:21px;margin:0;color:#0d3a28;">Pilih nominal per bulan</h3></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:13px;">
+      <div class="amt-grid" style="display:grid;gap:13px;">
         <sc-for list="{{ amounts }}" as="a" hint-placeholder-count="5">
           <div style="{{ a.cardStyle }}" onClick="{{ a.onClick }}" style-hover="transform:translateY(-3px)">
             <div style="font-family:Marcellus,serif;font-size:21px;line-height:1.1;">{{ a.label }}</div>
