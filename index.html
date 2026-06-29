@@ -467,6 +467,20 @@ class Component extends DCLogic {
   }
   toggleFaq(i) { this.setState((s) => ({ openFaq: s.openFaq === i ? -1 : i })); }
 
+  componentDidMount() {
+    if (window.location.hash) {
+      setTimeout(() => {
+        try {
+          const el = document.querySelector(window.location.hash);
+          if (el) {
+            const offset = el.getBoundingClientRect().top + window.scrollY - 68;
+            window.scrollTo({ top: Math.max(0, offset), behavior: 'smooth' });
+          }
+        } catch(e) {}
+      }, 200);
+    }
+  }
+
   buildWa() {
     const mv = this.monthlyValue();
     const months = this.state.months;
