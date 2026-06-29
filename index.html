@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:#0a4631;}
+input::placeholder,textarea::placeholder{color:#a99f86;}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+::selection{background:#c6a052;color:#093526;}
+</style>
+</helmet>
+<div style="background:#f6efe0;font-family:'Plus Jakarta Sans',sans-serif;color:#26302a;overflow-x:hidden;">
+
+<!-- ===== TOP BAR ===== -->
+<div style="position:sticky;top:0;z-index:50;background:rgba(8,58,40,.93);backdrop-filter:blur(10px);border-bottom:1px solid rgba(198,160,82,.32);">
+  <div style="max-width:1180px;margin:0 auto;padding:11px 26px;display:flex;align-items:center;gap:14px;">
+    <img src="assets/emblem-rta.png" alt="RTA Al-Qalam" style="width:42px;height:42px;object-fit:contain;flex:none;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35));">
+    <div style="line-height:1.15;flex:1;min-width:0;">
+      <div style="font-family:Marcellus,serif;color:#f4ead2;font-size:16px;letter-spacing:.02em;">Rumah Tahfidz Al-Qur'an Al-Qalam</div>
+      <div style="color:#c6a052;font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:600;">Darul Huffadz · Yayasan Al Qalam</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <a href="#tentang" style="color:#d8cdb3;text-decoration:none;font-size:13.5px;font-weight:500;padding:8px 12px;border-radius:8px;display:none;">Tentang</a>
+      <a href="#komitmen" style="background:linear-gradient(160deg,#d4b56a,#c6a052);color:#093526;text-decoration:none;font-size:13px;font-weight:700;padding:10px 18px;border-radius:999px;letter-spacing:.01em;box-shadow:0 6px 18px -8px rgba(198,160,82,.7);white-space:nowrap;">Jadi Orang Tua Asuh</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HERO ===== -->
+<section data-screen-label="Hero" style="position:relative;background:radial-gradient(120% 90% at 50% -10%,#0e5a3c 0%,#0a4631 45%,#063626 100%);color:#f3e9d2;padding:74px 26px 92px;overflow:hidden;">
+  <div style="position:absolute;inset:0;opacity:.06;background-image:radial-gradient(circle at 1px 1px,#e9d9a8 1px,transparent 0);background-size:26px 26px;"></div>
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(640px,86vw);height:min(640px,86vw);border:1px solid rgba(198,160,82,.18);border-radius:50%;"></div>
+  <div style="position:relative;max-width:880px;margin:0 auto;text-align:center;">
+    <div style="display:inline-flex;align-items:center;gap:11px;border:1px solid rgba(198,160,82,.45);padding:8px 18px;border-radius:999px;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#dcc585;font-weight:600;margin-bottom:30px;">
+      <span style="width:6px;height:6px;background:#c6a052;transform:rotate(45deg);display:inline-block;"></span>Program Donasi
+    </div>
+    <img src="assets/logo-full-rta.png" alt="Rumah Tahfidz Al-Qur'an Al-Qalam" style="display:block;width:min(210px,56vw);height:auto;margin:0 auto 26px;animation:floatY 7s ease-in-out infinite;filter:drop-shadow(1px 0 0 rgba(241,232,210,.95)) drop-shadow(-1px 0 0 rgba(241,232,210,.95)) drop-shadow(0 1px 0 rgba(241,232,210,.95)) drop-shadow(0 -1px 0 rgba(241,232,210,.95)) drop-shadow(1px 1px 0 rgba(241,232,210,.95)) drop-shadow(-1px -1px 0 rgba(241,232,210,.95)) drop-shadow(1px -1px 0 rgba(241,232,210,.95)) drop-shadow(-1px 1px 0 rgba(241,232,210,.95)) drop-shadow(0 6px 16px rgba(0,0,0,.3));">
+    <h1 style="font-family:Marcellus,serif;font-weight:400;font-size:clamp(44px,8vw,80px);line-height:1.02;margin:0 0 8px;color:#fbf3df;letter-spacing:-.01em;">Orang Tua Asuh</h1>
+    <div style="font-family:Amiri,serif;font-size:clamp(20px,3.4vw,30px);line-height:1.7;color:#d4b56a;direction:rtl;margin:6px auto 22px;max-width:760px;">بِالْقَلَمِ وَالْعِلْمِ وَنُورِ الْقُرْآنِ، تُزْهِرُ الْأَرْضُ بِثِمَارِ الْإِحْسَان</div>
+    <p style="max-width:600px;margin:0 auto 14px;font-size:clamp(17px,2.4vw,20px);line-height:1.65;color:#e4d9bf;">
+      Menjadi <strong style="color:#f4ead2;font-weight:600;">orang tua asuh</strong> bagi seorang santri penghafal Al-Qur'an dari kalangan dhuafa — menanggung biaya pendidikan dan kebutuhan mereka, agar cahaya Al-Qur'an terus tumbuh.
+    </p>
+    <div style="font-family:Marcellus,serif;font-style:italic;color:#bfa873;font-size:15px;margin-bottom:36px;">"Dengan pena, ilmu, dan cahaya Al-Qur'an, bumi mekar berbuah kebaikan."</div>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <a href="#komitmen" style="background:linear-gradient(160deg,#d4b56a,#bb9647);color:#08321f;text-decoration:none;font-weight:700;font-size:15.5px;padding:16px 32px;border-radius:999px;box-shadow:0 14px 34px -12px rgba(198,160,82,.7);">Mulai Jadi Orang Tua Asuh →</a>
+      <a href="#qris" style="background:rgba(255,255,255,.06);border:1px solid rgba(231,216,173,.4);color:#ecdfc2;text-decoration:none;font-weight:600;font-size:15.5px;padding:16px 30px;border-radius:999px;">Cara Berdonasi</a>
+    </div>
+  </div>
+  <!-- trust strip -->
+  <div style="position:relative;max-width:920px;margin:58px auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:rgba(198,160,82,.22);border:1px solid rgba(198,160,82,.22);border-radius:16px;overflow:hidden;">
+    <div style="background:#0a4631;padding:22px 16px;text-align:center;"><div style="font-family:Marcellus,serif;font-size:30px;color:#e6cf8e;">15 Juz</div><div style="font-size:12px;letter-spacing:.08em;color:#b7a77f;text-transform:uppercase;margin-top:4px;">Target Hafalan</div></div>
+    <div style="background:#0a4631;padding:22px 16px;text-align:center;"><div style="font-family:Marcellus,serif;font-size:30px;color:#e6cf8e;">100%</div><div style="font-size:12px;letter-spacing:.08em;color:#b7a77f;text-transform:uppercase;margin-top:4px;">Untuk Santri Dhuafa</div></div>
+    <div style="background:#0a4631;padding:22px 16px;text-align:center;"><div style="font-family:Marcellus,serif;font-size:30px;color:#e6cf8e;">24 Jam</div><div style="font-size:12px;letter-spacing:.08em;color:#b7a77f;text-transform:uppercase;margin-top:4px;">Pendidikan Berasrama</div></div>
+    <div style="background:#0a4631;padding:22px 16px;text-align:center;"><div style="font-family:Marcellus,serif;font-size:30px;color:#e6cf8e;">SMP/MTS</div><div style="font-size:12px;letter-spacing:.08em;color:#b7a77f;text-transform:uppercase;margin-top:4px;">Jenjang Saat Ini</div></div>
+  </div>
+</section>
+
+<!-- ===== TENTANG ===== -->
+<section id="tentang" data-screen-label="Tentang Program" style="padding:88px 26px;background:#f6efe0;">
+  <div style="max-width:1080px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:54px;align-items:start;">
+    <div>
+      <div style="color:#0c6240;font-size:12.5px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;margin-bottom:16px;">Apa Itu Program Ini</div>
+      <h2 style="font-family:Marcellus,serif;font-weight:400;font-size:clamp(32px,4.6vw,46px);line-height:1.1;margin:0 0 24px;color:#0d3a28;">Gotong royong menanggung satu generasi Qur'ani</h2>
+      <p style="font-size:17px;line-height:1.75;color:#42514a;margin:0 0 18px;">
+        <strong>Program Orang Tua Asuh</strong> adalah wujud nyata <em>takaful ijtimai</em> — jaminan sosial dalam Islam. Sebagai orang tua asuh, Anda menanggung sebagian biaya pendidikan dan kebutuhan harian seorang santri penghafal Al-Qur'an yang berasal dari keluarga dhuafa di Rumah Tahfidz Al-Qur'an Al-Qalam.
+      </p>
+      <p style="font-size:17px;line-height:1.75;color:#42514a;margin:0 0 18px;">
+        Dengan komitmen rutin Anda, anak-anak dhuafa berprestasi tetap dapat mengenyam pendidikan tahfidz berasrama secara <strong>gratis</strong> — memadukan hafalan Al-Qur'an yang <em>mutqin</em>, kurikulum nasional, dan pembinaan karakter kepemimpinan.
+      </p>
+      <div style="margin-top:26px;border-left:3px solid #c6a052;padding:6px 0 6px 20px;background:linear-gradient(90deg,rgba(198,160,82,.08),transparent);">
+        <p style="margin:0;font-size:15px;line-height:1.6;color:#5a4a25;"><strong style="color:#0d3a28;">Saat ini</strong> Rumah Tahfidz Al-Qalam hanya membuka pendaftaran santri jenjang <strong>SMP / MTS</strong> (lulusan SD/MI) dari kalangan dhuafa.</p>
+      </div>
+    </div>
+    <div style="background:linear-gradient(165deg,#0e5a3c,#093624);border-radius:22px;padding:38px 34px;color:#ecdfc2;position:relative;overflow:hidden;box-shadow:0 30px 60px -30px rgba(9,54,38,.6);">
+      <div style="position:absolute;inset:0;opacity:.07;background-image:radial-gradient(circle at 1px 1px,#e9d9a8 1px,transparent 0);background-size:22px 22px;"></div>
+      <div style="position:relative;">
+        <div style="font-family:Amiri,serif;font-size:46px;color:#d4b56a;line-height:1;">﴾﴿</div>
+        <h3 style="font-family:Marcellus,serif;font-weight:400;font-size:24px;margin:14px 0 22px;color:#fbf3df;">Mengapa peran Anda penting</h3>
+        <div style="display:flex;flex-direction:column;gap:18px;">
+          <div style="display:flex;gap:14px;"><span style="width:9px;height:9px;background:#c6a052;transform:rotate(45deg);flex:none;margin-top:7px;"></span><p style="margin:0;font-size:15px;line-height:1.6;color:#dccfb2;">Lembaga ini <strong style="color:#f0e6cc;">didanai sepenuhnya dari amanah umat</strong> — infak, sedekah, dan donasi.</p></div>
+          <div style="display:flex;gap:14px;"><span style="width:9px;height:9px;background:#c6a052;transform:rotate(45deg);flex:none;margin-top:7px;"></span><p style="margin:0;font-size:15px;line-height:1.6;color:#dccfb2;">Potensi terbaik umat sering tersembunyi di kalangan dhuafa. Anda membuka pintu bagi mereka.</p></div>
+          <div style="display:flex;gap:14px;"><span style="width:9px;height:9px;background:#c6a052;transform:rotate(45deg);flex:none;margin-top:7px;"></span><p style="margin:0;font-size:15px;line-height:1.6;color:#dccfb2;">Satu komitmen kecil yang rutin lebih berdampak daripada bantuan besar yang sesaat.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== YANG ANDA TANGGUNG ===== -->
+<section data-screen-label="Cakupan Donasi" style="padding:84px 26px;background:#fbf7ec;border-top:1px solid #ece3cf;">
+  <div style="max-width:1080px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:48px;">
+      <div style="color:#0c6240;font-size:12.5px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;margin-bottom:14px;">Donasi Anda Menanggung</div>
+      <h2 style="font-family:Marcellus,serif;font-weight:400;font-size:clamp(30px,4.4vw,44px);margin:0;color:#0d3a28;">Kebutuhan nyata seorang santri</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;">
+      <div style="background:#fff;border:1px solid #ece3cf;border-radius:18px;padding:30px 26px;box-shadow:0 1px 0 rgba(0,0,0,.02);">
+        <div style="width:46px;height:46px;border-radius:12px;background:rgba(12,98,64,.1);display:flex;align-items:center;justify-content:center;margin-bottom:18px;"><span style="width:14px;height:14px;background:#0c6240;transform:rotate(45deg);"></span></div>
+        <h3 style="font-family:Marcellus,serif;font-weight:400;font-size:21px;margin:0 0 8px;color:#0d3a28;">Asrama & Makan</h3>
+        <p style="margin:0;font-size:14.5px;line-height:1.6;color:#5b6a61;">Tempat tinggal yang layak dan makan harian bergizi selama menghafal Al-Qur'an.</p>
+      </div>
+      <div style="background:#fff;border:1px solid #ece3cf;border-radius:18px;padding:30px 26px;box-shadow:0 1px 0 rgba(0,0,0,.02);">
+        <div style="width:46px;height:46px;border-radius:12px;background:rgba(198,160,82,.16);display:flex;align-items:center;justify-content:center;margin-bottom:18px;"><span style="width:14px;height:14px;background:#c6a052;transform:rotate(45deg);"></span></div>
+        <h3 style="font-family:Marcellus,serif;font-weight:400;font-size:21px;margin:0 0 8px;color:#0d3a28;">Biaya Pendidikan</h3>
+        <p style="margin:0;font-size:14.5px;line-height:1.6;color:#5b6a61;">Honor guru tahfidz, kitab, mushaf, dan operasional kegiatan belajar-mengajar.</p>
+      </div>
+      <div style="background:#fff;border:1px solid #ece3cf;border-radius:18px;padding:30px 26px;box-shadow:0 1px 0 rgba(0,0,0,.02);">
+        <div style="width:46px;height:46px;border-radius:12px;background:rgba(22,36,78,.1);display:flex;align-items:center;justify-content:center;margin-bottom:18px;"><span style="width:14px;height:14px;background:#16244e;transform:rotate(45deg);"></span></div>
+        <h3 style="font-family:Marcellus,serif;font-weight:400;font-size:21px;margin:0 0 8px;color:#0d3a28;">Seragam & Kebutuhan</h3>
+        <p style="margin:0;font-size:14.5px;line-height:1.6;color:#5b6a61;">Pakaian, perlengkapan belajar, dan kebutuhan pribadi harian para santri.</p>
+      </div>
+      <div style="background:#fff;border:1px solid #ece3cf;border-radius:18px;padding:30px 26px;box-shadow:0 1px 0 rgba(0,0,0,.02);">
+        <div style="width:46px;height:46px;border-radius:12px;background:rgba(12,98,64,.1);display:flex;align-items:center;justify-content:center;margin-bottom:18px;"><span style="width:14px;height:14px;border:3px solid #0c6240;border-radius:50%;"></span></div>
+        <h3 style="font-family:Marcellus,serif;font-weight:400;font-size:21px;margin:0 0 8px;color:#0d3a28;">Pembinaan Karakter</h3>
+        <p style="margin:0;font-size:14.5px;line-height:1.6;color:#5b6a61;">Pendampingan akhlak, kepemimpinan, dan kemandirian sepanjang hari.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CARA KERJA ===== -->
+<section data-screen-label="Cara Kerja" style="padding:84px 26px;background:#f6efe0;">
+  <div style="max-width:1000px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:50px;">
+      <div style="color:#0c6240;font-size:12.5px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;margin-bottom:14px;">Hanya 4 Langkah</div>
+      <h2 style="font-family:Marcellus,serif;font-weight:400;font-size:clamp(30px,4.4vw,44px);margin:0;color:#0d3a28;">Cara menjadi orang tua asuh</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;">
+      <div style="text-align:center;padding:8px;"><div style="width:58px;height:58px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(160deg,#0e5a3c,#093624);color:#e6cf8e;font-family:Marcellus,serif;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px -12px rgba(9,54,38,.6);">1</div><h3 style="font-family:Marcellus,serif;font-weight:400;font-size:19px;margin:0 0 7px;color:#0d3a28;">Pilih komitmen</h3><p style="margin:0;font-size:14px;line-height:1.6;color:#5b6a61;">Tentukan jangka waktu & nominal donasi sesuai kemampuan Anda.</p></div>
+      <div style="text-align:center;padding:8px;"><div style="width:58px;height:58px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(160deg,#0e5a3c,#093624);color:#e6cf8e;font-family:Marcellus,serif;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px -12px rgba(9,54,38,.6);">2</div><h3 style="font-family:Marcellus,serif;font-weight:400;font-size:19px;margin:0 0 7px;color:#0d3a28;">Isi data diri</h3><p style="margin:0;font-size:14px;line-height:1.6;color:#5b6a61;">Lengkapi formulir digital — nama, alamat, WhatsApp & tanggal transfer.</p></div>
+      <div style="text-align:center;padding:8px;"><div style="width:58px;height:58px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(160deg,#0e5a3c,#093624);color:#e6cf8e;font-family:Marcellus,serif;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px -12px rgba(9,54,38,.6);">3</div><h3 style="font-family:Marcellus,serif;font-weight:400;font-size:19px;margin:0 0 7px;color:#0d3a28;">Transfer via QRIS</h3><p style="margin:0;font-size:14px;line-height:1.6;color:#5b6a61;">Scan QRIS INFAQ RTA Al-Qalam setiap tanggal komitmen Anda.</p></div>
+      <div style="text-align:center;padding:8px;"><div style="width:58px;height:58px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(160deg,#0e5a3c,#093624);color:#e6cf8e;font-family:Marcellus,serif;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px -12px rgba(9,54,38,.6);">4</div><h3 style="font-family:Marcellus,serif;font-weight:400;font-size:19px;margin:0 0 7px;color:#0d3a28;">Terima laporan</h3><p style="margin:0;font-size:14px;line-height:1.6;color:#5b6a61;">Dapatkan laporan perkembangan santri & keuangan secara berkala.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== KOMITMEN BUILDER ===== -->
+<section id="komitmen" data-screen-label="Form Komitmen" style="padding:88px 26px;background:radial-gradient(120% 80% at 50% 0%,#0e5a3c 0%,#0a4631 50%,#063626 100%);color:#ecdfc2;position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;opacity:.05;background-image:radial-gradient(circle at 1px 1px,#e9d9a8 1px,transparent 0);background-size:26px 26px;"></div>
+  <div style="position:relative;max-width:920px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:44px;">
+      <div style="color:#d4b56a;font-size:12.5px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;margin-bottom:14px;">Formulir Digital</div>
+      <h2 style="font-family:Marcellus,serif;font-weight:400;font-size:clamp(32px,4.8vw,48px);margin:0 0 10px;color:#fbf3df;">Buat komitmen Anda</h2>
+      <p style="margin:0 auto;max-width:520px;font-size:16px;line-height:1.6;color:#cfc1a4;">Pilih jangka waktu dan nominal yang sesuai dengan kemampuan Anda. Tidak ada nominal yang terlalu kecil.</p>
+    </div>
+
+    <div style="background:#fbf7ec;border-radius:24px;padding:clamp(24px,4vw,44px);color:#26302a;box-shadow:0 40px 80px -36px rgba(0,0,0,.6);border:1px solid rgba(198,160,82,.3);">
+
+      <!-- Step 1: durasi -->
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:16px;"><span style="width:26px;height:26px;border-radius:50%;background:#0c6240;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;">1</span><h3 style="font-family:Marcellus,serif;font-weight:400;font-size:21px;margin:0;color:#0d3a28;">Pilih jangka waktu</h3></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:13px;margin-bottom:34px;">
+        <sc-for list="{{ durations }}" as="d" hint-placeholder-count="4">
+          <div style="{{ d.cardStyle }}" onClick="{{ d.onClick }}" style-hover="transform:translateY(-3px)">
+            <div style="font-family:Marcellus,serif;font-size:27px;line-height:1;">{{ d.label }}</div>
+            <div style="font-size:11.5px;margin-top:8px;letter-spacing:.05em;text-transform:uppercase;opacity:.72;">{{ d.sub }}</div>
+            <div style="{{ d.tickStyle }}">{{ d.tick }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <!-- Step 2: nominal -->
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:16px;"><span style="width:26px;height:26px;border-radius:50%;background:#0c6240;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;">2</span><h3 style="font-family:Marcellus,serif;font-weight:400;font-size:21px;margin:0;color:#0d3a28;">Pilih nominal per bulan</h3></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:13px;">
+        <sc-for list="{{ amounts }}" as="a" hint-placeholder-count="5">
+          <div style="{{ a.cardStyle }}" onClick="{{ a.onClick }}" style-hover="transform:translateY(-3px)">
+            <div style="font-family:Marcellus,serif;font-size:21px;line-height:1.1;">{{ a.label }}</div>
+            <div style="font-size:11.5px;margin-top:7px;letter-spacing:.05em;text-transform:uppercase;opacity:.72;">{{ a.sub }}</div>
+            <div style="{{ a.tickStyle }}">{{ a.tick }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ showCustom }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:14px;display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid #c6a052;border-radius:13px;padding:4px 16px;max-width:340px;">
+          <span style="font-family:Marcellus,serif;font-size:18px;color:#0c6240;">Rp</span>
+          <input value="{{ customAmount }}" onInput="{{ onCustom }}" inputmode="numeric" placeholder="Masukkan nominal" style="border:none;outline:none;background:transparent;font-size:18px;font-family:'Plus Jakarta Sans';font-weight:600;color:#0d3a28;padding:12px 0;width:100%;">
+          <span style="font-size:13px;color:#8a7d5f;white-space:nowrap;">/ bulan</span>
+        </div>
+      </sc-if>
+
+      <!-- Live summary -->
+      <div style="margin:34px 0;background:linear-gradient(160deg,#0e5a3c,#093624);border-radius:18px;padding:26px 28px;color:#ecdfc2;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:18px;align-items:center;">
+        <div><div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#a99a76;margin-bottom:5px;">Jangka Waktu</div><div style="font-family:Marcellus,serif;font-size:22px;color:#fbf3df;">{{ monthsText }}</div></div>
+        <div><div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#a99a76;margin-bottom:5px;">Donasi / Bulan</div><div style="font-family:Marcellus,serif;font-size:22px;color:#fbf3df;">{{ monthlyText }}</div></div>
+        <div style="border-left:1px solid rgba(198,160,82,.3);padding-left:18px;"><div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#d4b56a;margin-bottom:5px;">Total Komitmen</div><div style="font-family:Marcellus,serif;font-size:27px;color:#e6cf8e;">{{ totalText }}</div></div>
+      </div>
+
+      <!-- Step 3: data diri -->
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:18px;"><span style="width:26px;height:26px;border-radius:50%;background:#0c6240;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;">3</span><h3 style="font-family:Marcellus,serif;font-weight:400;font-size:21px;margin:0;color:#0d3a28;">Lengkapi data diri</h3></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
+        <div>
+          <label style="display:block;font-size:12.5px;font-weight:600;color:#4a564e;margin-bottom:7px;letter-spacing:.02em;">Nama Lengkap <span style="color:#c0392b;">*</span></label>
+          <input value="{{ nameVal }}" onInput="{{ onName }}" placeholder="Nama Anda" style="width:100%;border:1.5px solid #ddd4bf;border-radius:11px;padding:13px 15px;font-size:15px;font-family:'Plus Jakarta Sans';background:#fff;outline:none;color:#26302a;" style-focus="border-color:#c6a052">
+        </div>
+        <div>
+          <label style="display:block;font-size:12.5px;font-weight:600;color:#4a564e;margin-bottom:7px;letter-spacing:.02em;">No. HP / WhatsApp <span style="color:#c0392b;">*</span></label>
+          <input value="{{ phoneVal }}" onInput="{{ onPhone }}" inputmode="tel" placeholder="08xx xxxx xxxx" style="width:100%;border:1.5px solid #ddd4bf;border-radius:11px;padding:13px 15px;font-size:15px;font-family:'Plus Jakarta Sans';background:#fff;outline:none;color:#26302a;" style-focus="border-color:#c6a052">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="display:block;font-size:12.5px;font-weight:600;color:#4a564e;margin-bottom:7px;letter-spacing:.02em;">Alamat</label>
+          <input value="{{ addressVal }}" onInput="{{ onAddress }}" placeholder="Alamat domisili Anda" style="width:100%;border:1.5px solid #ddd4bf;border-radius:11px;padding:13px 15px;font-size:15px;font-family:'Plus Jakarta Sans';background:#fff;outline:none;color:#26302a;" style-focus="border-color:#c6a052">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:12.5px;font-weight:600;color:#4a564e;margin-bottom:9px;letter-spacing:.02em;">Komitmen Tanggal Transfer <span style="font-weight:700;color:#0c6240;">{{ transferDayLabel }}</span></label>
+          <div style="max-width:320px;background:#fff;border:1.5px solid #e3dcc8;border-radius:14px;padding:14px;box-shadow:0 8px 22px -16px rgba(9,54,38,.35);">
+            <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid #efe7d3;">
+              <span style="width:7px;height:7px;background:#c6a052;transform:rotate(45deg);"></span>
+              <span style="font-family:Marcellus,serif;font-size:15px;color:#0d3a28;">Tanggal Transfer</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;">
+              <sc-for list="{{ dayCells }}" as="c" hint-placeholder-count="28">
+                <div style="{{ c.style }}" onClick="{{ c.onClick }}" style-hover="transform:translateY(-2px)">{{ c.label }}</div>
+              </sc-for>
+            </div>
+          </div>
+          <p style="margin:8px 2px 0;font-size:12px;color:#8a7d5f;">Pilih tanggal di mana Anda berkomitmen berdonasi setiap bulan.</p>
+        </div>
+        <div>
+          <label style="display:block;font-size:12.5px;font-weight:600;color:#4a564e;margin-bottom:7px;letter-spacing:.02em;">Catatan (opsional)</label>
+          <input value="{{ noteVal }}" onInput="{{ onNote }}" placeholder="mis. atas nama hamba Allah" style="width:100%;border:1.5px solid #ddd4bf;border-radius:11px;padding:13px 15px;font-size:15px;font-family:'Plus Jakarta Sans';background:#fff;outline:none;color:#26302a;" style-focus="border-color:#c6a052">
+        </div>
+      </div>
+
+      <sc-if value="{{ showError }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:18px;background:#fdecea;border:1px solid #e8b4ad;color:#a23423;border-radius:11px;padding:13px 16px;font-size:14px;">{{ errorMsg }}</div>
+      </sc-if>
+
+      <a href="{{ liveWaLink }}" target="_blank" rel="noopener" onClick="{{ onSubmit }}" style="margin-top:26px;width:100%;background:linear-gradient(160deg,#0e5a3c,#0a4631);color:#fbf3df;text-decoration:none;border:none;border-radius:14px;padding:18px;font-size:16.5px;font-weight:700;font-family:'Plus Jakarta Sans';cursor:pointer;letter-spacing:.01em;box-shadow:0 16px 34px -16px rgba(9,54,38,.7);display:flex;align-items:center;justify-content:center;gap:10px;" style-hover="transform:translateY(-2px)">
+        <span style="width:9px;height:9px;background:#d4b56a;transform:rotate(45deg);"></span> Kirim Komitmen via WhatsApp
+      </a>
+      <p style="text-align:center;font-size:12.5px;color:#8a7d5f;margin:14px 0 0;">Data dikirim langsung ke Admin RTA Al-Qalam melalui WhatsApp. Tidak ada pembayaran di halaman ini.</p>
+
+      <sc-if value="{{ submitted }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:26px;background:linear-gradient(160deg,#0e5a3c,#093624);border-radius:18px;padding:30px 28px;color:#ecdfc2;text-align:center;">
+          <div style="width:54px;height:54px;border-radius:50%;border:2px solid #d4b56a;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#e6cf8e;font-size:26px;">✓</div>
+          <h3 style="font-family:Marcellus,serif;font-weight:400;font-size:23px;margin:0 0 8px;color:#fbf3df;">Jazaakumullaahu khayran!</h3>
+          <p style="margin:0 auto 20px;max-width:420px;font-size:15px;line-height:1.6;color:#cfc1a4;">Komitmen Anda sebagai orang tua asuh telah disiapkan. Jika WhatsApp belum terbuka otomatis, tekan tombol di bawah lalu kirim pesannya ke Admin.</p>
+          <a href="{{ waLink }}" target="_blank" style="display:inline-block;background:linear-gradient(160deg,#d4b56a,#bb9647);color:#08321f;text-decoration:none;font-weight:700;font-size:15px;padding:14px 30px;border-radius:999px;margin-bottom:10px;">Buka WhatsApp Admin →</a>
+          <div><a href="#qris" style="color:#d4b56a;font-size:13.5px;text-decoration:underline;">Lanjut ke cara berdonasi (QRIS)</a></div>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== QRIS ===== -->
+<section id="qris" data-screen-label="Cara Berdonasi QRIS" style="padding:88px 26px;background:#fbf7ec;">
+  <div style="max-width:1000px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:46px;">
+      <div style="color:#0c6240;font-size:12.5px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;margin-bottom:14px;">Cara Berdonasi</div>
+      <h2 style="font-family:Marcellus,serif;font-weight:400;font-size:clamp(30px,4.4vw,44px);margin:0 0 8px;color:#0d3a28;">Scan QRIS, satu untuk semua</h2>
+      <p style="margin:0 auto;max-width:520px;font-size:16px;line-height:1.6;color:#5b6a61;">Donasi Anda dapat ditunaikan melalui QRIS resmi <strong>INFAQ RTA Al-Qalam</strong> dari aplikasi bank atau e-wallet apa pun.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:30px;align-items:center;">
+      <!-- QR card -->
+      <div style="background:#fff;border-radius:22px;padding:26px;border:1px solid #ece3cf;box-shadow:0 24px 50px -28px rgba(9,54,38,.4);max-width:380px;margin:0 auto;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div style="font-family:Marcellus,serif;font-size:18px;color:#0d3a28;line-height:1.1;">INFAQ RTA<br>Al-Qalam</div>
+          <div style="text-align:right;"><div style="font-size:10px;letter-spacing:.1em;color:#8a7d5f;text-transform:uppercase;">QR Standar Nasional</div><div style="font-weight:700;color:#0c6240;font-size:15px;letter-spacing:.05em;">QRIS</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid #eee5d2;border-radius:14px;padding:10px;">
+          <img src="assets/qris-qr.png" alt="QRIS INFAQ RTA Al-Qalam" style="width:100%;display:block;border-radius:6px;">
+        </div>
+        <div style="text-align:center;margin-top:14px;font-size:12.5px;color:#5b6a61;">NMID : <strong style="color:#0d3a28;">ID1026525038901</strong></div>
+        <div style="text-align:center;margin-top:4px;font-family:Marcellus,serif;font-style:italic;color:#b08f3f;font-size:13px;">"Satu QRIS untuk semua"</div>
+      </div>
+      <!-- steps + contact -->
+      <div>
+        <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:26px;">
+          <div style="display:flex;gap:14px;align-items:flex-start;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(12,98,64,.1);color:#0c6240;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;">1</span><div><div style="font-weight:600;color:#0d3a28;font-size:15.5px;">Buka aplikasi berlogo QRIS</div><div style="font-size:13.5px;color:#5b6a61;">m-Banking, DANA, OVO, GoPay, ShopeePay, dll.</div></div></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(12,98,64,.1);color:#0c6240;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;">2</span><div><div style="font-weight:600;color:#0d3a28;font-size:15.5px;">Scan & periksa nama penerima</div><div style="font-size:13.5px;color:#5b6a61;">Pastikan tertera <strong>INFAQ RTA AL QALAM</strong>.</div></div></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(12,98,64,.1);color:#0c6240;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;">3</span><div><div style="font-weight:600;color:#0d3a28;font-size:15.5px;">Masukkan nominal & bayar</div><div style="font-size:13.5px;color:#5b6a61;">Sesuai komitmen bulanan Anda, lalu simpan bukti transfer.</div></div></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(198,160,82,.18);color:#b08f3f;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;">4</span><div><div style="font-weight:600;color:#0d3a28;font-size:15.5px;">Konfirmasi ke Admin</div><div style="font-size:13.5px;color:#5b6a61;">Kirim bukti ke WhatsApp Admin untuk pencatatan & kuitansi.</div></div></div>
+        </div>
+        <a href="{{ waAdminLink }}" target="_blank" style="display:inline-flex;align-items:center;gap:10px;background:#0c6240;color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:14px 26px;border-radius:999px;box-shadow:0 12px 28px -12px rgba(12,98,64,.6);">
+          <span style="width:8px;height:8px;background:#d4b56a;border-radius:50%;"></span> WA Admin · 0819-7339-9739
+        </a>
+        <div style="margin-top:16px;font-size:13px;color:#8a7d5f;">Butuh poster lengkap? <a href="assets/qris-rta.png" target="_blank" style="color:#0c6240;font-weight:600;">Lihat poster QRIS resmi →</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section data-screen-label="FAQ" style="padding:88px 26px;background:#f6efe0;border-top:1px solid #ece3cf;">
+  <div style="max-width:820px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:44px;">
+      <div style="color:#0c6240;font-size:12.5px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;margin-bottom:14px;">Pertanyaan Umum</div>
+      <h2 style="font-family:Marcellus,serif;font-weight:400;font-size:clamp(30px,4.4vw,44px);margin:0;color:#0d3a28;">FAQ Program Orang Tua Asuh</h2>
+      <p style="margin:12px auto 0;max-width:480px;font-size:14.5px;color:#5b6a61;">Acuan jawaban bagi Admin saat menerima pertanyaan dari calon donatur.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+
+      <div style="{{ faqCard0 }}">
+        <button onClick="{{ faqClick0 }}" style="width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px;text-align:left;font-family:'Plus Jakarta Sans';"><span style="font-size:16px;font-weight:600;color:#0d3a28;">Apa itu Program Orang Tua Asuh?</span><span style="{{ faqSign0 }}"><span style="display:block;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-3px;"></span></span></button>
+        <div style="{{ faqBody0 }}"><p style="margin:0;padding:0 22px 22px;font-size:14.5px;line-height:1.7;color:#52615a;">Program donasi rutin di mana Anda berperan sebagai orang tua asuh yang menanggung sebagian biaya pendidikan dan kebutuhan seorang santri penghafal Al-Qur'an dari kalangan dhuafa di RTA Al-Qalam, sehingga mereka dapat belajar secara gratis.</p></div>
+      </div>
+
+      <div style="{{ faqCard1 }}">
+        <button onClick="{{ faqClick1 }}" style="width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px;text-align:left;font-family:'Plus Jakarta Sans';"><span style="font-size:16px;font-weight:600;color:#0d3a28;">Berapa nominal minimal untuk menjadi orang tua asuh?</span><span style="{{ faqSign1 }}"><span style="display:block;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-3px;"></span></span></button>
+        <div style="{{ faqBody1 }}"><p style="margin:0;padding:0 22px 22px;font-size:14.5px;line-height:1.7;color:#52615a;">Mulai dari Rp100.000 per bulan. Tersedia pilihan Rp100.000, Rp250.000, Rp500.000, Rp750.000, atau nominal lain sesuai kemauan dan kemampuan Anda. Tidak ada nominal yang dianggap terlalu kecil.</p></div>
+      </div>
+
+      <div style="{{ faqCard2 }}">
+        <button onClick="{{ faqClick2 }}" style="width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px;text-align:left;font-family:'Plus Jakarta Sans';"><span style="font-size:16px;font-weight:600;color:#0d3a28;">Berapa lama jangka waktu komitmennya?</span><span style="{{ faqSign2 }}"><span style="display:block;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-3px;"></span></span></button>
+        <div style="{{ faqBody2 }}"><p style="margin:0;padding:0 22px 22px;font-size:14.5px;line-height:1.7;color:#52615a;">Anda dapat memilih jangka waktu 6 bulan, 1 tahun, 2 tahun, atau 3 tahun. Komitmen 3 tahun setara dengan menemani satu santri menuntaskan seluruh jenjang SMP/MTS-nya.</p></div>
+      </div>
+
+      <div style="{{ faqCard3 }}">
+        <button onClick="{{ faqClick3 }}" style="width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px;text-align:left;font-family:'Plus Jakarta Sans';"><span style="font-size:16px;font-weight:600;color:#0d3a28;">Bagaimana cara pembayarannya?</span><span style="{{ faqSign3 }}"><span style="display:block;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-3px;"></span></span></button>
+        <div style="{{ faqBody3 }}"><p style="margin:0;padding:0 22px 22px;font-size:14.5px;line-height:1.7;color:#52615a;">Melalui QRIS resmi INFAQ RTA Al-Qalam yang dapat di-scan dari aplikasi bank atau e-wallet apa pun. Anda berdonasi setiap bulan pada tanggal komitmen yang Anda pilih saat mengisi formulir.</p></div>
+      </div>
+
+      <div style="{{ faqCard4 }}">
+        <button onClick="{{ faqClick4 }}" style="width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px;text-align:left;font-family:'Plus Jakarta Sans';"><span style="font-size:16px;font-weight:600;color:#0d3a28;">Apakah saya harus transfer tepat di tanggal komitmen?</span><span style="{{ faqSign4 }}"><span style="display:block;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-3px;"></span></span></button>
+        <div style="{{ faqBody4 }}"><p style="margin:0;padding:0 22px 22px;font-size:14.5px;line-height:1.7;color:#52615a;">Tanggal komitmen berfungsi sebagai pengingat rutin agar donasi Anda konsisten. Tidak masalah jika tertunda beberapa hari — yang utama adalah keistiqamahan niat Anda.</p></div>
+      </div>
+
+      <div style="{{ faqCard5 }}">
+        <button onClick="{{ faqClick5 }}" style="width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px;text-align:left;font-family:'Plus Jakarta Sans';"><span style="font-size:16px;font-weight:600;color:#0d3a28;">Ke mana donasi saya disalurkan?</span><span style="{{ faqSign5 }}"><span style="display:block;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-3px;"></span></span></button>
+        <div style="{{ faqBody5 }}"><p style="margin:0;padding:0 22px 22px;font-size:14.5px;line-height:1.7;color:#52615a;">Seluruh donasi dialokasikan untuk biaya operasional pendidikan dan kebutuhan santri: asrama, makan harian, honor guru tahfidz, kitab & mushaf, seragam, serta kebutuhan pribadi para santri dhuafa. Donasi dikelola secara kolektif dan transparan sesuai SOP Yayasan.</p></div>
+      </div>
+
+      <div style="{{ faqCard6 }}">
+        <button onClick="{{ faqClick6 }}" style="width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px;text-align:left;font-family:'Plus Jakarta Sans';"><span style="font-size:16px;font-weight:600;color:#0d3a28;">Apakah saya akan menerima laporan?</span><span style="{{ faqSign6 }}"><span style="display:block;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-3px;"></span></span></button>
+        <div style="{{ faqBody6 }}"><p style="margin:0;padding:0 22px 22px;font-size:14.5px;line-height:1.7;color:#52615a;">Ya. Sesuai SOP, Yayasan menerbitkan laporan berkala (impact report) berisi ringkasan penggunaan dana, perkembangan hafalan & prestasi santri, serta dokumentasi kegiatan, yang dikirimkan kepada para donatur terdaftar.</p></div>
+      </div>
+
+      <div style="{{ faqCard7 }}">
+        <button onClick="{{ faqClick7 }}" style="width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px;text-align:left;font-family:'Plus Jakarta Sans';"><span style="font-size:16px;font-weight:600;color:#0d3a28;">Santri usia/jenjang apa yang dibina saat ini?</span><span style="{{ faqSign7 }}"><span style="display:block;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-3px;"></span></span></button>
+        <div style="{{ faqBody7 }}"><p style="margin:0;padding:0 22px 22px;font-size:14.5px;line-height:1.7;color:#52615a;">Saat ini RTA Al-Qalam hanya membuka pendaftaran santri jenjang SMP/MTS (lulusan SD/MI) dari kalangan dhuafa, dengan target hafalan 15 Juz dalam pendidikan berasrama.</p></div>
+      </div>
+
+      <div style="{{ faqCard8 }}">
+        <button onClick="{{ faqClick8 }}" style="width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px;text-align:left;font-family:'Plus Jakarta Sans';"><span style="font-size:16px;font-weight:600;color:#0d3a28;">Bagaimana jika saya ingin mengubah atau menghentikan komitmen?</span><span style="{{ faqSign8 }}"><span style="display:block;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-3px;"></span></span></button>
+        <div style="{{ faqBody8 }}"><p style="margin:0;padding:0 22px 22px;font-size:14.5px;line-height:1.7;color:#52615a;">Komitmen ini bersifat sukarela. Anda dapat menyesuaikan nominal, memperpanjang, atau menghentikannya kapan saja dengan menghubungi Admin RTA Al-Qalam melalui WhatsApp.</p></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer style="background:radial-gradient(120% 100% at 50% 0%,#0e5a3c,#063626);color:#cfc1a4;padding:64px 26px 40px;text-align:center;position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;opacity:.05;background-image:radial-gradient(circle at 1px 1px,#e9d9a8 1px,transparent 0);background-size:26px 26px;"></div>
+  <div style="position:relative;max-width:640px;margin:0 auto;">
+    <img src="assets/emblem-rta.png" alt="Emblem" style="width:84px;height:84px;object-fit:contain;margin:0 auto 20px;display:block;filter:drop-shadow(0 8px 20px rgba(0,0,0,.4));">
+    <div style="font-family:Marcellus,serif;font-size:24px;color:#fbf3df;margin-bottom:6px;">Rumah Tahfidz Al-Qur'an Al-Qalam</div>
+    <div style="font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:#c6a052;font-weight:600;margin-bottom:22px;">Darul Huffadz · Yayasan Al Qalam Citra Gran Cibubur</div>
+    <div style="font-family:Amiri,serif;font-size:24px;color:#d4b56a;direction:rtl;margin-bottom:8px;">بِالْقَلَمِ وَالْعِلْمِ وَنُورِ الْقُرْآن، تُزْهِرُ الْأَرْضُ بِثِمَارِ الْإِحْسَان</div>
+    <p style="font-family:Marcellus,serif;font-style:italic;font-size:15px;color:#bfa873;margin:0 0 28px;">"Dengan pena, ilmu, dan cahaya Al-Qur'an, bumi mekar berbuah kebaikan."</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:30px;">
+      <a href="{{ waAdminLink }}" target="_blank" style="background:linear-gradient(160deg,#d4b56a,#bb9647);color:#08321f;text-decoration:none;font-weight:700;font-size:14.5px;padding:13px 26px;border-radius:999px;">Hubungi Admin (WhatsApp)</a>
+      <a href="#komitmen" style="border:1px solid rgba(231,216,173,.4);color:#ecdfc2;text-decoration:none;font-weight:600;font-size:14.5px;padding:13px 26px;border-radius:999px;">Jadi Orang Tua Asuh</a>
+    </div>
+    <div style="border-top:1px solid rgba(198,160,82,.22);padding-top:22px;font-size:12.5px;color:#9a8c6c;line-height:1.7;">
+      WA Admin: 0819-7339-9739 · QRIS: INFAQ RTA Al-Qalam (NMID ID1026525038901)<br>
+      Donasi Anda menjaga keberlangsungan pendidikan para penghafal Al-Qur'an dari kalangan dhuafa.
+    </div>
+  </div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = {
+    months: null,
+    amountKey: null,
+    customAmount: '',
+    name: '', address: '', phone: '', transferDay: '1', note: '',
+    submitted: false, error: '', waLink: '',
+    openFaq: 0,
+  };
+
+  amountMap = { '100': 100000, '250': 250000, '500': 500000, '750': 750000 };
+  WA = '6281973399739';
+
+  GFORM = {
+    action: 'https://docs.google.com/forms/d/e/1FAIpQLSf_kEGvREhEqwTzH8RHN8sReCLDKZTAorBCR9I81ZcyAPbyoA/formResponse',
+    name: 'entry.827177918',
+    phone: 'entry.433190014',
+    address: 'entry.2095310306',
+    duration: 'entry.1197534936',
+    amount: 'entry.1986076729',
+    transferDay: 'entry.1908569646',
+    note: 'entry.1112172306',
+  };
+  amountOption = { '100': 'Rp. 100000', '250': 'Rp. 250000', '500': 'Rp. 500000', '750': 'Rp. 750000' };
+
+  submitToGoogle() {
+    const g = this.GFORM;
+    const data = new URLSearchParams();
+    data.append(g.name, this.state.name);
+    data.append(g.phone, this.state.phone);
+    data.append(g.address, this.state.address || '-');
+    data.append(g.duration, this.durLabel(this.state.months));
+    if (this.state.amountKey === 'custom') {
+      data.append(g.amount, '__other_option__');
+      data.append(g.amount + '.other_option_response', 'Rp. ' + this.monthlyValue());
+    } else {
+      data.append(g.amount, this.amountOption[this.state.amountKey] || '');
+    }
+    data.append(g.transferDay, String(this.state.transferDay));
+    if (this.state.note) data.append(g.note, this.state.note);
+    try {
+      fetch(g.action, { method: 'POST', mode: 'no-cors', body: data });
+    } catch (e) { /* silent — submission still reaches Google */ }
+  }
+
+  fmt(n) { return 'Rp\u00a0' + (n || 0).toLocaleString('id-ID'); }
+
+  durLabel(m) { return ({ 6: '6 Bulan', 12: '1 Tahun', 24: '2 Tahun', 36: '3 Tahun' })[m]; }
+
+  monthlyValue() {
+    const { amountKey, customAmount } = this.state;
+    if (amountKey === 'custom') return parseInt((customAmount + '').replace(/\D/g, '')) || 0;
+    return this.amountMap[amountKey] || 0;
+  }
+
+  selDuration(m) { this.setState({ months: m, submitted: false, error: '' }); }
+  selAmount(k) { this.setState({ amountKey: k, submitted: false, error: '' }); }
+  field(f) { return (e) => this.setState({ [f]: e.target.value, submitted: false, error: '' }); }
+  onCustom(e) {
+    const digits = (e.target.value + '').replace(/\D/g, '');
+    this.setState({ customAmount: digits, submitted: false, error: '' });
+  }
+  toggleFaq(i) { this.setState((s) => ({ openFaq: s.openFaq === i ? -1 : i })); }
+
+  buildWa() {
+    const mv = this.monthlyValue();
+    const months = this.state.months;
+    const total = mv * months;
+    const lines = [
+      "Assalamu'alaikum Admin RTA Al-Qalam.",
+      'Saya ingin mendaftar sebagai *Orang Tua Asuh*.',
+      '',
+      'Nama: ' + this.state.name,
+      'Alamat: ' + (this.state.address || '-'),
+      'No. HP/WA: ' + this.state.phone,
+      'Jangka Waktu: ' + this.durLabel(months),
+      'Nominal per Bulan: ' + this.fmt(mv),
+      'Total Komitmen: ' + this.fmt(total),
+      'Komitmen Transfer: setiap tanggal ' + this.state.transferDay,
+    ];
+    if (this.state.note) lines.push('Catatan: ' + this.state.note);
+    lines.push('', 'Mohon informasi langkah selanjutnya. Jazaakumullaahu khayran.');
+    return 'https://wa.me/' + this.WA + '?text=' + encodeURIComponent(lines.join('\n'));
+  }
+
+  submit(e) {
+    const { name, phone, months } = this.state;
+    const mv = this.monthlyValue();
+    let err = '';
+    if (!name.trim() || !phone.trim()) err = 'Mohon lengkapi Nama dan No. HP/WhatsApp Anda.';
+    else if (!months) err = 'Mohon pilih jangka waktu komitmen.';
+    else if (!mv) err = 'Mohon pilih atau isi nominal donasi.';
+    if (err) {
+      if (e && e.preventDefault) e.preventDefault();
+      this.setState({ error: err, submitted: false });
+      return;
+    }
+    // valid: record to Google Form in the background, then let the anchor open WhatsApp
+    this.submitToGoogle();
+    const link = this.buildWa();
+    this.setState({ submitted: true, error: '', waLink: link });
+  }
+
+  optStyle(on) {
+    return {
+      cursor: 'pointer',
+      borderRadius: '14px',
+      padding: '20px 16px',
+      textAlign: 'center',
+      transition: 'all .18s ease',
+      position: 'relative',
+      background: on ? 'linear-gradient(160deg,#0e5a3c,#093624)' : '#ffffff',
+      color: on ? '#f4ead2' : '#22302a',
+      border: on ? '1.5px solid #c6a052' : '1.5px solid #e3dcc8',
+      boxShadow: on ? '0 14px 32px -14px rgba(198,160,82,.6)' : '0 1px 0 rgba(0,0,0,.02)',
+    };
+  }
+  tickStyle(on) {
+    return {
+      display: on ? 'inline-block' : 'none',
+      marginTop: '12px',
+      fontSize: '10.5px',
+      fontWeight: 700,
+      letterSpacing: '.08em',
+      textTransform: 'uppercase',
+      color: '#08321f',
+      background: 'linear-gradient(160deg,#d4b56a,#c6a052)',
+      padding: '4px 12px',
+      borderRadius: '999px',
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const fmt = this.fmt.bind(this);
+    const mv = this.monthlyValue();
+    const months = s.months;
+    const total = (mv && months) ? mv * months : 0;
+
+    const durations = [
+      { m: 6, sub: 'Setengah tahun' },
+      { m: 12, sub: '12 bulan' },
+      { m: 24, sub: '24 bulan' },
+      { m: 36, sub: '36 bulan' },
+    ].map((d) => {
+      const on = s.months === d.m;
+      return {
+        label: this.durLabel(d.m), sub: d.sub,
+        onClick: () => this.selDuration(d.m),
+        cardStyle: this.optStyle(on), tickStyle: this.tickStyle(on),
+        tick: 'Terpilih',
+      };
+    });
+
+    const amounts = [
+      { k: '100', v: 100000, sub: 'per bulan' },
+      { k: '250', v: 250000, sub: 'per bulan' },
+      { k: '500', v: 500000, sub: 'per bulan' },
+      { k: '750', v: 750000, sub: 'per bulan' },
+      { k: 'custom', v: 0, sub: 'sesuai kemampuan', custom: true },
+    ].map((a) => {
+      const on = s.amountKey === a.k;
+      return {
+        label: a.custom ? 'Lainnya' : fmt(a.v).replace('Rp\u00a0', 'Rp'),
+        sub: a.sub,
+        onClick: () => this.selAmount(a.k),
+        cardStyle: this.optStyle(on), tickStyle: this.tickStyle(on),
+        tick: 'Terpilih',
+      };
+    });
+
+    const customDisplay = s.customAmount ? Number(s.customAmount).toLocaleString('id-ID') : '';
+
+    const days = [];
+    for (let i = 1; i <= 28; i++) days.push(i);
+    const dayCells = days.map((d) => {
+      const on = String(s.transferDay) === String(d);
+      return {
+        label: d,
+        onClick: () => this.setState({ transferDay: String(d), submitted: false, error: '' }),
+        style: {
+          cursor: 'pointer', textAlign: 'center', aspectRatio: '1 / 1', display: 'flex',
+          alignItems: 'center', justifyContent: 'center', borderRadius: '8px',
+          fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: '13.5px', fontWeight: 600,
+          transition: 'all .15s ease', userSelect: 'none',
+          background: on ? 'linear-gradient(160deg,#0e5a3c,#093624)' : '#fff',
+          color: on ? '#f4ead2' : '#3a463f',
+          border: on ? '1.5px solid #c6a052' : '1.5px solid #e3dcc8',
+          boxShadow: on ? '0 8px 18px -10px rgba(198,160,82,.6)' : 'none',
+        },
+      };
+    });
+
+    // FAQ derived styles
+    const fv = {};
+    for (let i = 0; i < 9; i++) {
+      const open = s.openFaq === i;
+      fv['faqClick' + i] = () => this.toggleFaq(i);
+      fv['faqCard' + i] = {
+        background: '#fff',
+        border: open ? '1.5px solid #c6a052' : '1.5px solid #ece3cf',
+        borderRadius: '14px',
+        overflow: 'hidden',
+        transition: 'border-color .2s ease',
+        boxShadow: open ? '0 14px 30px -18px rgba(9,54,38,.35)' : '0 1px 0 rgba(0,0,0,.02)',
+      };
+      fv['faqSign' + i] = {
+        flex: 'none', width: '28px', height: '28px', borderRadius: '50%',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: open ? '#0c6240' : 'rgba(12,98,64,.1)',
+        color: open ? '#fff' : '#0c6240',
+        transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+        transition: 'all .26s ease',
+      };
+      fv['faqBody' + i] = {
+        maxHeight: open ? '420px' : '0px',
+        opacity: open ? 1 : 0,
+        overflow: 'hidden',
+        transition: 'max-height .28s ease, opacity .28s ease',
+      };
+    }
+
+    return {
+      durations, amounts,
+      showCustom: s.amountKey === 'custom',
+      customAmount: customDisplay,
+      onCustom: (e) => this.onCustom(e),
+      monthsText: months ? this.durLabel(months) : '—',
+      monthlyText: mv ? fmt(mv) : '—',
+      totalText: total ? fmt(total) : '—',
+      nameVal: s.name, addressVal: s.address, phoneVal: s.phone,
+      noteVal: s.note, transferDay: s.transferDay,
+      onName: this.field('name'), onAddress: this.field('address'),
+      onPhone: this.field('phone'), onNote: this.field('note'),
+      onTransfer: this.field('transferDay'),
+      days, dayCells, transferDayLabel: 'Setiap tanggal ' + s.transferDay,
+      onSubmit: (e) => this.submit(e),
+      liveWaLink: this.buildWa(),
+      submitted: s.submitted, waLink: s.waLink,
+      showError: !!s.error, errorMsg: s.error,
+      waAdminLink: 'https://wa.me/' + this.WA + '?text=' + encodeURIComponent("Assalamu'alaikum, saya ingin bertanya tentang Program Orang Tua Asuh RTA Al-Qalam."),
+      ...fv,
+    };
+  }
+}
+</script>
+</body>
+</html>
