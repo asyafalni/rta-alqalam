@@ -8,8 +8,8 @@ A one-page Bahasa-Indonesia donation microsite for a foster-parent ("Orang Tua A
 Islamic Qur'an-memorization boarding school. Hifi design. Recreate faithfully in the target stack.
 
 ## Golden rules
-1. **The bundled HTML is a reference, not production code.** Rebuild it with the project's own
-   framework/components. Do NOT ship the `.dc.html` or `support.js`.
+1. **`index.html` is the production file** (renamed from `Program Orang Tua Asuh.dc.html`).
+   `support.js` is the prototype runtime only — it is **not** part of the production build.
 2. **Match the visual design exactly** — colors, fonts, spacing, copy, and interactions are final.
    Pull the exact values from README "Design Tokens" and the prototype's inline styles.
 3. **Keep all copy verbatim** (Indonesian + Arabic). Do not paraphrase, translate, or "improve" it.
@@ -49,4 +49,4 @@ Use the provided files in `assets/` as-is. The hero uses the full text logo on a
 - Pixel-faithful to the prototype across mobile + desktop.
 - Form validates, opens WhatsApp with a correct pre-filled message, AND records to the Google Form.
 - FAQ accordion works (chevron rotates, one open at a time).
-- All copy and integration values match exactly. No `.dc.html`/`support.js` in the shipped build.
+- All copy and integration values match exactly. `support.js` is not referenced in the shipped build.

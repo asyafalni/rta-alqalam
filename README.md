@@ -12,26 +12,18 @@ digital form, shows how to donate via QRIS, and answers FAQs (intended as an adm
 Language: **Bahasa Indonesia** (with Arabic motto accents). Audience: prospective donors and the
 admin who fields their questions.
 
-## About the Design Files
-The files in this bundle are **design references created in HTML** — a working prototype that shows
-the intended look, copy, and behavior. They are **not** meant to be shipped as-is into production.
-The task is to **recreate this design in the target codebase's environment** (React, Vue, Next.js,
-plain static site, WordPress, etc.) using that project's established patterns, components, and build
-tooling. If no codebase exists yet, pick the most appropriate stack — for a brochure/donation page
-like this, a small static site or a single-page React/Next app is plenty.
-
-> Technical note on the prototype format: the prototype is authored as a "Design Component"
-> (`.dc.html`) that depends on a runtime helper (`support.js`). This is a prototyping convention,
-> **not** a requirement for the final build. Treat the `.dc.html` as annotated HTML + a small logic
-> class describing state and handlers. See "How to read the prototype" below.
+## About the Production File
+`index.html` is the production page (renamed from `Program Orang Tua Asuh.dc.html`). It contains
+the full template and logic class and is served directly. `support.js` is the original prototype
+runtime — it is **not** part of the production build and should not be referenced.
 
 ## Fidelity
 **High-fidelity (hifi).** Final colors, typography, spacing, copy, and interactions are all
 intentional and specified below. Recreate the UI faithfully. The only thing that should change in
 production is the *implementation* (framework/components), not the visual design.
 
-## How to read the prototype
-`Program Orang Tua Asuh.dc.html` contains two relevant parts:
+## How to read the source
+`index.html` contains two relevant parts:
 - **The template** (markup between `<x-dc>` … `</x-dc>`): the HTML structure with inline styles.
   `{{ someName }}` are data holes; `<sc-for list="{{ items }}" as="x">` is a loop;
   `<sc-if value="{{ flag }}">` is a conditional. These map directly to `.map()` / conditional
@@ -40,7 +32,7 @@ production is the *implementation* (framework/components), not the visual design
   (`this.state`), event handlers, and a `renderVals()` method that returns every value the template
   consumes. Port `state` to your component state and `renderVals()` logic to derived values/handlers.
 
-Ignore `support.js` — it is only the prototype runtime.
+Ignore `support.js` — it is the prototype runtime and is not used in production.
 
 ## Screens / Views
 This is a single scrolling page with anchored sections. Top to bottom:
@@ -201,7 +193,7 @@ From the logic class — replicate these in your component:
 All assets were provided by the client (RTA Al-Qalam). Keep them; do not regenerate.
 
 ## Files
-- `Program Orang Tua Asuh.dc.html` — the full prototype (template + logic). Primary reference.
-- `support.js` — prototype runtime only; **do not port**.
+- `index.html` — the production page (template + logic class). Renamed from `Program Orang Tua Asuh.dc.html`.
+- `support.js` — prototype runtime; **not used in production**.
 - `assets/` — images listed above.
 - `CLAUDE.md` — working notes / guardrails for Claude Code.
