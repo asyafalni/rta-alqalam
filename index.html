@@ -18,6 +18,7 @@ body{margin:0;background:#0a4631;}
 input::placeholder,textarea::placeholder{color:#a99f86;}
 @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 ::selection{background:#c6a052;color:#093526;}
+.form-field:focus{border-color:#c6a052!important;outline:none;}
 </style>
 </helmet>
 <div style="background:#f6efe0;font-family:'Plus Jakarta Sans',sans-serif;color:#26302a;overflow-x:hidden;">
@@ -197,11 +198,17 @@ input::placeholder,textarea::placeholder{color:#a99f86;}
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
         <div>
           <label style="display:block;font-size:12.5px;font-weight:600;color:#4a564e;margin-bottom:7px;letter-spacing:.02em;">Nama Lengkap <span style="color:#c0392b;">*</span></label>
-          <input value="{{ nameVal }}" onInput="{{ onName }}" placeholder="Nama Anda" style="width:100%;border:1.5px solid #ddd4bf;border-radius:11px;padding:13px 15px;font-size:15px;font-family:'Plus Jakarta Sans';background:#fff;outline:none;color:#26302a;" style-focus="border-color:#c6a052">
+          <input value="{{ nameVal }}" onInput="{{ onName }}" placeholder="Nama Anda" class="form-field" style="{{ nameInputStyle }}">
+          <sc-if value="{{ showNameError }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:5px;font-size:12px;color:#c0392b;display:flex;align-items:center;gap:5px;"><span style="font-weight:700;">!</span>{{ nameError }}</div>
+          </sc-if>
         </div>
         <div>
           <label style="display:block;font-size:12.5px;font-weight:600;color:#4a564e;margin-bottom:7px;letter-spacing:.02em;">No. HP / WhatsApp <span style="color:#c0392b;">*</span></label>
-          <input value="{{ phoneVal }}" onInput="{{ onPhone }}" inputmode="tel" placeholder="08xx xxxx xxxx" style="width:100%;border:1.5px solid #ddd4bf;border-radius:11px;padding:13px 15px;font-size:15px;font-family:'Plus Jakarta Sans';background:#fff;outline:none;color:#26302a;" style-focus="border-color:#c6a052">
+          <input value="{{ phoneVal }}" onInput="{{ onPhone }}" inputmode="tel" placeholder="08xx xxxx xxxx" class="form-field" style="{{ phoneInputStyle }}">
+          <sc-if value="{{ showPhoneError }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:5px;font-size:12px;color:#c0392b;display:flex;align-items:center;gap:5px;"><span style="font-weight:700;">!</span>{{ phoneError }}</div>
+          </sc-if>
         </div>
         <div style="grid-column:1/-1;">
           <label style="display:block;font-size:12.5px;font-weight:600;color:#4a564e;margin-bottom:7px;letter-spacing:.02em;">Alamat</label>
@@ -379,6 +386,7 @@ class Component extends DCLogic {
     name: '', address: '', phone: '', transferDay: '1', note: '',
     submitted: false, error: '', waLink: '',
     openFaq: 0,
+    nameError: '', phoneError: '',
   };
 
   amountMap = { '100': 100000, '250': 250000, '500': 500000, '750': 750000 };
@@ -395,6 +403,12 @@ class Component extends DCLogic {
     note: 'entry.1112172306',
   };
   amountOption = { '100': 'Rp. 100000', '250': 'Rp. 250000', '500': 'Rp. 500000', '750': 'Rp. 750000' };
+  _lastSubmit = 0;
+
+  validatePhone(phone) {
+    const digits = phone.replace(/[\s\-\+\.()]/g, '');
+    return /^(08\d{8,11}|628\d{8,11})$/.test(digits);
+  }
 
   submitToGoogle() {
     const g = this.GFORM;
@@ -428,7 +442,7 @@ class Component extends DCLogic {
 
   selDuration(m) { this.setState({ months: m, submitted: false, error: '' }); }
   selAmount(k) { this.setState({ amountKey: k, submitted: false, error: '' }); }
-  field(f) { return (e) => this.setState({ [f]: e.target.value, submitted: false, error: '' }); }
+  field(f) { return (e) => this.setState({ [f]: e.target.value, submitted: false, error: '', [`${f}Error`]: '' }); }
   onCustom(e) {
     const digits = (e.target.value + '').replace(/\D/g, '');
     this.setState({ customAmount: digits, submitted: false, error: '' });
@@ -457,21 +471,33 @@ class Component extends DCLogic {
   }
 
   submit(e) {
+    // debounce: block re-submission within 5 seconds to prevent duplicate Google Form records
+    if (Date.now() - this._lastSubmit < 5000) {
+      if (e && e.preventDefault) e.preventDefault();
+      return;
+    }
     const { name, phone, months } = this.state;
     const mv = this.monthlyValue();
-    let err = '';
-    if (!name.trim() || !phone.trim()) err = 'Mohon lengkapi Nama dan No. HP/WhatsApp Anda.';
-    else if (!months) err = 'Mohon pilih jangka waktu komitmen.';
+    let nameError = '', phoneError = '', err = '';
+    if (!name.trim()) nameError = 'Nama lengkap wajib diisi.';
+    if (!phone.trim()) phoneError = 'No. HP/WhatsApp wajib diisi.';
+    else if (!this.validatePhone(phone)) phoneError = 'Nomor tidak valid — gunakan format 08xx-xxxx-xxxx atau +628xx.';
+    if (nameError || phoneError) {
+      if (e && e.preventDefault) e.preventDefault();
+      this.setState({ nameError, phoneError, submitted: false });
+      return;
+    }
+    if (!months) err = 'Mohon pilih jangka waktu komitmen.';
     else if (!mv) err = 'Mohon pilih atau isi nominal donasi.';
     if (err) {
       if (e && e.preventDefault) e.preventDefault();
-      this.setState({ error: err, submitted: false });
+      this.setState({ error: err, nameError: '', phoneError: '', submitted: false });
       return;
     }
-    // valid: record to Google Form in the background, then let the anchor open WhatsApp
+    this._lastSubmit = Date.now();
     this.submitToGoogle();
     const link = this.buildWa();
-    this.setState({ submitted: true, error: '', waLink: link });
+    this.setState({ submitted: true, error: '', nameError: '', phoneError: '', waLink: link });
   }
 
   optStyle(on) {
@@ -611,6 +637,10 @@ class Component extends DCLogic {
       liveWaLink: this.buildWa(),
       submitted: s.submitted, waLink: s.waLink,
       showError: !!s.error, errorMsg: s.error,
+      showNameError: !!s.nameError, nameError: s.nameError,
+      showPhoneError: !!s.phoneError, phoneError: s.phoneError,
+      nameInputStyle: 'width:100%;border:1.5px solid ' + (s.nameError ? '#e74c3c' : '#ddd4bf') + ';border-radius:11px;padding:13px 15px;font-size:15px;font-family:\'Plus Jakarta Sans\';background:#fff;outline:none;color:#26302a;transition:border-color .15s;',
+      phoneInputStyle: 'width:100%;border:1.5px solid ' + (s.phoneError ? '#e74c3c' : '#ddd4bf') + ';border-radius:11px;padding:13px 15px;font-size:15px;font-family:\'Plus Jakarta Sans\';background:#fff;outline:none;color:#26302a;transition:border-color .15s;',
       waAdminLink: 'https://wa.me/' + this.WA + '?text=' + encodeURIComponent("Assalamu'alaikum, saya ingin bertanya tentang Program Orang Tua Asuh RTA Al-Qalam."),
       ...fv,
     };
