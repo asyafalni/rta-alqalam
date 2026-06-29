@@ -19,6 +19,7 @@ input::placeholder,textarea::placeholder{color:#a99f86;}
 @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 ::selection{background:#c6a052;color:#093526;}
 .form-field:focus{border-color:#c6a052!important;outline:none;}
+section[id]{scroll-margin-top:68px;}
 @media(max-width:479px){
   .tb-title{font-size:13px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .tb-sub{display:none!important;}
@@ -472,10 +473,7 @@ class Component extends DCLogic {
       setTimeout(() => {
         try {
           const el = document.querySelector(window.location.hash);
-          if (el) {
-            const offset = el.getBoundingClientRect().top + window.scrollY - 68;
-            window.scrollTo({ top: Math.max(0, offset), behavior: 'smooth' });
-          }
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
         } catch(e) {}
       }, 200);
     }
