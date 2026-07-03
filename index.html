@@ -3,6 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+/* Auto-refresh stale copies: the site is served without Cache-Control, so
+   browsers heuristically cache index.html and returning visitors can see an
+   old version. This compares the cached page's ETag (what's on screen) with
+   the live one on the server and does a single silent reload only when they
+   differ — a visitor already on the latest version never reloads or flickers.
+   The check runs at idle (after first paint) with low-priority requests, so it
+   never competes with the initial render for current users. */
+(function () {
+  function checkFreshness() {
+    try {
+      var url = location.pathname + location.search;
+      var tag = function (r) { return r.headers.get('etag') || r.headers.get('last-modified'); };
+      Promise.all([
+        // What's on screen now: the copy the browser served from its cache.
+        fetch(url, { cache: 'force-cache', priority: 'low' }).then(tag),
+        // What's live on the server right now (headers only, cache bypassed).
+        fetch(url, { method: 'HEAD', cache: 'no-store', priority: 'low' }).then(tag)
+      ]).then(function (v) {
+        var mine = v[0], live = v[1];
+        if (mine && live && mine !== live && sessionStorage.getItem('rta_reloaded') !== live) {
+          sessionStorage.setItem('rta_reloaded', live); // guard against reload loops
+          location.reload();
+        }
+      }).catch(function () { /* offline or blocked — keep showing current copy */ });
+    } catch (e) { /* fetch/sessionStorage unavailable — no-op */ }
+  }
+  // Defer past first paint so current visitors see zero impact on load.
+  var schedule = window.requestIdleCallback || function (cb) { return setTimeout(cb, 1200); };
+  if (document.readyState === 'complete') schedule(checkFreshness);
+  else window.addEventListener('load', function () { schedule(checkFreshness); });
+})();
+</script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -17,6 +50,10 @@ html{scroll-behavior:smooth;}
 body{margin:0;background:#0a4631;}
 input::placeholder,textarea::placeholder{color:#a99f86;}
 @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes rtaPing{0%{transform:translate(-50%,-50%) scale(.7);opacity:.6}70%,100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
+.asnaf-grid{grid-template-columns:repeat(2,1fr);}
+@media(min-width:640px){.asnaf-grid{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:479px){.asnaf-grid > div{padding:15px 13px!important;}}
 ::selection{background:#c6a052;color:#093526;}
 .form-field:focus{border-color:#c6a052!important;outline:none;}
 @media(max-width:479px){
@@ -113,6 +150,183 @@ input::placeholder,textarea::placeholder{color:#a99f86;}
   </div>
 </section>
 
+<!-- ===== PROFIL SANTRI ===== -->
+<section id="profil" data-screen-label="Profil Santri" style="padding:88px 26px;background:radial-gradient(120% 80% at 50% 0%,#0e5a3c 0%,#0a4631 50%,#063626 100%);color:#ecdfc2;position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;opacity:.05;background-image:radial-gradient(circle at 1px 1px,#e9d9a8 1px,transparent 0);background-size:26px 26px;"></div>
+  <div style="position:relative;max-width:1080px;margin:0 auto;">
+
+    <!-- header -->
+    <div style="text-align:center;margin-bottom:42px;">
+      <div style="color:#d4b56a;font-size:12.5px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;margin-bottom:14px;">Mengenal Para Santri</div>
+      <h2 style="font-family:Marcellus,serif;font-weight:400;font-size:clamp(30px,4.6vw,46px);margin:0 0 12px;color:#fbf3df;">Profil santri penerima amanah</h2>
+      <p style="margin:0 auto;max-width:660px;font-size:16px;line-height:1.65;color:#cfc1a4;">Sepuluh santri penghafal Al-Qur'an dari berbagai penjuru negeri — seluruhnya berasal dari keluarga dhuafa yang termasuk salah satu dari delapan asnaf, golongan yang berhak menerima zakat.</p>
+    </div>
+
+    <!-- stat strip -->
+    <div class="trust-strip" style="max-width:760px;margin:0 auto 54px;display:grid;gap:1px;background:rgba(198,160,82,.22);border:1px solid rgba(198,160,82,.22);border-radius:16px;overflow:hidden;">
+      <div style="background:#0a4631;padding:20px 14px;text-align:center;"><div style="font-family:Marcellus,serif;font-size:30px;color:#e6cf8e;">10</div><div style="font-size:11.5px;letter-spacing:.08em;color:#b7a77f;text-transform:uppercase;margin-top:4px;">Santri Aktif</div></div>
+      <div style="background:#0a4631;padding:20px 14px;text-align:center;"><div style="font-family:Marcellus,serif;font-size:30px;color:#e6cf8e;">3</div><div style="font-size:11.5px;letter-spacing:.08em;color:#b7a77f;text-transform:uppercase;margin-top:4px;">Provinsi Asal</div></div>
+      <div style="background:#0a4631;padding:20px 14px;text-align:center;"><div style="font-family:Marcellus,serif;font-size:30px;color:#e6cf8e;">8</div><div style="font-size:11.5px;letter-spacing:.08em;color:#b7a77f;text-transform:uppercase;margin-top:4px;">Kategori Asnaf</div></div>
+      <div style="background:#0a4631;padding:20px 14px;text-align:center;"><div style="font-family:Marcellus,serif;font-size:30px;color:#e6cf8e;">100%</div><div style="font-size:11.5px;letter-spacing:.08em;color:#b7a77f;text-transform:uppercase;margin-top:4px;">Keluarga yang Membutuhkan</div></div>
+    </div>
+
+    <!-- map -->
+    <div style="text-align:center;margin-bottom:18px;">
+      <div style="font-family:Marcellus,serif;font-size:22px;color:#fbf3df;margin-bottom:4px;">Daerah asal santri</div>
+      <div style="font-size:13.5px;color:#a99a76;">Tersebar di 3 provinsi — mayoritas berasal dari Jawa Barat</div>
+    </div>
+    <div style="position:relative;width:100%;max-width:840px;margin:0 auto 16px;">
+      <img src="assets/map-id.svg" alt="Peta sebaran daerah asal santri di Indonesia" style="width:100%;height:auto;display:block;filter:drop-shadow(0 14px 34px rgba(0,0,0,.45));">
+      <svg viewBox="0 0 1000 368" preserveAspectRatio="xMidYMid meet" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;">
+        <defs>
+          <linearGradient id="rtaJb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6cf8e"/><stop offset="1" stop-color="#c6a052"/></linearGradient>
+          <linearGradient id="rtaGrn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4fb083"/><stop offset="1" stop-color="#2e7d55"/></linearGradient>
+          <filter id="rtaGlow" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#e6cf8e" flood-opacity="0.85"/></filter>
+        </defs>
+        <path d="M150.3 83.3l-0.4 1.1-0.3 2.8 0 0.8 0.1 0.6 0.3 0.9 0.3 1.2 0.1 2.1 0 0.6-0.3 0.8 0 0.1-0.2 0.7 0 0.8 0.1 0.5 0.1 0.3 0.2 0.2 0.8 0.6 0.2 0.2 0.2 0.3 0.4 1.3 0.8 1.7 0.2 0.5 0 0.4-0.1 0.4-0.1 0.3-0.2 0.2-0.2 0.2-1.3 0.8-0.6 0.2-0.3 0.2-3.9 1.7-0.4 0.3-0.2 0.1-0.1 0.2-0.1 0.1 0 0.2 0 0.1 0.1 0.1 0.9 0.8 0.2 0.2 0.1 0.2 0 0.2 0 0.8 0.1 0.2 0.1 0.1 0.1 0.2 0.9 0.5 0.2 0.1 0.2 0.2 0.1 0.2 0.1 0.3 0.1 0.3-0.1 0.4-0.2 0.9-0.1 0.2 0 0.3 0.2 0.4 0 0.3 0 0.4-0.1 1.3 0 0.9 0 0.2-0.1 0.2-0.1 0.1-0.1 0.1-0.2 0.2-0.1 0.2-0.1 0.3-0.1 0.3 0 0.4 0 0.5-0.2 0.2-0.3 0-0.2 0.1-0.3-0.1-0.3-0.1-0.3-0.2-0.5-0.4-0.2-0.1-0.2-0.2-0.8-0.2-0.7-0.2-0.3-0.2-0.3-0.1-0.8-0.2-0.9-0.4-0.5-0.1-0.3 0.2-0.1 0-0.3 0.1-0.3-0.1-0.3 0-0.2-0.1-0.7-0.4-0.1 0-0.1 0-0.1 0.1 0 0.2 0.2 0.4 0.2 0.3 0.1 0.1 0.2 0.1 0.1 0.1 0.1 0.3 0.1 0.1 0.2 0.1 0.4 0.1 0.1 0.1 0.1 0.1 0.1 0.2 0.1 0.2 0.2 0.7 0.1 0.3 0.9 0.9 0.1 0.2 0.1 0.3 0.3 0.4 0.5 1 0.1 0.1 0 0.2 0 0.3-0.1 0.2-0.1 0.5-0.2 0.1-0.2 0.2-0.9 0.3-0.3 0.1-0.3 0-0.5-0.2-0.1-0.2-0.1-0.1-0.2 0-1.2 0-0.2-0.1-0.2-0.1-0.2-0.1-0.2-0.4-0.1-0.1-0.1-0.1-0.2 0-0.2-0.1-0.2 0-0.5-0.3-0.3-0.1-0.4 0-0.5 0.1-1.4 0.9-0.5 0.2-0.4 0-0.6 0.1-0.6 0.1-0.2 0.1-0.2 0.3-1.5 1.9-2.3 2.4-0.2-0.1-0.1-0.1 0.1-0.2 0.2-0.3 0.1-0.2 0-0.4-0.1-0.3-0.4-0.1-0.4-0.1 0.4-0.9 0-0.4-0.1-1.5-0.1-0.4-0.2-0.3-0.2 0.1-0.1-0.3 0.2-0.9-0.1-0.5-0.2-0.4-0.3-0.2-0.5 0.3-0.2-0.6 0.2-1.8-0.2-0.7-0.7-0.9-0.1-0.1-0.4-0.1 0-0.3 0-0.8-0.1-0.7-1.1-3.9-1.3-3.1-0.3-0.5 0-0.2 0-0.2 0.1-0.3 0-0.2 0-0.2-0.9-0.8-0.2-0.3-0.2-0.8-0.1-0.4-0.1-0.4 0-0.1-0.2-0.1-0.2-0.1-0.2-0.1-0.1 0-0.1-0.2-0.1-0.4-0.2-0.4 0-0.1 0.3-0.1 0.1 0.1 0.2 0.1 0.1 0.1 0 0.2 0.1 0.2 0.3-0.2 0.4-0.8 0.2-0.2 0.4-0.4 0.1-0.2 0-0.7-0.1-0.4-0.2-0.1-0.4 0-0.1-0.2 0.1-0.2-0.1-0.4-0.2-0.4-0.2-0.3-0.7-0.5-0.2 0.1-0.1 0.1 0 0.3 0.1 0 0.2 0.2 0 0.1-0.1 0.2 0 0.1-0.2 0.2-0.4-0.2-0.6-0.6-1.7-2.4-0.8-1-1.8-1.1-0.3-0.1-0.4-0.1-0.4 0-0.4 0-0.3 0 0-0.1-0.1-0.3 0-0.1-0.1-0.1-0.2-0.1-0.4 0-0.5 0-0.3 0-0.2-0.2-0.1-0.5-0.2-0.3-0.7-0.4-1.1-1-1.1-0.6 0.5-2.4 0.1-0.3-0.2-0.8-0.3-0.7-0.1-0.5-0.2-0.1-0.2-0.1-0.2-0.1-0.1 0-0.2-0.3-0.4-1.4-0.2-0.9 0-0.3 0.1-0.2 0.1-0.4 0.1-0.2 0-0.3 0-0.2 0.4-0.2 0.2-0.2 0.1-0.2-0.1-0.1-0.2-0.4-0.2-0.6-0.1-0.4 0.1-0.3 0.1-0.2 0.1-0.2 0-0.3-0.2-0.3-0.2-0.1-0.4-0.1-0.3-0.1-0.2-0.2-0.5-0.8-0.2-0.1-0.4-0.1-0.3-0.1-0.2-0.2 0-0.1-0.1-0.3 0.1-0.8-0.3-1.6-0.1-0.3 0-0.1 0.1-0.1 0.1 0 0.3 0.1 0.2 0 0.2-0.1 0.1-0.7 0-0.2-0.1-0.2-0.5-0.7-0.1-0.2-0.1-0.4-0.1-0.2-0.1-0.2-0.1-0.1-0.3-0.3-0.2-0.2 0.2-0.2 0.3-0.1 1.3-0.3 0.4-0.3 0.3-0.6-0.2-0.6-0.2-0.1-0.8-0.5-0.1-0.3-0.2-0.2-0.1-0.3-0.1-0.3 0-0.2 0.2-0.3 0-0.2 0-0.2-0.4-0.3-0.1-0.2-0.1-0.5-0.1-0.2-0.1-0.1-0.2-0.1-0.1-0.1-0.3-0.2-0.1-0.3-0.3-1.1-0.2-0.4-0.6-0.8-0.1-0.3 0-0.2 0.2-0.2 0.1-0.1 0.1-0.1 1.6-1.3 0.3-0.5 0-0.2-0.1-0.2 0-0.4 0.1-0.6 0.4 0.3 0.2 0 0.2 0 0.1-0.2 0-0.2 0.2-0.2 0.2-0.2 0.6-0.4 0.3-0.4 0.1-0.3 0.1-0.3 0.1-0.4 0.1-0.4 0-0.2 0.2-0.8 0.2-0.7 0.2-0.9 0.2-0.2 0.2-0.2 0-0.2 0-0.2-0.2-0.3 0-0.2 0.2-0.1 0.6 0 0.2-0.1 0.3-0.1 0.2-0.4 0.1 0 0.7-0.2 0.2 0 1.5 0.1 0 1.5-0.1 0.2-0.4 0.3-0.9 0.3-0.2 0.1-0.1 0.2 0 0.3 0 0.7 0.4-0.5 0.3-0.2 0.4-0.1 0.1-0.1 0.3-0.4 0.1 0 0-0.1 0.8 1.8 0.1 0.2 1.1-0.2 0.4 0 0.5 0.2 0.7 0.4 0.4 0.1 0.3 0.1 0.4 0.7 0.2 0.2 0.3 0 0.4-0.1 0.3 0.1 0.2 0.7 0.2 0.3 0.3 0.2 0.3 0.1 1.3 0.4 0.5 0.8 0 0.8 0.2 0.6 1.7 1.6 2 0.9 1.2 0.2 0.4 0.2 0.6 0.5 0.3 0.1 0.6 0.1 0.4 0.3 0.5 0.5 1.6 0.7 1.8 1.3 1.9 1.5 0.3 0.2 0.7 0.1 0.3 0.2 0.4 0.4 0.5 0.3 0.2 0.2 0.2 0.5 0.1 0.3 0.5 0.5 0.6 0.5 0.6 0.3 1.9 0.5 0.6 0.3 0.4 0 0.3 0.2 0.6 1.2 1 0.9 0.4 0.5 0.1 0.7 0.6-0.1 0.4 0.4 0.4 0.4 0.5 0.3 0.5 0.3 0.2 0.7 0.2 2.2-0.1 0.3-0.1 0.3-0.2 0.2-0.2 0.3-0.1 0.4 0 0.1-0.2 0.3 0 0.2 0.1 0.1 0.2 0.1 0.1 0 0.2 0.1 0.1 0.2 0 0.1-0.1 0.1 0 0.1 0.5 0.7-0.1 0.2 0.1 0.1 0.1 0 0.1-0.1 0.1-0.2 0-0.1-0.1-0.1-0.1-0.2 0-0.6-0.1-0.2-0.6-0.3-0.1-0.2 0.2-0.3 0.7-0.2 0.7 0.1 0.4 0.7 0 0.3 0 0.5 0 0.3 0.2 0.6 0.1 0.3 0.1 0.4 0.3 0.5 0.3 0.3 0.2-0.2 0-0.3-0.3-0.7-0.1-0.3 0-0.8 0.1-0.4 0.2-0.3 0.2-0.3 0.3-0.2 0.4-0.1 0.5 0 0.2 0.1 0 0.1 0 0.2 0.1 0.2 0.1 0.1 0.4 0.2 0.1 0.1 0.1 0.1 0 0.5 0.1 0.2 0.2 0.3 0 0.1 0.1 0.2 0.5 0.3 0.2 0.1 0.1 0.1 0 0.2z m-35.8 59.6l0 0.3 0 0.2-0.2 0.3-0.1 0.2 0.2 0.2 0.1 0.3 0 0.3-0.1 0.3-0.1 0 0-0.1 0-0.1-0.1-0.1 0-0.1-0.2 0.2-0.1 0-0.1 0-0.2-0.1 0.2-0.2-0.1-0.2-0.3-0.1-0.3 0.1-0.1 0.3-0.1 0.3 0 0.4 0 0.1-0.6-0.2-1.5-0.8-0.8-0.2 0.2-0.1 0.2-0.1 0.1-0.1 0.2 0 0.3 0.2 0.2 0 0.1-0.3 0.4-1.2 0.1-0.4-0.1-0.9 0-0.4 0.1-0.2 0.4-0.5 0.2-0.2 0.2-0.1 0.1 0 0.2-0.1 0.1-0.1 0-0.2-0.2-0.6 0.2-0.3 0.3 0.1 0.2 0.2 0.8 1.4 0.3 0.7-0.2 0.5 0.2 0.3 0.1 0.4-0.1 0.4-0.1 0.3z m-0.5-5.9l0.4 0.8 0.7 0.8 0.5 0.7-0.1 0.8 0-0.1-0.1 0.2-0.1 0.2-0.1 0.2 0.1 0.2 0.1 0.3 0 0.3-0.2 0-0.5-1.3-2.1-3-0.3-0.5-0.6-1.3-0.4-0.6-0.2-0.2-0.3-0.1-0.3-0.2-0.1-0.2 0.2-0.1 0.4-0.2 0.7-0.1 0.9 0.4 0.7 0.8 0.5 1.1 0.2 1.1z m1.5-36.5l0.3 0.2 0.4 0.4 0.2 0.4-0.4 0.1-0.4 0.1-0.6 0-0.6-0.1-0.7-0.3-0.2 0-0.3-0.1-0.1-0.2-0.1-0.3 0.1-0.3 0.3-0.3 0.3-0.1 0.3 0.1 0.2 0.3 0.3 0.5 0.3 0.2 0.2-0.1 0.2-0.3 0.3-0.2z m-12.4 13.6l0.2 0.2-0.1 0.5-0.3 0.7 0-0.2-0.3 0.6-0.1 0.6 0.1 1.2 0 0.3-0.2 0.5-0.1 1.1-0.1 1.5-0.1 0.4-1 1.2-0.1 0.1-0.2-0.1-0.2-0.1-0.5-0.4-0.2 0.4-0.3 0-0.5-0.4 0 0.1-0.2 0.2-0.2 0-0.2-0.3-0.1-0.1-0.1-0.1-0.1 0 0.2-0.5-0.1-0.4-0.3-0.3-0.2-0.3 0-0.3 0-0.5-0.1-0.2-0.1-0.2-0.3-0.7-0.1-0.2-0.3-0.9-0.8-0.7-1.7-1.1 0.1-0.3-0.3-0.2-0.4-0.1-0.4 0-0.8 0-0.2-0.1 0.1-0.5-0.1-0.8-0.3-0.8-1-1.6-0.2-0.6 0-0.1-0.2-0.2-0.2-0.1-0.2-0.2-0.2-0.5-0.3-0.2 0-0.2-0.1-0.3-0.1-0.1-0.1-0.1-0.1-0.1-0.2-0.1-0.2-0.1-0.2-0.1-0.3-0.1-0.1-0.2-0.2-0.5-0.1-0.2-0.8-0.8-0.4-0.3-0.5-0.2-0.3 0.2-0.1-0.4 0.3-0.2 0.6-0.2 0.4 0 0.2 0.1 0.2 0.1 0.2 0.2 0.1 0.1 0.1-0.1 0.2 0 0.5 0.1 0.6-0.1 0.5-0.1 0.3-0.3 0.9-0.7 0.2-0.3 0.1-0.3-0.1-0.5 0.1-0.2 0.3-0.1 0.5 0.5 0.3 0.2 0.3-0.1 0.2-0.1 0.2 0.1 0.2 0.3 0 0.3 0.1 0.1 0.1 0 0.3 0 0.2 0 0.2 0 0.1 0 0 0.1 0.1 0.2 0 0.1 0.5 0.5 0.1 0.1 0.1 0.1 0.1 0.4 0.1 0.2 1.1 1 0.2 0.4 0.3 0.8 1.5 1.9 0.4 0.2 0.8 0.2 0.4 0.2 0.3 0.2 0.2 0.2 0.4 0.5 0.1 0.2 0.1 0.3 0.1 0.3 0.3 0.1 0.4 0 0.4 0.1 0.2 0.3 0.4 0.8 0.1 0.1z m12.3 16.6l0.8-0.3 0.7 0 1 0.1 0.8-0.1 0.5 0.1 0.5 0 0.8 0.1 0.6 0.4 0.3 0.7-0.2 0.4-0.8 0-0.8 0-0.7 0.3-0.7 0-0.8-0.2-0.6-0.1-0.9 0-0.7-0.1-0.2-0.4-0.1-0.7 0.5-0.2z" fill="url(#rtaGrn)" stroke="#0a4631" stroke-width="0.7"/>
+        <path d="M280.7 191.8l0.2 0.4-0.5 0.9 0.1 0.4-0.6 0.2-0.1 0.1-0.9-0.3-0.3-0.1-0.8-0.7-0.7-0.2 0-0.2 0.2-0.2 0.1 0 0.1-0.4 0.1 0 0.4-0.4 0.4-0.2 0.4-0.1 0.3 0.3 0.3 0.1 1 0.2 0.3 0.2z m3.8-1.4l0 0.5-0.2 0.4-0.1 0.1-0.3-0.1-0.2-0.1-0.3-0.1-0.2-0.1-0.3-0.2 0.3-0.4 0.2-0.4 0.3-0.1 0-0.1 0.1-0.1 0.2-0.1 0.1 0.1 0.1 0.3 0.3 0.4z m5.9 0.2l0.1-0.4 0.5-0.3 0.6-0.2 0.5-0.1 0.2 0.1 0 0.3 0.1 0.1 0.1 0.2-0.2 0.4-0.2 0.5-0.4 0.3-0.7 0.2-0.3 0.4-0.3-0.1-0.6-0.7-0.5-0.4 0.1-0.2 0.4 0.2 0.3-0.2 0.3-0.1z m17.7-0.4l-0.1 0.3-0.2 0.3-0.1 0.2-0.1 0.2-0.2 0.5-0.8 1.1-0.2 0.5 0 0.2 0.1 0.3 0 0.2-0.1 0.2-0.1 0.3-0.1 0.2 0 0.1-0.1 0.1-0.1 0.2 0 0.2 0 0.1 0.4 0.3 0.1 0.2-0.5 0-0.7 0.3-0.4 0.1-0.4 0-0.4 0.1-0.2 0.2-0.1 0.4 0 0.7-0.2 0.1-0.6 0-0.4 0.1-0.4 0.1-0.3-0.1-0.2-0.4 0-0.9-0.1-0.4-0.4-0.4-1.1-0.9 0.1 0 0-0.1-0.1-0.2-0.1-0.2-0.2-0.2-0.2 0-0.1 0.1-0.3 0.1-0.3 0.1 0 0.3 0.3 0.5 0 0.8-0.5 0.4-1.3 0.6-1.3 0-0.5 0.7-0.6 0.2-0.5-0.3-0.2-0.4 0.2-0.6 0.7-0.9 0-0.1 0-0.1-0.1-0.1-0.1-0.1-0.1-0.1-0.5-0.5-0.1-0.1 0-0.3 0-0.2 0-0.2-0.1-0.2-0.1-0.2-0.1-0.2 0-0.3 0.1-0.2 0.4-0.4 0.1-0.2 0-0.7-0.1-0.1-0.3 0-0.5 0.2-0.2 0.1-0.1-0.3 0-0.2 0.2-0.2 0.2-0.2 0.3 0 0.4-0.3 0.1-0.5-0.1-0.6-0.2-0.6 0.2-0.1 0.4-0.2 0.2-0.2 0.1-0.2 0-1.3 0.3-1.9 0.3-0.5 0.8-0.2 0.3 0 0.6 0.2 0.3 0 0.3-0.2 0.6-0.4 0.3-0.1 0.3 0.5 0.7 0.3 0.7 0 0.4-0.1 1 0.2 0.3 0.2 0.2 0.2 0.4 1 0.1 0 0.1-0.5 0.2-0.3 0.2-0.1 0.7 0.2 0.1 0.1 0.2 0.4 0.1 0.1 0.3 0 0.3 0.3 0.2 0.3 0 0.3 0.4-0.2 0.3 0.1 1.4 1.6 0.2 0.7 0.3 0.7 0 0.4z m-30.1-5.7l0.9 0 0.3 0.1 0 0.3-0.1 0.1-0.1 0-0.2 0-0.2 0-0.7 0.4-0.2 0-0.3 0.1-0.4 0.3-0.9 1.4-1.2 3.4-0.2 0.8 0.2 0.6 0.7 0.5 0.2 0 0.3 0 0.2 0.1 0.2 0.2 0.1 0.1 0.1 0.2 0.3 0 0.4 0.2 0.1 0.3 0 0.3-0.1 0.3 0.1 0.3 0.1 0.1-0.1 0.2-0.2-0.1-0.1 0.1-0.2 0.2-0.3 0-0.1 0-0.1-0.1-0.2 0-0.3 0.2-0.1-0.1-0.1-0.1-0.1-0.1-1-0.2-0.6 0.1-0.1 0.5-0.2-0.1-0.1-0.1-0.4 0.3-0.3-0.2-0.2-0.5-0.1-0.4-0.1-0.2-0.2-0.2-0.4-0.3-0.2-0.2-0.2-0.5-0.2-0.2-0.4-0.1-0.9 0-0.4-0.1-1-0.9-4.1-1.5-0.4-0.1-1.4-0.1-0.3-0.2-1.3-2-0.3-0.9-0.1-0.9 0.2-0.8 0.4-0.9 0.3-0.8-0.3-0.9-0.7-0.4-0.7-0.3-0.6-0.5-0.2-0.9 0.1-0.6 0-0.2 0-0.2-0.2-0.3-0.1-0.4-0.2-0.4 0-0.2 0-0.6-0.1-0.6-0.1-0.3-0.2-0.1-0.3-0.2-0.3-0.1-1.2-0.2-0.1 0-0.2-0.2-0.1 0-0.1 0-0.2 0.1-0.1 0-0.6-0.1-0.2 0-0.3-0.3-0.3-0.5-0.2-0.2-0.5 0.3-1 0.3-0.4 0.2-0.4 0.3-0.2 0-0.4 0-1.3 0-1 0.3-0.1-0.1-0.1-0.1-0.4-0.6-0.1-0.2-0.8-0.3-0.3-0.1-0.7 0.1-0.3 0-0.3 0.2-0.4-0.7 0-0.8 0.2-0.8 0.3-0.6 0.6-0.4 2.3-0.8 1.5-1 0.5-0.8-0.1-0.9-0.8-0.5-0.4-0.3 0.2-0.1 0.1-0.1 0-0.2-0.1-0.4 0.1-0.2 0.2-0.1 0.2 0 0.2-0.1 0.1-0.2 0.1-0.3 0.1-0.1 0.1 0 0.2 0 0.2 0 0.8-0.9 0.2-0.1 0.9 0.1 0.4-0.1 0.2-0.1 0.1-0.2 0.3-0.2 0.5-0.1 0.4 0.3 0.1 0.5 0.1 0.5 0.1 0.4 0.4 0.4 0.5 0.3 0.6 0.2-0.2 0.3-0.8 0.7-0.1 0.3 0.3 0.3 0.4 0.4 0.2 0.1 0.4 0.2 0.3 0 0.2-0.1 0.4-0.1 0.1 0.1 0.2 0.4 0.1 0.1 0.1 0 0.6 0-0.2-0.4-0.3-0.4-0.6-0.6-0.2-0.4 0-0.4 0.2-0.7-0.1-0.1-0.3-0.5-0.1-0.2 0-0.3-0.1-0.2-0.1-0.3-0.1-0.3-0.2-0.2-0.3-0.2 0.5-0.1 1.8 0 0.5-0.2 0.8-0.5 0.4 0 0.4 0.1 0.1 0.2 0.1 0.3 0.3 0.3 0.1 0.1 0.2 0 0.5 0 0.1 0 0.9 0.7 0.2 0.1 0.1 0.2-0.1 0.2-0.2 0.2 0 0.3 0 0.8 0.1 0.2 0.1 0.2 0.2 0.1 0.1 0.1 0.1 0.2 0.1 0.3 0.1 0.2 0.1 0.1 0.2 0 0.1 0.2 0 0.1 0 0.3 0.1 0.2 0.2 0.1 0.2 0 0.2 0.1 0 0.2-0.1 0.2 0 0.2 1 1.2 0.1 0.2-0.1 0.2-0.2 1.3 0 0.8 0.7 3.4 1.3 3.4 0.5 0.9 0.6 0.7 0.7 0.6 0.3 0.2 0.5 0.2 0.4 0.1 0.2-0.2 0.3-0.1 2.2 0.8 2.6 0.4 1.3 0.5 0.4 0.1z" fill="url(#rtaGrn)" stroke="#0a4631" stroke-width="0.7"/>
+        <path d="M320 268.9l-1.4 1.6-0.4 0.8-0.1 0.3-0.2 1 0.1 0.6 0 0.4-0.1 0.2-0.1 0.3-0.3 0.2-0.2 0.3-0.3 0.2-0.5 0.4-0.2 0.1-0.2 0.1-0.5 0-0.8-0.1-0.3 0-0.4 0.1-0.2 0.2-0.2 0.3-0.1 0.3 0 0.4-0.5 1.6 0.2 0.6 0.5 0.1 0.4 0.1 0.2 0.4 0.1 0.1 0.2 0.1 0.5-0.2 0.2 0 0.1 0.1 0.1 0.2 0.1 0.5 0.1 0 0.2 0.1 0.3 0.1 0.1 0.1 0 0.2 0.1 0.3 0.1 0.9 0.4 1.4 0 0.3 0 0.3-0.1 0.3-0.1 0.2 0 0.3 0.1 0.1 0.1 0.1 1.1 1-0.2 0.1-0.5 0.4-0.5-0.3-0.2 0-0.1-0.1-0.2-0.1-0.2 0-0.2 0.1-0.2 0.2-0.2 0.2 0.2 0.4-0.1 0.1-0.1 0.1-0.4-0.1-0.1-0.5-0.1-0.1-0.3 0-1.3 0-0.4 0.1-0.6 0.6-0.1 0.9-0.2 0.5-0.8 0.5-2.5 0-3.8-0.6-3.6-0.9-1-0.1-0.8 0.2-0.6-0.3-0.1-0.6-0.4-0.3-0.6-0.1-1.2-0.2-0.6-0.2-0.2-0.4-0.3-0.5-0.7-0.4-0.7-0.5-0.7-0.2-0.5-0.2-0.9-0.3-0.3-0.4-0.3-0.1-0.4-0.1-0.1 0-0.2 0-0.1-0.2-1 0.2-1.3-0.2-1-0.1-0.7-0.1-0.6-0.2-0.7-0.2-0.7-0.2-4.7-0.4-1.6 0-3.6-0.4-1.7-0.1-0.8-0.7-0.5-0.2-0.5-0.1-0.5 0.3-0.2 0.1 0-0.4 0.1-0.5-0.5-0.5 0.1-0.9 0-0.4 0.1-0.3 0.2-0.4 0.4-0.4 0.3-0.2 0.4 0 0.3-0.1 0.1-0.2-0.3-0.4 0.3-0.3 0.8-1 0.6-0.5 0-0.8-0.1-0.6-0.5-0.4-0.6 0.1-0.6-0.3-0.6 0.2-0.3 0.5-0.1-0.2-0.1-0.2 0-0.3 0.1-0.5 0.2-0.5 0.8-1.4 1.1-1 0-0.3-0.4-0.4-0.2-0.1-0.7-0.2-0.1-0.3-0.2-0.4-0.4-3.5 0.1-0.6 0.2-0.6 0.2-0.5 0-0.5-0.1-0.5-0.1-0.3 0.2-0.4 0.2-0.2 0.2-0.1 0.2 0 0.1 0.2 0.1 0.3 0.2 0.2 0.1 0.1 0.3-0.1 0.3-0.2 0.3-0.2 0.5 0.1 0.4 0.1 0.4 0.3 0.6 0.2 2.2 0 0.5-0.3-0.1-0.3 0-1.1 0.3 0.2 0.1 0.1 0.1 0.2 0.1 0.1 0.2 0.2 0.3 0.2 0.2 0 0.1-0.1 0.4-0.2 0.7 0.3 0.7 0.6 0.4-0.2 0.2-0.5 0.4-1.4 0.1-0.3 0.1-0.2 0-0.3 0-0.7 0.1-1.1 0-1.3 0.1 0 0.2-0.2 0.1-0.3 0.1-0.3 0-0.2-0.2-0.3-0.1-0.2 0.1-0.3 0.4-0.6 0-0.7 0.4-0.2 0.7 0.1 0.7 0.4 0.2 0.2 0.2 0.2 0.3 0.3 0.4 0.1 0.4 0 0.3 0 1.5-0.5 0.8 0.2 0.6 0.2 0.5 0.7 0.7 1.1 0.7 0.8 0.4 0.8 0.8 0.4 1.1 0.4 1.1 0 0.7 0.8 0.5 0.2 0.4-0.2 0.3 0.2 0.3-0.1 0.3-0.2 0.4-0.2 0.1-0.1 0.2 0 0.2 0 0.2 0.1 0.2 0 0-0.2 0-0.2 0.3-0.1 0.4 0.1 0 0.3 0.3 0 0.3-0.3 0.1-0.1 0.3 0.5 0 0.4 1 0.6 0.8 0.4 1.2 0.6 0.5 0.1 0.4 0.2 0.4 0 0.3 0 0.2-0.1 0.4-0.2 0.4-0.3 0.1 0 0.2-0.2 0.1-0.2 0.1-0.3 0-0.2-0.2-0.2-0.2-0.2 0.2-0.1 0.4 0.2 0.6 0.2 1.3 0.1 0.4 0.2 0.1-0.2 0.4-0.1 0.1 0.5 0.2 1.4 1.6 2 0.4 0.2 0.3 0.1 1 0.6 0.7 3.6 0.6 1.9 1.1 0.1 0.9 0.5 0.8 0.4 0.9-0.1 0.8-0.4 0.2 0.2 0.3 0.1 0.3 0 0.3 0.1 0.1 0.1z" fill="url(#rtaJb)" stroke="#8a6f2f" stroke-width="0.7" filter="url(#rtaGlow)"/>
+      </svg>
+      <!-- pulsing spotlight on the Jawa Barat hub -->
+      <span style="position:absolute;left:29.46%;top:73.48%;width:40px;height:40px;border-radius:50%;border:2px solid #d4b56a;transform:translate(-50%,-50%);animation:rtaPing 2.6s ease-out infinite;"></span>
+      <!-- count badges -->
+      <div style="position:absolute;left:29.46%;top:73.48%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:linear-gradient(160deg,#e6cf8e,#c6a052);color:#08321f;font-family:Marcellus,serif;font-size:19px;display:flex;align-items:center;justify-content:center;border:2px solid #fbf3df;box-shadow:0 0 0 5px rgba(212,181,106,.2),0 10px 20px -6px rgba(0,0,0,.55);">8</div>
+      <div style="position:absolute;left:26.29%;top:48.37%;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;background:linear-gradient(160deg,#4fb083,#2e7d55);color:#fbf3df;font-family:Marcellus,serif;font-size:14px;display:flex;align-items:center;justify-content:center;border:2px solid #eaf5ee;box-shadow:0 0 0 4px rgba(79,176,131,.22),0 8px 16px -6px rgba(0,0,0,.55);">1</div>
+      <div style="position:absolute;left:12.67%;top:22.8%;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;background:linear-gradient(160deg,#4fb083,#2e7d55);color:#fbf3df;font-family:Marcellus,serif;font-size:14px;display:flex;align-items:center;justify-content:center;border:2px solid #eaf5ee;box-shadow:0 0 0 4px rgba(79,176,131,.22),0 8px 16px -6px rgba(0,0,0,.55);">1</div>
+    </div>
+    <!-- legend -->
+    <div style="display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:56px;font-size:13px;color:#cfc1a4;">
+      <span style="display:inline-flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;border-radius:4px;background:linear-gradient(160deg,#e6cf8e,#c6a052);"></span>8 santri &middot; Jawa Barat</span>
+      <span style="display:inline-flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;border-radius:4px;background:linear-gradient(160deg,#4fb083,#2e7d55);"></span>1 santri</span>
+      <span style="display:inline-flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;border-radius:4px;background:#6f9c76;"></span>Provinsi lain</span>
+    </div>
+
+    <!-- origin list + jobs -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;margin-bottom:22px;">
+
+      <!-- Daerah asal -->
+      <div style="background:#fbf7ec;border-radius:20px;padding:30px 28px;color:#26302a;box-shadow:0 26px 54px -32px rgba(0,0,0,.55);">
+        <div style="color:#0c6240;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Daerah Asal</div>
+        <h3 style="font-family:Marcellus,serif;font-weight:400;font-size:22px;margin:0 0 16px;color:#0d3a28;">Dari 3 provinsi, 10 kota</h3>
+
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:16px 0;border-bottom:1px solid #efe7d3;">
+          <span style="flex:none;width:36px;height:36px;border-radius:50%;background:linear-gradient(160deg,#e6cf8e,#c6a052);color:#08321f;font-family:Marcellus,serif;font-size:17px;display:flex;align-items:center;justify-content:center;">8</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:Marcellus,serif;font-size:18px;color:#0d3a28;">Jawa Barat</div>
+            <div style="margin-top:9px;display:flex;flex-wrap:wrap;gap:6px;">
+              <span style="font-size:12px;color:#42514a;background:#f1ead9;border:1px solid #e3dcc8;border-radius:999px;padding:4px 11px;">Depok</span>
+              <span style="font-size:12px;color:#42514a;background:#f1ead9;border:1px solid #e3dcc8;border-radius:999px;padding:4px 11px;">Kota Bogor</span>
+              <span style="font-size:12px;color:#42514a;background:#f1ead9;border:1px solid #e3dcc8;border-radius:999px;padding:4px 11px;">Bekasi</span>
+              <span style="font-size:12px;color:#42514a;background:#f1ead9;border:1px solid #e3dcc8;border-radius:999px;padding:4px 11px;">Subang</span>
+              <span style="font-size:12px;color:#42514a;background:#f1ead9;border:1px solid #e3dcc8;border-radius:999px;padding:4px 11px;">Bandung</span>
+              <span style="font-size:12px;color:#42514a;background:#f1ead9;border:1px solid #e3dcc8;border-radius:999px;padding:4px 11px;">Cirebon</span>
+              <span style="font-size:12px;color:#42514a;background:#f1ead9;border:1px solid #e3dcc8;border-radius:999px;padding:4px 11px;">Bogor</span>
+              <span style="font-size:12px;color:#42514a;background:#f1ead9;border:1px solid #e3dcc8;border-radius:999px;padding:4px 11px;">Sukabumi</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:16px 0;border-bottom:1px solid #efe7d3;">
+          <span style="flex:none;width:36px;height:36px;border-radius:50%;background:linear-gradient(160deg,#4fb083,#2e7d55);color:#fbf3df;font-family:Marcellus,serif;font-size:16px;display:flex;align-items:center;justify-content:center;">1</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:Marcellus,serif;font-size:18px;color:#0d3a28;">Kep. Bangka Belitung</div>
+            <div style="margin-top:9px;display:flex;flex-wrap:wrap;gap:6px;"><span style="font-size:12px;color:#42514a;background:#f1ead9;border:1px solid #e3dcc8;border-radius:999px;padding:4px 11px;">Bangka</span></div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:16px 0 4px;">
+          <span style="flex:none;width:36px;height:36px;border-radius:50%;background:linear-gradient(160deg,#4fb083,#2e7d55);color:#fbf3df;font-family:Marcellus,serif;font-size:16px;display:flex;align-items:center;justify-content:center;">1</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:Marcellus,serif;font-size:18px;color:#0d3a28;">Sumatera Utara</div>
+            <div style="margin-top:9px;display:flex;flex-wrap:wrap;gap:6px;"><span style="font-size:12px;color:#42514a;background:#f1ead9;border:1px solid #e3dcc8;border-radius:999px;padding:4px 11px;">Asahan</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Latar belakang keluarga -->
+      <div style="background:#fbf7ec;border-radius:20px;padding:30px 28px;color:#26302a;box-shadow:0 26px 54px -32px rgba(0,0,0,.55);">
+        <div style="color:#0c6240;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Latar Belakang Keluarga</div>
+        <h3 style="font-family:Marcellus,serif;font-weight:400;font-size:22px;margin:0 0 8px;color:#0d3a28;">Pekerjaan orang tua santri</h3>
+        <p style="margin:0 0 20px;font-size:13.5px;line-height:1.6;color:#5b6a61;">Mayoritas adalah buruh, petani, dan pekerja informal dengan penghasilan yang tidak menentu.</p>
+
+        <div style="margin-bottom:15px;"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><span style="font-size:14px;font-weight:600;color:#2b3630;">Serabutan</span><span style="font-family:Marcellus,serif;font-size:15px;color:#b08f3f;">4</span></div><div style="height:12px;border-radius:999px;background:#ece3cf;overflow:hidden;"><div style="width:100%;height:100%;border-radius:999px;background:linear-gradient(90deg,#d4b56a,#c6a052);"></div></div></div>
+        <div style="margin-bottom:15px;"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><span style="font-size:14px;font-weight:600;color:#2b3630;">Satpam</span><span style="font-family:Marcellus,serif;font-size:15px;color:#0c6240;">2</span></div><div style="height:12px;border-radius:999px;background:#ece3cf;overflow:hidden;"><div style="width:50%;height:100%;border-radius:999px;background:linear-gradient(90deg,#0e5a3c,#0c6240);"></div></div></div>
+        <div style="margin-bottom:15px;"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><span style="font-size:14px;font-weight:600;color:#2b3630;">Petani</span><span style="font-family:Marcellus,serif;font-size:15px;color:#0c6240;">1</span></div><div style="height:12px;border-radius:999px;background:#ece3cf;overflow:hidden;"><div style="width:25%;height:100%;border-radius:999px;background:linear-gradient(90deg,#0e5a3c,#0c6240);"></div></div></div>
+        <div style="margin-bottom:15px;"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><span style="font-size:14px;font-weight:600;color:#2b3630;">Guru</span><span style="font-family:Marcellus,serif;font-size:15px;color:#0c6240;">1</span></div><div style="height:12px;border-radius:999px;background:#ece3cf;overflow:hidden;"><div style="width:25%;height:100%;border-radius:999px;background:linear-gradient(90deg,#0e5a3c,#0c6240);"></div></div></div>
+        <div style="margin-bottom:15px;"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><span style="font-size:14px;font-weight:600;color:#2b3630;">Pekerja Migran Indonesia</span><span style="font-family:Marcellus,serif;font-size:15px;color:#0c6240;">1</span></div><div style="height:12px;border-radius:999px;background:#ece3cf;overflow:hidden;"><div style="width:25%;height:100%;border-radius:999px;background:linear-gradient(90deg,#0e5a3c,#0c6240);"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><span style="font-size:14px;font-weight:600;color:#2b3630;">Ibu Rumah Tangga</span><span style="font-family:Marcellus,serif;font-size:15px;color:#0c6240;">1</span></div><div style="height:12px;border-radius:999px;background:#ece3cf;overflow:hidden;"><div style="width:25%;height:100%;border-radius:999px;background:linear-gradient(90deg,#0e5a3c,#0c6240);"></div></div></div>
+      </div>
+    </div>
+
+    <!-- 8 asnaf -->
+    <div style="background:#fbf7ec;border-radius:22px;padding:clamp(26px,4vw,42px);color:#26302a;box-shadow:0 30px 60px -34px rgba(0,0,0,.55);">
+      <div style="text-align:center;max-width:700px;margin:0 auto 30px;">
+        <div style="color:#0c6240;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;margin-bottom:12px;">Kriteria Penerima</div>
+        <h3 style="font-family:Marcellus,serif;font-weight:400;font-size:clamp(24px,3.6vw,34px);margin:0 0 14px;color:#0d3a28;">Harus termasuk salah satu dari 8 asnaf</h3>
+        <div style="font-family:Amiri,serif;font-size:22px;line-height:1.8;color:#b08f3f;direction:rtl;margin:0 auto 10px;max-width:640px;">إِنَّمَا الصَّدَقَاتُ لِلْفُقَرَاءِ وَالْمَسَاكِينِ</div>
+        <p style="margin:0;font-size:15px;line-height:1.7;color:#42514a;">Beasiswa pendidikan tahfidz ini hanya diberikan kepada santri yang keluarganya termasuk salah satu dari delapan golongan (asnaf) penerima zakat — sebagaimana ditegaskan dalam Al-Qur'an Surah At-Taubah ayat 60. Santri RTA Al-Qalam umumnya berasal dari golongan <strong style="color:#0d3a28;">fakir</strong>, <strong style="color:#0d3a28;">miskin</strong>, dan <strong style="color:#0d3a28;">fisabilillah</strong>.</p>
+      </div>
+
+      <div class="asnaf-grid" style="display:grid;gap:14px;">
+        <div style="background:#fff;border:1.5px solid #c6a052;border-radius:16px;padding:20px 18px;position:relative;box-shadow:0 16px 32px -20px rgba(198,160,82,.55);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;"><span style="width:30px;height:30px;border-radius:9px;background:linear-gradient(160deg,#e6cf8e,#c6a052);color:#08321f;font-family:Marcellus,serif;font-size:14px;display:flex;align-items:center;justify-content:center;">1</span><span style="font-family:Amiri,serif;font-size:19px;color:#b08f3f;direction:rtl;">الْفُقَرَاء</span></div>
+          <h4 style="font-family:Marcellus,serif;font-weight:400;font-size:18px;margin:0 0 6px;color:#0d3a28;">Fakir</h4>
+          <p style="margin:0;font-size:12.5px;line-height:1.55;color:#5b6a61;">Tidak memiliki harta maupun penghasilan untuk memenuhi kebutuhan pokok.</p>
+          <div style="margin-top:12px;display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#08321f;background:linear-gradient(160deg,#d4b56a,#c6a052);padding:4px 10px;border-radius:999px;">Kategori utama santri</div>
+        </div>
+
+        <div style="background:#fff;border:1.5px solid #c6a052;border-radius:16px;padding:20px 18px;position:relative;box-shadow:0 16px 32px -20px rgba(198,160,82,.55);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;"><span style="width:30px;height:30px;border-radius:9px;background:linear-gradient(160deg,#e6cf8e,#c6a052);color:#08321f;font-family:Marcellus,serif;font-size:14px;display:flex;align-items:center;justify-content:center;">2</span><span style="font-family:Amiri,serif;font-size:19px;color:#b08f3f;direction:rtl;">الْمَسَاكِين</span></div>
+          <h4 style="font-family:Marcellus,serif;font-weight:400;font-size:18px;margin:0 0 6px;color:#0d3a28;">Miskin</h4>
+          <p style="margin:0;font-size:12.5px;line-height:1.55;color:#5b6a61;">Memiliki penghasilan, namun tidak mencukupi kebutuhan dasar sehari-hari.</p>
+          <div style="margin-top:12px;display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#08321f;background:linear-gradient(160deg,#d4b56a,#c6a052);padding:4px 10px;border-radius:999px;">Kategori utama santri</div>
+        </div>
+
+        <div style="background:#fff;border:1.5px solid #ece3cf;border-radius:16px;padding:20px 18px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;"><span style="width:30px;height:30px;border-radius:9px;background:rgba(12,98,64,.1);color:#0c6240;font-family:Marcellus,serif;font-size:14px;display:flex;align-items:center;justify-content:center;">3</span><span style="font-family:Amiri,serif;font-size:19px;color:#b08f3f;direction:rtl;">الْعَامِلِين</span></div>
+          <h4 style="font-family:Marcellus,serif;font-weight:400;font-size:18px;margin:0 0 6px;color:#0d3a28;">Amil</h4>
+          <p style="margin:0;font-size:12.5px;line-height:1.55;color:#5b6a61;">Petugas yang mengurus pengumpulan dan penyaluran zakat.</p>
+        </div>
+
+        <div style="background:#fff;border:1.5px solid #ece3cf;border-radius:16px;padding:20px 18px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;"><span style="width:30px;height:30px;border-radius:9px;background:rgba(12,98,64,.1);color:#0c6240;font-family:Marcellus,serif;font-size:14px;display:flex;align-items:center;justify-content:center;">4</span><span style="font-family:Amiri,serif;font-size:19px;color:#b08f3f;direction:rtl;">الْمُؤَلَّفَة</span></div>
+          <h4 style="font-family:Marcellus,serif;font-weight:400;font-size:18px;margin:0 0 6px;color:#0d3a28;">Muallaf</h4>
+          <p style="margin:0;font-size:12.5px;line-height:1.55;color:#5b6a61;">Orang yang baru memeluk Islam dan hatinya perlu diteguhkan.</p>
+        </div>
+
+        <div style="background:#fff;border:1.5px solid #ece3cf;border-radius:16px;padding:20px 18px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;"><span style="width:30px;height:30px;border-radius:9px;background:rgba(12,98,64,.1);color:#0c6240;font-family:Marcellus,serif;font-size:14px;display:flex;align-items:center;justify-content:center;">5</span><span style="font-family:Amiri,serif;font-size:19px;color:#b08f3f;direction:rtl;">الرِّقَاب</span></div>
+          <h4 style="font-family:Marcellus,serif;font-weight:400;font-size:18px;margin:0 0 6px;color:#0d3a28;">Riqab</h4>
+          <p style="margin:0;font-size:12.5px;line-height:1.55;color:#5b6a61;">Memerdekakan budak atau membebaskan diri dari perbudakan.</p>
+        </div>
+
+        <div style="background:#fff;border:1.5px solid #b9bec8;border-radius:16px;padding:20px 18px;position:relative;box-shadow:0 16px 32px -20px rgba(120,128,140,.5);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;"><span style="width:30px;height:30px;border-radius:9px;background:linear-gradient(160deg,#e2e5ea,#b9bec8);color:#3a3f47;font-family:Marcellus,serif;font-size:14px;display:flex;align-items:center;justify-content:center;">6</span><span style="font-family:Amiri,serif;font-size:19px;color:#b08f3f;direction:rtl;">الْغَارِمِين</span></div>
+          <h4 style="font-family:Marcellus,serif;font-weight:400;font-size:18px;margin:0 0 6px;color:#0d3a28;">Gharim</h4>
+          <p style="margin:0;font-size:12.5px;line-height:1.55;color:#5b6a61;">Orang yang terlilit hutang untuk memenuhi kebutuhan yang halal.</p>
+          <div style="margin-top:12px;display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#3a3f47;background:linear-gradient(160deg,#e6e9ee,#b6bcc6);padding:4px 10px;border-radius:999px;">Kategori tambahan santri</div>
+        </div>
+
+        <div style="background:#fff;border:1.5px solid #c6a052;border-radius:16px;padding:20px 18px;position:relative;box-shadow:0 16px 32px -20px rgba(198,160,82,.55);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;"><span style="width:30px;height:30px;border-radius:9px;background:linear-gradient(160deg,#e6cf8e,#c6a052);color:#08321f;font-family:Marcellus,serif;font-size:14px;display:flex;align-items:center;justify-content:center;">7</span><span style="font-family:Amiri,serif;font-size:19px;color:#b08f3f;direction:rtl;">فِي سَبِيلِ الله</span></div>
+          <h4 style="font-family:Marcellus,serif;font-weight:400;font-size:18px;margin:0 0 6px;color:#0d3a28;">Fisabilillah</h4>
+          <p style="margin:0;font-size:12.5px;line-height:1.55;color:#5b6a61;">Berjuang di jalan Allah — termasuk menuntut ilmu agama dan menghafal Al-Qur'an.</p>
+          <div style="margin-top:12px;display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#08321f;background:linear-gradient(160deg,#d4b56a,#c6a052);padding:4px 10px;border-radius:999px;">Kategori utama santri</div>
+        </div>
+
+        <div style="background:#fff;border:1.5px solid #ece3cf;border-radius:16px;padding:20px 18px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;"><span style="width:30px;height:30px;border-radius:9px;background:rgba(12,98,64,.1);color:#0c6240;font-family:Marcellus,serif;font-size:14px;display:flex;align-items:center;justify-content:center;">8</span><span style="font-family:Amiri,serif;font-size:19px;color:#b08f3f;direction:rtl;">ابْن السَّبِيل</span></div>
+          <h4 style="font-family:Marcellus,serif;font-weight:400;font-size:18px;margin:0 0 6px;color:#0d3a28;">Ibnu Sabil</h4>
+          <p style="margin:0;font-size:12.5px;line-height:1.55;color:#5b6a61;">Musafir yang kehabisan bekal dalam perjalanannya.</p>
+        </div>
+      </div>
+
+      <p style="text-align:center;margin:28px auto 0;max-width:560px;font-size:14px;line-height:1.65;color:#5b6a61;">Amanah Anda memastikan mereka tetap dapat menghafal Al-Qur'an tanpa terbebani biaya.</p>
+    </div>
+
+  </div>
+</section>
+
 <!-- ===== YANG ANDA TANGGUNG ===== -->
 <section data-screen-label="Cakupan Donasi" style="padding:84px 26px;background:#fbf7ec;border-top:1px solid #ece3cf;">
   <div style="max-width:1080px;margin:0 auto;">
@@ -155,7 +369,7 @@ input::placeholder,textarea::placeholder{color:#a99f86;}
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;">
       <div style="text-align:center;padding:8px;"><div style="width:58px;height:58px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(160deg,#0e5a3c,#093624);color:#e6cf8e;font-family:Marcellus,serif;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px -12px rgba(9,54,38,.6);">1</div><h3 style="font-family:Marcellus,serif;font-weight:400;font-size:19px;margin:0 0 7px;color:#0d3a28;">Pilih komitmen</h3><p style="margin:0;font-size:14px;line-height:1.6;color:#5b6a61;">Tentukan jangka waktu & nominal donasi sesuai kemampuan Anda.</p></div>
       <div style="text-align:center;padding:8px;"><div style="width:58px;height:58px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(160deg,#0e5a3c,#093624);color:#e6cf8e;font-family:Marcellus,serif;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px -12px rgba(9,54,38,.6);">2</div><h3 style="font-family:Marcellus,serif;font-weight:400;font-size:19px;margin:0 0 7px;color:#0d3a28;">Isi data diri</h3><p style="margin:0;font-size:14px;line-height:1.6;color:#5b6a61;">Lengkapi formulir digital — nama, alamat, WhatsApp & tanggal transfer.</p></div>
-      <div style="text-align:center;padding:8px;"><div style="width:58px;height:58px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(160deg,#0e5a3c,#093624);color:#e6cf8e;font-family:Marcellus,serif;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px -12px rgba(9,54,38,.6);">3</div><h3 style="font-family:Marcellus,serif;font-weight:400;font-size:19px;margin:0 0 7px;color:#0d3a28;">Transfer via QRIS</h3><p style="margin:0;font-size:14px;line-height:1.6;color:#5b6a61;">Scan QRIS INFAQ RTA Al-Qalam setiap tanggal komitmen Anda.</p></div>
+      <div style="text-align:center;padding:8px;"><div style="width:58px;height:58px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(160deg,#0e5a3c,#093624);color:#e6cf8e;font-family:Marcellus,serif;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px -12px rgba(9,54,38,.6);">3</div><h3 style="font-family:Marcellus,serif;font-weight:400;font-size:19px;margin:0 0 7px;color:#0d3a28;">Donasi via QRIS / Transfer</h3><p style="margin:0;font-size:14px;line-height:1.6;color:#5b6a61;">Scan QRIS atau transfer ke rekening BSI INFAQ RTA Al-Qalam setiap tanggal komitmen Anda.</p></div>
       <div style="text-align:center;padding:8px;"><div style="width:58px;height:58px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(160deg,#0e5a3c,#093624);color:#e6cf8e;font-family:Marcellus,serif;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px -12px rgba(9,54,38,.6);">4</div><h3 style="font-family:Marcellus,serif;font-weight:400;font-size:19px;margin:0 0 7px;color:#0d3a28;">Terima laporan</h3><p style="margin:0;font-size:14px;line-height:1.6;color:#5b6a61;">Dapatkan laporan perkembangan santri & keuangan secara berkala.</p></div>
     </div>
   </div>
@@ -328,7 +542,7 @@ input::placeholder,textarea::placeholder{color:#a99f86;}
             <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(61,196,182,.14) 0%,transparent 55%);pointer-events:none;"></div>
             <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;">
               <div style="font-size:11px;color:#9ab8a8;text-transform:uppercase;letter-spacing:.14em;margin-bottom:10px;">Nomor Rekening BSI</div>
-              <div style="font-family:Marcellus,serif;font-size:clamp(26px,5vw,34px);color:#fff;letter-spacing:.14em;line-height:1;">7346-7741-12</div>
+              <button onClick="{{ copyRek }}" aria-label="Salin nomor rekening BSI" title="Salin nomor rekening" style="background:none;border:none;padding:0;cursor:pointer;display:flex;align-items:center;gap:14px;flex-wrap:wrap;text-align:left;"><span style="font-family:Marcellus,serif;font-size:clamp(26px,5vw,34px);color:#fff;letter-spacing:.14em;line-height:1;">7346-7741-12</span><span style="{{ copyPillStyle }}">{{ copyLabel }}</span></button>
               <div style="margin-top:14px;font-size:12px;color:#3DC4B8;letter-spacing:.1em;font-weight:700;text-transform:uppercase;">INFAQ RTA AL QALAM</div>
             </div>
             <div style="position:relative;border-top:1px solid rgba(61,196,182,.22);margin-top:24px;padding-top:14px;font-size:12px;color:#9ab8a8;font-style:italic;">Dapat ditransfer dari bank mana pun via SKN / RTGS / BI-Fast</div>
@@ -443,7 +657,9 @@ class Component extends DCLogic {
     submitted: false, error: '', waLink: '',
     openFaq: 0,
     nameError: '', phoneError: '',
+    copied: false,
   };
+  REK = '7346774112';
 
   amountMap = { '100': 100000, '250': 250000, '500': 500000, '750': 750000 };
   WA = '6281973399739';
@@ -504,6 +720,37 @@ class Component extends DCLogic {
     this.setState({ customAmount: digits, submitted: false, error: '' });
   }
   toggleFaq(i) { this.setState((s) => ({ openFaq: s.openFaq === i ? -1 : i })); }
+
+  copyRek() {
+    const num = this.REK;
+    const done = () => {
+      this.setState({ copied: true });
+      clearTimeout(this._copyT);
+      this._copyT = setTimeout(() => this.setState({ copied: false }), 2000);
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(num).then(done, () => this._fallbackCopy(num, done));
+      } else {
+        this._fallbackCopy(num, done);
+      }
+    } catch (e) { this._fallbackCopy(num, done); }
+  }
+  _fallbackCopy(text, done) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '0';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      done();
+    } catch (e) { /* clipboard unavailable — number stays visible for manual copy */ }
+  }
 
   componentDidMount() {
     if (window.location.hash) {
@@ -709,6 +956,19 @@ class Component extends DCLogic {
       nameInputStyle: 'width:100%;border:1.5px solid ' + (s.nameError ? '#e74c3c' : '#ddd4bf') + ';border-radius:11px;padding:13px 15px;font-size:15px;font-family:\'Plus Jakarta Sans\';background:#fff;outline:none;color:#26302a;transition:border-color .15s;',
       phoneInputStyle: 'width:100%;border:1.5px solid ' + (s.phoneError ? '#e74c3c' : '#ddd4bf') + ';border-radius:11px;padding:13px 15px;font-size:15px;font-family:\'Plus Jakarta Sans\';background:#fff;outline:none;color:#26302a;transition:border-color .15s;',
       waAdminLink: 'https://wa.me/' + this.WA + '?text=' + encodeURIComponent("Assalamu'alaikum, saya ingin bertanya tentang Program Orang Tua Asuh RTA Al-Qalam."),
+      copyRek: () => this.copyRek(),
+      copyLabel: s.copied ? 'Tersalin ✓' : 'Salin',
+      copyPillStyle: {
+        display: 'inline-flex', alignItems: 'center', gap: '6px',
+        fontFamily: "'Plus Jakarta Sans',sans-serif",
+        fontSize: '11px', fontWeight: 700, letterSpacing: '.08em',
+        textTransform: 'uppercase',
+        padding: '6px 12px', borderRadius: '999px',
+        border: '1px solid rgba(61,196,182,.5)',
+        background: s.copied ? 'rgba(61,196,182,.92)' : 'rgba(61,196,182,.1)',
+        color: s.copied ? '#063626' : '#3DC4B8',
+        transition: 'all .2s ease', whiteSpace: 'nowrap',
+      },
       ...fv,
     };
   }
