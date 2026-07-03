@@ -277,39 +277,76 @@ input::placeholder,textarea::placeholder{color:#a99f86;}
 </section>
 
 <!-- ===== QRIS ===== -->
-<section id="qris" data-screen-label="Cara Berdonasi QRIS" style="padding:88px 26px;background:#fbf7ec;">
-  <div style="max-width:1000px;margin:0 auto;">
+<section id="qris" data-screen-label="Cara Berdonasi" style="padding:88px 26px;background:#fbf7ec;">
+  <div style="max-width:1100px;margin:0 auto;">
     <div style="text-align:center;margin-bottom:46px;">
       <div style="color:#0c6240;font-size:12.5px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;margin-bottom:14px;">Cara Berdonasi</div>
-      <h2 style="font-family:Marcellus,serif;font-weight:400;font-size:clamp(30px,4.4vw,44px);margin:0 0 8px;color:#0d3a28;">Scan QRIS, satu untuk semua</h2>
-      <p style="margin:0 auto;max-width:520px;font-size:16px;line-height:1.6;color:#5b6a61;">Donasi Anda dapat ditunaikan melalui QRIS resmi <strong>INFAQ RTA Al-Qalam</strong> dari aplikasi bank atau e-wallet apa pun.</p>
+      <h2 style="font-family:Marcellus,serif;font-weight:400;font-size:clamp(30px,4.4vw,44px);margin:0 0 8px;color:#0d3a28;">Pilih cara berdonasi Anda</h2>
+      <p style="margin:0 auto;max-width:580px;font-size:16px;line-height:1.6;color:#5b6a61;">Donasi dapat dilakukan melalui <strong>QRIS</strong> dari e-wallet atau m-Banking apa pun, atau <strong>transfer langsung</strong> ke rekening BSI kami.</p>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:30px;align-items:center;">
-      <!-- QR card -->
-      <div style="background:#fff;border-radius:22px;padding:26px;border:1px solid #ece3cf;box-shadow:0 24px 50px -28px rgba(9,54,38,.4);max-width:380px;margin:0 auto;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-          <div style="font-family:Marcellus,serif;font-size:18px;color:#0d3a28;line-height:1.1;">INFAQ RTA<br>Al-Qalam</div>
-          <div style="text-align:right;"><div style="font-size:10px;letter-spacing:.1em;color:#8a7d5f;text-transform:uppercase;">QR Standar Nasional</div><div style="font-weight:700;color:#0c6240;font-size:15px;letter-spacing:.05em;">QRIS</div></div>
-        </div>
-        <div style="background:#fff;border:1px solid #eee5d2;border-radius:14px;padding:10px;">
-          <img src="assets/qris-qr.png" alt="QRIS INFAQ RTA Al-Qalam" style="width:100%;display:block;border-radius:6px;">
-        </div>
-        <div style="text-align:center;margin-top:14px;font-size:12.5px;color:#5b6a61;">NMID : <strong style="color:#0d3a28;">ID1026525038901</strong></div>
-        <div style="text-align:center;margin-top:4px;font-family:Marcellus,serif;font-style:italic;color:#b08f3f;font-size:13px;">"Satu QRIS untuk semua"</div>
-      </div>
-      <!-- steps + contact -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:40px;align-items:start;">
+
+      <!-- ── QRIS column ── -->
       <div>
-        <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:26px;">
-          <div style="display:flex;gap:14px;align-items:flex-start;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(12,98,64,.1);color:#0c6240;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;">1</span><div><div style="font-weight:600;color:#0d3a28;font-size:15.5px;">Buka aplikasi berlogo QRIS</div><div style="font-size:13.5px;color:#5b6a61;">m-Banking, DANA, OVO, GoPay, ShopeePay, dll.</div></div></div>
-          <div style="display:flex;gap:14px;align-items:flex-start;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(12,98,64,.1);color:#0c6240;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;">2</span><div><div style="font-weight:600;color:#0d3a28;font-size:15.5px;">Scan & periksa nama penerima</div><div style="font-size:13.5px;color:#5b6a61;">Pastikan tertera <strong>INFAQ RTA AL QALAM</strong>.</div></div></div>
-          <div style="display:flex;gap:14px;align-items:flex-start;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(12,98,64,.1);color:#0c6240;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;">3</span><div><div style="font-weight:600;color:#0d3a28;font-size:15.5px;">Masukkan nominal & bayar</div><div style="font-size:13.5px;color:#5b6a61;">Sesuai komitmen bulanan Anda, lalu simpan bukti transfer.</div></div></div>
-          <div style="display:flex;gap:14px;align-items:flex-start;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(198,160,82,.18);color:#b08f3f;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;">4</span><div><div style="font-weight:600;color:#0d3a28;font-size:15.5px;">Konfirmasi ke Admin</div><div style="font-size:13.5px;color:#5b6a61;">Kirim bukti ke WhatsApp Admin untuk pencatatan & kuitansi.</div></div></div>
+        <div style="background:#fff;border-radius:22px;padding:26px;border:1px solid #ece3cf;box-shadow:0 24px 50px -28px rgba(9,54,38,.4);margin-bottom:26px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div style="font-family:Marcellus,serif;font-size:18px;color:#0d3a28;line-height:1.1;">INFAQ RTA<br>Al-Qalam</div>
+            <div style="text-align:right;"><div style="font-size:10px;letter-spacing:.1em;color:#8a7d5f;text-transform:uppercase;">QR Standar Nasional</div><div style="font-weight:700;color:#0c6240;font-size:15px;letter-spacing:.05em;">QRIS</div></div>
+          </div>
+          <div style="background:#fff;border:1px solid #eee5d2;border-radius:14px;padding:10px;">
+            <img src="assets/qris-qr.png" alt="QRIS INFAQ RTA Al-Qalam" style="width:100%;display:block;border-radius:6px;">
+          </div>
+          <div style="text-align:center;margin-top:14px;font-size:12.5px;color:#5b6a61;">NMID : <strong style="color:#0d3a28;">ID1026525038901</strong></div>
+          <div style="text-align:center;margin-top:4px;font-family:Marcellus,serif;font-style:italic;color:#b08f3f;font-size:13px;">"Satu QRIS untuk semua"</div>
         </div>
-        <a href="{{ waAdminLink }}" target="_blank" style="display:inline-flex;align-items:center;gap:10px;background:#0c6240;color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:14px 26px;border-radius:999px;box-shadow:0 12px 28px -12px rgba(12,98,64,.6);">
-          <span style="width:8px;height:8px;background:#d4b56a;border-radius:50%;"></span> WA Admin · 0819-7339-9739
-        </a>
-        <div style="margin-top:16px;font-size:13px;color:#8a7d5f;">Butuh poster lengkap? <a href="assets/qris-rta.png" target="_blank" style="color:#0c6240;font-weight:600;">Lihat poster QRIS resmi →</a></div>
+        <div style="font-weight:700;color:#0d3a28;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;">Cara Scan QRIS</div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;gap:14px;align-items:flex-start;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(12,98,64,.1);color:#0c6240;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;">1</span><div><div style="font-weight:600;color:#0d3a28;font-size:15px;">Buka aplikasi berlogo QRIS</div><div style="font-size:13.5px;color:#5b6a61;">m-Banking, DANA, OVO, GoPay, ShopeePay, dll.</div></div></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(12,98,64,.1);color:#0c6240;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;">2</span><div><div style="font-weight:600;color:#0d3a28;font-size:15px;">Scan & periksa nama penerima</div><div style="font-size:13.5px;color:#5b6a61;">Pastikan tertera <strong>INFAQ RTA AL QALAM</strong>.</div></div></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(12,98,64,.1);color:#0c6240;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;">3</span><div><div style="font-weight:600;color:#0d3a28;font-size:15px;">Masukkan nominal & bayar</div><div style="font-size:13.5px;color:#5b6a61;">Sesuai komitmen bulanan Anda, lalu simpan bukti.</div></div></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(198,160,82,.18);color:#b08f3f;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;">4</span><div><div style="font-weight:600;color:#0d3a28;font-size:15px;">Konfirmasi ke Admin</div><div style="font-size:13.5px;color:#5b6a61;">Kirim bukti ke WhatsApp Admin untuk pencatatan & kuitansi.</div></div></div>
+        </div>
+        <div style="margin-top:18px;font-size:13px;color:#8a7d5f;">Butuh poster lengkap? <a href="assets/qris-rta.png" target="_blank" style="color:#0c6240;font-weight:600;">Lihat poster QRIS resmi →</a></div>
       </div>
+
+      <!-- ── BSI Transfer column ── -->
+      <div>
+        <div style="background:linear-gradient(145deg,#0e5a3c 0%,#063626 100%);border-radius:22px;padding:28px;box-shadow:0 24px 50px -28px rgba(6,54,38,.55);margin-bottom:26px;position:relative;overflow:hidden;">
+          <div style="position:absolute;inset:0;opacity:.07;background-image:radial-gradient(circle at 1px 1px,#e9d9a8 1px,transparent 0);background-size:22px 22px;pointer-events:none;"></div>
+          <!-- BSI brand -->
+          <div style="position:relative;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+            <div>
+              <div style="font-family:Marcellus,serif;font-size:32px;color:#fff;letter-spacing:.06em;line-height:1;">BSI</div>
+              <div style="font-size:10px;color:#c6a052;letter-spacing:.16em;text-transform:uppercase;font-weight:600;margin-top:3px;">Bank Syariah Indonesia</div>
+            </div>
+            <div style="background:rgba(255,255,255,.08);border:1px solid rgba(198,160,82,.28);border-radius:10px;padding:7px 13px;text-align:center;">
+              <div style="font-size:10px;color:#c6a052;text-transform:uppercase;letter-spacing:.1em;font-weight:600;">Transfer</div>
+              <div style="font-size:11px;color:#ecdfc2;font-weight:500;margin-top:1px;">Bank / BI-Fast</div>
+            </div>
+          </div>
+          <!-- Account number -->
+          <div style="position:relative;">
+            <div style="font-size:11px;color:#9ab8a8;text-transform:uppercase;letter-spacing:.14em;margin-bottom:8px;">Nomor Rekening BSI</div>
+            <div style="font-family:Marcellus,serif;font-size:clamp(26px,5vw,34px);color:#fff;letter-spacing:.14em;line-height:1;">7346-7741-12</div>
+            <div style="margin-top:12px;font-size:12px;color:#c6a052;letter-spacing:.1em;font-weight:700;text-transform:uppercase;">INFAQ RTA AL QALAM</div>
+          </div>
+          <div style="position:relative;border-top:1px solid rgba(198,160,82,.2);margin:20px 0 0;padding-top:14px;font-size:12px;color:#9ab8a8;font-style:italic;">Dapat ditransfer dari bank mana pun via SKN / RTGS / BI-Fast</div>
+        </div>
+        <div style="font-weight:700;color:#0d3a28;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;">Cara Transfer Bank</div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;gap:14px;align-items:flex-start;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(12,98,64,.1);color:#0c6240;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;">1</span><div><div style="font-weight:600;color:#0d3a28;font-size:15px;">Buka m-Banking atau ATM</div><div style="font-size:13.5px;color:#5b6a61;">BSI, BCA, Mandiri, BRI, BNI, atau bank mana pun.</div></div></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(12,98,64,.1);color:#0c6240;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;">2</span><div><div style="font-weight:600;color:#0d3a28;font-size:15px;">Transfer ke rekening BSI</div><div style="font-size:13.5px;color:#5b6a61;">No. rek. <strong>7346774112</strong> — pastikan nama: <strong>INFAQ RTA AL QALAM</strong>.</div></div></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(12,98,64,.1);color:#0c6240;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;">3</span><div><div style="font-weight:600;color:#0d3a28;font-size:15px;">Masukkan nominal & transfer</div><div style="font-size:13.5px;color:#5b6a61;">Sesuai komitmen bulanan Anda, lalu simpan bukti.</div></div></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(198,160,82,.18);color:#b08f3f;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;">4</span><div><div style="font-weight:600;color:#0d3a28;font-size:15px;">Konfirmasi ke Admin</div><div style="font-size:13.5px;color:#5b6a61;">Kirim bukti ke WhatsApp Admin untuk pencatatan & kuitansi.</div></div></div>
+        </div>
+      </div>
+
+    </div>
+    <!-- Shared WA button -->
+    <div style="text-align:center;margin-top:44px;">
+      <a href="{{ waAdminLink }}" target="_blank" style="display:inline-flex;align-items:center;gap:10px;background:#0c6240;color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:14px 26px;border-radius:999px;box-shadow:0 12px 28px -12px rgba(12,98,64,.6);">
+        <span style="width:8px;height:8px;background:#d4b56a;border-radius:50%;"></span> WA Admin · 0819-7339-9739
+      </a>
     </div>
   </div>
 </section>
@@ -387,7 +424,7 @@ input::placeholder,textarea::placeholder{color:#a99f86;}
       <a href="#komitmen" style="border:1px solid rgba(231,216,173,.4);color:#ecdfc2;text-decoration:none;font-weight:600;font-size:14.5px;padding:13px 26px;border-radius:999px;">Jadi Orang Tua Asuh</a>
     </div>
     <div style="border-top:1px solid rgba(198,160,82,.22);padding-top:22px;font-size:12.5px;color:#9a8c6c;line-height:1.7;">
-      WA Admin: 0819-7339-9739 · QRIS: INFAQ RTA Al-Qalam (NMID ID1026525038901)<br>
+      WA Admin: 0819-7339-9739 · QRIS: INFAQ RTA Al-Qalam (NMID ID1026525038901) · BSI: 7346774112<br>
       Donasi Anda menjaga keberlangsungan pendidikan para penghafal Al-Qur'an dari kalangan dhuafa.
     </div>
   </div>
