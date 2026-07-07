@@ -503,24 +503,24 @@ class Component extends DCLogic {
 
   // Open book (gold cover, white pages) with a loading bar across the pages
   // whose green fill tracks memorization progress (juz / 15).
-  // A 15-page Qur'an. The card shows the page the student is currently on
-  // (the page after the last completed juz), plus 15 page markers.
+  // A 15-page Qur'an. Left page: current juz number in Arabic-Indic digits;
+  // right page: the word "juz" (جزء); a 15-marker row tracks progress.
   bookSvg(juz, uid){
     const E=(t,p,c)=>React.createElement(t,p,c);
     const j=Math.max(0,Math.min(15,juz||0));
     const done=j>=15, cur=done?15:j+1;
-    const OUT='#b98f3e', GOLD='#e8bd57', INK='#0a4631', PAGE='#fdf8ec';
+    const arb=String(cur).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d));
+    const OUT='#b98f3e', GOLD='#e8bd57', INK='#0a4631', PAGE='#fdf8ec', AMIRI="'Amiri',serif";
     const cover={fill:GOLD, stroke:OUT, strokeWidth:2.2, strokeLinejoin:'round'};
     const page={fill:PAGE, stroke:OUT, strokeWidth:1.6, strokeLinejoin:'round'};
-    const tf="'Plus Jakarta Sans',ui-sans-serif,sans-serif";
     // 15 page markers: done (gold), current (green), remaining (faint)
     const dots=[]; const x0=28, x1=112;
     for(let i=1;i<=15;i++){
       const x=x0+(x1-x0)*(i-1)/14;
-      let fill='#e2d8bf', rad=1.7;
+      let fill='#e2d8bf', rad=1.6;
       if(i<=j){ fill='#c6a052'; }
-      else if(!done && i===cur){ fill='#34a85a'; rad=2.7; }
-      dots.push(E('circle',{key:'dt'+i,cx:x,cy:79,r:rad,fill}));
+      else if(!done && i===cur){ fill='#34a85a'; rad=2.6; }
+      dots.push(E('circle',{key:'dt'+i,cx:x,cy:84,r:rad,fill}));
     }
     return E('svg',{viewBox:'0 0 140 122',width:'100%',height:'100%'},[
       E('path',{key:'or',d:'M70,7 L75,15 L70,23 L65,15 Z',fill:GOLD,stroke:OUT,strokeWidth:1.4,strokeLinejoin:'round'}),
@@ -528,9 +528,9 @@ class Component extends DCLogic {
       E('path',{key:'cr',d:'M70,108 L70,26 Q98,16 131,26 L126,100 Q96,94 70,108 Z',...cover}),
       E('path',{key:'pl',d:'M70,99 L70,32 Q45,23 17,30 L21,90 Q45,85 70,99 Z',...page}),
       E('path',{key:'pr',d:'M70,99 L70,32 Q95,23 123,30 L119,90 Q95,85 70,99 Z',...page}),
-      E('line',{key:'st',x1:70,y1:33,x2:70,y2:43,stroke:'#e6d3a0',strokeWidth:1.4}),
-      E('text',{key:'lb',x:70,y:49,textAnchor:'middle',fontSize:7.5,fontWeight:700,fill:'#a9946a',letterSpacing:'1.5',fontFamily:tf},'HALAMAN'),
-      E('text',{key:'no',x:70,y:71,textAnchor:'middle',fontSize:23,fontWeight:800,fill:INK,fontFamily:tf},String(cur)),
+      E('line',{key:'st',x1:70,y1:33,x2:70,y2:97,stroke:'#ecdcb4',strokeWidth:1.2}),
+      E('text',{key:'nm',x:43,y:68,textAnchor:'middle',fontSize:30,fontWeight:700,fill:INK,fontFamily:AMIRI},arb),
+      E('text',{key:'jw',x:98,y:60,textAnchor:'middle',fontSize:17,fontWeight:700,fill:INK,fontFamily:AMIRI},'جزء'),
       ...dots,
     ]);
   }
