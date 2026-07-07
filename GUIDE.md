@@ -66,19 +66,19 @@ Header names in row 1 **must be exactly** these lowercase keys (the tracker matc
 | K | `akh`  | Akhlak (0–100) | number | Musyrif/Mudir |
 | L | `akd`  | Akademik — math/IPA/… (0–100) | number | **Admin** |
 | M | `bhs`  | Bahasa — Indonesia/Inggris (0–100) | number | **Admin** |
-| N | `juz`    | **total** juz memorized (0–15) — drives progress | number | Musyrif/Mudir |
-| O | `curjuz` | juz **currently** being memorized (1–30; independent of juz — many start from Juz 30 back) | number | Musyrif/Mudir |
+| N | `juzdone` | which juz are memorized — a list in any order, e.g. `1,2,3,28,29,30` (juz count & progress derive from it) | text | Musyrif/Mudir |
+| O | `curjuz` | juz **currently** being memorized (1–30; independent — many start from Juz 30 back) | number | Musyrif/Mudir |
 | P+ | `wali`, `nohp`, `alamat`, `status`, `catatan_musyrif`, `catatan_mudir`, … | **PRIVATE — never mirrored** | any | staff |
 
-> The score columns (G–N) can be typed directly by staff, or computed from the `Setoran` tab
+> The score columns (G–M) can be typed directly by staff, or computed from the `Setoran` tab
 > with your own formulas. Keeping `Master` current (manual vs formula) is your choice — the
 > tracker only needs this row-per-santri shape.
 
 Example header row + first data row:
 
 ```
-id  name                     nick    kota    prov         hal  haf tah mur ilm akh akd bhs juz curjuz | wali          nohp
-s1  Ahmad Fauzan Ramadhani   Fauzan  Depok   Jawa Barat   1    88  91  85  85  90  84  86  8   9      | Bpk. Ramadhani 08xxxx
+id  name                     nick    kota    prov         hal  haf tah mur ilm akh akd bhs juzdone            curjuz | wali
+s1  Ahmad Fauzan Ramadhani   Fauzan  Depok   Jawa Barat   1    88  91  85  85  90  84  86  "1,2,3,4,5,6,7,8"  9    | Bpk. Ramadhani
 ```
 
 ---
@@ -107,7 +107,7 @@ exactly `Roster`** with a single formula in cell **A1** that mirrors the public 
 > Prefer to reorder/rename in the mirror? Use an explicit select, e.g.
 > `"select Col1, Col2, Col3, Col4, Col5, Col6, Col7, Col8, Col9, Col10, Col11, Col12, Col13, Col14, Col15 where Col1 is not null"`.
 > Column order does not matter to the tracker (it matches by header name), but the headers must
-> stay exactly `id, name, nick, …, juz, curjuz`.
+> stay exactly `id, name, nick, …, juzdone, curjuz`.
 
 ---
 
