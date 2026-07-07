@@ -658,7 +658,7 @@ class Component extends DCLogic {
       goGallery:()=>this.setState({view:'gallery'}),
       goDashboard:()=>this.setState({view:'dashboard'}),
       goEntry:()=>this.setState({view:'entry'}),
-      goLogin:()=>{ if(st.clerkReady && window.Clerk){ this._afterSignIn=true; window.Clerk.openSignIn(); } else { this.setState({loginOpen:true}); } },
+      goLogin:()=>{ const C=window.Clerk; if(C){ this._afterSignIn=true; if(C.loaded){ C.openSignIn(); } else { C.load().then(()=>C.openSignIn()).catch(()=>this.setState({loginOpen:true})); } } else { this.setState({loginOpen:true}); } },
       closeLogin:()=>this.setState({loginOpen:false}),
       stopLogin:(ev)=>{ ev && ev.stopPropagation && ev.stopPropagation(); },
       logout:()=>{ try{ if(window.Clerk && window.Clerk.user) window.Clerk.signOut(); }catch(e){} this.setState({view:'gallery', role:'public', loginOpen:false, selectedId:null}); },
