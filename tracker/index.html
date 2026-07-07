@@ -35,6 +35,26 @@
   @keyframes dcUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
   @keyframes dcRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
   @keyframes dcFade{from{opacity:0}to{opacity:1}}
+  /* responsive staff-screen grids */
+  .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(min-width:700px){.stat-grid{grid-template-columns:repeat(4,1fr);gap:14px}}
+  .detail-grid{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}
+  @media(min-width:768px){.detail-grid{grid-template-columns:290px 1fr;gap:26px}}
+  .radar-grid{display:grid;grid-template-columns:1fr;gap:16px;align-items:center}
+  @media(min-width:520px){.radar-grid{grid-template-columns:150px 1fr;gap:20px}}
+  .juz-map{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+  @media(min-width:480px){.juz-map{grid-template-columns:repeat(10,1fr)}}
+  @media(min-width:720px){.juz-map{grid-template-columns:repeat(15,1fr)}}
+  .roster-head{display:none}
+  @media(min-width:760px){.roster-head{display:grid;grid-template-columns:34px 1.7fr 1.5fr 1fr 60px 84px;gap:12px}}
+  .roster-row{display:grid;gap:9px 10px;align-items:center;grid-template-columns:auto 1fr auto auto;grid-template-areas:'tier santri grade act' 'prog prog prog prog'}
+  .roster-row>.r-tier{grid-area:tier}
+  .roster-row>.r-santri{grid-area:santri;min-width:0}
+  .roster-row>.r-prog{grid-area:prog}
+  .roster-row>.r-asal{grid-area:asal;display:none}
+  .roster-row>.r-grade{grid-area:grade}
+  .roster-row>.r-act{grid-area:act}
+  @media(min-width:760px){.roster-row{grid-template-columns:34px 1.7fr 1.5fr 1fr 60px 84px;grid-template-areas:'tier santri prog asal grade act'}.roster-row>.r-asal{display:block}}
 </style>
 </helmet>
 
@@ -81,7 +101,7 @@
   <!-- ============ GALLERY ============ -->
   <sc-if value="{{ isGallery }}" hint-placeholder-val="{{ false }}">
     <div style="max-width:1180px;margin:0 auto;padding:0 20px 60px">
-      <div style="display:flex;align-items:center;gap:14px;padding:16px 0 14px">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;padding:16px 0 14px">
         <img src="../assets/logo-rta.png" style="height:44px;width:auto" />
         <div style="flex:1;min-width:0">
           <div style="font-weight:800;font-size:16px;line-height:1.1">RTA Al-Qalam — Capaian Santri</div>
@@ -124,9 +144,9 @@
     <sc-if value="{{ sel }}" hint-placeholder-val="{{ true }}">
     <div style="max-width:1000px;margin:0 auto;padding:16px 20px 60px">
       <button onClick="{{ back }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer;margin-bottom:18px">← Kembali</button>
-      <div style="display:grid;grid-template-columns:290px 1fr;gap:26px;align-items:start">
+      <div class="detail-grid">
         <!-- hero card -->
-        <div style="background:linear-gradient(160deg,#1c3157,#0f1c3a);border-radius:18px;padding:24px 22px;color:#f5f3ec;text-align:center;box-shadow:0 14px 32px rgba(15,28,58,.32)">
+        <div style="background:radial-gradient(120% 90% at 50% -10%,#0e5a3c 0%,#0a4631 55%,#063626 100%);border-radius:18px;padding:24px 22px;color:#f5f3ec;text-align:center;box-shadow:0 14px 32px rgba(10,50,30,.32)">
           <div style="width:104px;height:104px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;font-size:34px;font-weight:800;background:rgba(255,255,255,.07);border:3px solid {{ sel.gColor }};color:#fff">{{ sel.initials }}</div>
           <div style="font-size:19px;font-weight:800">{{ sel.name }}</div>
           <div style="font-size:12.5px;color:rgba(245,243,236,.6);margin-top:3px">{{ sel.kota }} · {{ sel.prov }}</div>
@@ -149,7 +169,7 @@
         <div style="display:flex;flex-direction:column;gap:20px">
           <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:20px 22px">
             <div style="font-weight:800;font-size:14px;margin-bottom:16px">Profil Kemampuan</div>
-            <div style="display:grid;grid-template-columns:170px 1fr;gap:20px;align-items:center">
+            <div class="radar-grid">
               <div style="aspect-ratio:1;max-width:170px">{{ selRadar }}</div>
               <div style="display:flex;flex-direction:column;gap:11px">
                 <sc-for list="{{ sel.pillars }}" as="p" hint-placeholder-count="6">
@@ -163,7 +183,7 @@
           </div>
           <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:20px 22px">
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px"><span style="font-weight:800;font-size:14px">Peta Hafalan — 30 Juz</span><span style="font-size:12px;color:#6b7280">{{ sel.juz }}/15 juz target · {{ sel.juzPct }}%</span></div>
-            <div style="display:grid;grid-template-columns:repeat(15,1fr);gap:5px">
+            <div class="juz-map">
               <sc-for list="{{ selJuz }}" as="j" hint-placeholder-count="30">
                 <div style="aspect-ratio:1;border-radius:7px;border:1px solid;display:grid;place-items:center;font-size:10.5px;font-weight:700;{{ j.style }}">{{ j.n }}</div>
               </sc-for>
@@ -186,7 +206,7 @@
   <!-- ============ DASHBOARD ============ -->
   <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ false }}">
     <div style="max-width:1120px;margin:0 auto;padding:16px 20px 60px">
-      <div style="display:flex;align-items:center;gap:14px;padding:0 0 20px">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;padding:0 0 20px">
         <img src="../assets/logo-rta.png" style="height:44px;width:auto" />
         <div style="flex:1;min-width:0">
           <div style="font-weight:800;font-size:16px;line-height:1.1">Dashboard {{ roleLabel }}</div>
@@ -199,7 +219,7 @@
         <button onClick="{{ logout }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Keluar</button>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px">
+      <div class="stat-grid" style="margin-bottom:22px">
         <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:16px 18px"><div style="font-size:12px;color:#6b7280;font-weight:600">Total Santri</div><div style="font-size:28px;font-weight:800;margin-top:4px">{{ rosterCount }}</div></div>
         <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:16px 18px"><div style="font-size:12px;color:#6b7280;font-weight:600">Total Juz Terhafal</div><div style="font-size:28px;font-weight:800;margin-top:4px;color:#2f8f3a">{{ totalJuz }}</div></div>
         <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:16px 18px"><div style="font-size:12px;color:#6b7280;font-weight:600">Rata-rata Juz</div><div style="font-size:28px;font-weight:800;margin-top:4px">{{ avgJuz }}</div></div>
@@ -207,23 +227,23 @@
       </div>
 
       <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;overflow:hidden">
-        <div style="display:grid;grid-template-columns:38px 1.6fr 1.4fr 1fr 70px 90px;gap:12px;padding:13px 18px;background:#f7f6f2;border-bottom:1px solid #e6e1d5;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#9aa1ad">
+        <div class="roster-head" style="padding:13px 18px;background:#f7f6f2;border-bottom:1px solid #e6e1d5;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#9aa1ad">
           <span>#</span><span>Santri</span><span>Progres Hafalan</span><span>Asal</span><span style="text-align:center">Nilai</span><span></span>
         </div>
         <sc-for list="{{ roster }}" as="s" hint-placeholder-count="10">
-          <div style="display:grid;grid-template-columns:38px 1.6fr 1.4fr 1fr 70px 90px;gap:12px;padding:12px 18px;border-bottom:1px solid #f0ede4;align-items:center">
-            <span style="width:26px;height:26px;border-radius:50%;background:#f7f6f2;display:grid;place-items:center;font-size:11px;font-weight:800;color:#16264d">{{ s.tier }}</span>
-            <div style="display:flex;align-items:center;gap:10px;min-width:0">
-              <span style="width:34px;height:34px;border-radius:50%;background:#16264d;color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800;flex:none">{{ s.initials }}</span>
+          <div class="roster-row" style="padding:12px 18px;border-bottom:1px solid #f0ede4">
+            <span class="r-tier" style="width:26px;height:26px;border-radius:50%;background:#f5ecd3;display:grid;place-items:center;font-size:11px;font-weight:800;color:#0a4631">{{ s.tier }}</span>
+            <div class="r-santri" style="display:flex;align-items:center;gap:10px;min-width:0">
+              <span style="width:34px;height:34px;border-radius:50%;background:#0a4631;color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800;flex:none">{{ s.initials }}</span>
               <div style="min-width:0"><div style="font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.nick }}</div><div style="font-size:11px;color:#9aa1ad">Halaqah {{ s.hal }}</div></div>
             </div>
-            <div>
+            <div class="r-prog">
               <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:4px"><span>{{ s.juz }}/15 Juz</span><span>{{ s.juzPct }}%</span></div>
               <div style="height:7px;border-radius:6px;background:#eef0f4;overflow:hidden"><div style="height:100%;width:{{ s.juzPct }}%;background:#2f8f3a;border-radius:6px"></div></div>
             </div>
-            <span style="font-size:12.5px;color:#6b7280">{{ s.kota }}</span>
-            <span style="justify-self:center;font-size:14px;font-weight:800;color:{{ s.gColor }}">{{ s.gLetter }}</span>
-            <div style="display:flex;gap:6px;justify-self:end">
+            <span class="r-asal" style="font-size:12.5px;color:#6b7280">{{ s.kota }}</span>
+            <span class="r-grade" style="justify-self:center;font-size:14px;font-weight:800;color:{{ s.gColor }}">{{ s.gLetter }}</span>
+            <div class="r-act" style="display:flex;gap:6px;justify-self:end">
               <button onClick="{{ s.onOpen }}" title="Profil" style="width:30px;height:30px;border-radius:8px;border:1px solid #e6e1d5;background:#fff;cursor:pointer;font-size:13px">👁</button>
               <button onClick="{{ s.onEntry }}" title="Input" style="width:30px;height:30px;border-radius:8px;border:none;background:#2f8f3a;color:#fff;cursor:pointer;font-size:15px;font-weight:700">+</button>
             </div>
