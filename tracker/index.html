@@ -10,15 +10,19 @@
 <helmet>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box}
-  body{margin:0;background:#eceadf;font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;color:#16264d;-webkit-font-smoothing:antialiased}
-  a{color:#2f8f3a;text-decoration:none}
-  a:hover{color:#1f7a34}
+  *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+  body{margin:0;background:#f6efe0;font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;color:#26302a}
+  a{color:#0c6240;text-decoration:none}
+  a:hover{color:#08321f}
   input,select,textarea,button{font-family:inherit}
-  ::selection{background:rgba(47,143,58,.2)}
+  input:focus,select:focus,textarea:focus{border-color:#c6a052!important;outline:none}
+  ::selection{background:#c6a052;color:#093526}
   .arb{font-family:'Amiri',serif}
+  .disp{font-family:'Marcellus',serif;font-weight:400}
+  .book-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px}
+  @media(max-width:420px){.book-grid{grid-template-columns:repeat(2,1fr);gap:12px}}
 </style>
 </helmet>
 
@@ -90,37 +94,18 @@
 
       <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:22px">
         <input value="{{ search }}" onInput="{{ onSearch }}" placeholder="Cari nama atau kota…" style="flex:1;min-width:180px;padding:10px 13px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;outline:none;color:#16264d" />
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:11px;font-weight:700;letter-spacing:.08em;color:#9aa1ad;text-transform:uppercase">Gaya Kartu</span>
-          <button onClick="{{ themeMinimal.onClick }}" style="{{ themeMinimal.style }}">Minimalis</button>
-          <button onClick="{{ themeGold.onClick }}" style="{{ themeGold.style }}">Emas</button>
-          <button onClick="{{ themeNavy.onClick }}" style="{{ themeNavy.style }}">Navy</button>
-          <button onClick="{{ themeCrest.onClick }}" style="{{ themeCrest.style }}">Crest</button>
-        </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:20px">
+      <div class="book-grid">
         <sc-for list="{{ gallery }}" as="s" hint-placeholder-count="8">
-          <div onClick="{{ s.onOpen }}" style="{{ s.cardStyle }}" style-hover="transform:translateY(-4px)" style="border-radius:16px;padding:18px 16px 15px;cursor:pointer;transition:transform .15s;position:relative;display:flex;flex-direction:column">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
-              <div style="text-align:center;line-height:1">
-                <div style="font-size:38px;font-weight:800;{{ s.ratingStyle }}">{{ s.gLetter }}</div>
-                <div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;{{ s.ratingSubStyle }}">{{ s.gName }}</div>
-                <div style="margin-top:8px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;{{ s.chipStyle }}">{{ s.juz }} Juz</div>
-              </div>
-              <div style="width:74px;height:74px;border-radius:50%;display:grid;place-items:center;font-size:24px;font-weight:800;{{ s.avStyle }}">{{ s.initials }}</div>
-            </div>
-            <div style="margin-top:12px">
-              <div style="font-weight:700;font-size:15px;line-height:1.15;{{ s.nameStyle }}">{{ s.nick }}</div>
-              <div style="font-size:11.5px;margin-top:2px;{{ s.subStyle }}">{{ s.kota }} · {{ s.prov }}</div>
-            </div>
-            <div style="margin-top:13px;padding-top:12px;border-top:1px solid;{{ s.divStyle }};display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px 6px">
-              <sc-for list="{{ s.pillars }}" as="p" hint-placeholder-count="6">
-                <div style="display:flex;align-items:baseline;gap:5px">
-                  <span style="font-size:10px;font-weight:700;letter-spacing:.03em;{{ s.statLabelStyle }}">{{ p.abbr }}</span>
-                  <span style="font-size:14px;font-weight:800;margin-left:auto;{{ s.statValStyle }}">{{ p.letter }}</span>
-                </div>
-              </sc-for>
+          <div onClick="{{ s.onOpen }}" style="background:#fffdf7;border:1px solid #ece3cf;border-radius:18px;padding:16px 14px 15px;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 6px 20px rgba(120,95,30,.08);position:relative;display:flex;flex-direction:column;align-items:center;text-align:center" style-hover="transform:translateY(-5px);box-shadow:0 16px 32px rgba(120,95,30,.17)">
+            <div style="position:absolute;top:11px;right:11px;font-size:10px;font-weight:700;color:#8a6d1e;background:#f5ecd3;border:1px solid #e6d3a0;padding:3px 9px;border-radius:999px">{{ s.juz }}/15 Juz</div>
+            <div style="width:132px;height:98px;margin:8px auto 2px">{{ s.book }}</div>
+            <div class="disp" style="font-size:19px;color:#0a4631;line-height:1.15;margin-top:8px">{{ s.nick }}</div>
+            <div style="font-size:11.5px;color:#9a8c6a;margin-top:3px">{{ s.kota }}</div>
+            <div style="width:100%;margin-top:14px">
+              <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;color:#b7a77f;text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px"><span>Hafalan</span><span style="color:#c6a052">{{ s.juzPct }}%</span></div>
+              <div style="height:7px;border-radius:6px;background:#efe7d2;overflow:hidden"><div style="height:100%;width:{{ s.juzPct }}%;background:linear-gradient(90deg,#c6a052,#e6cf8e);border-radius:6px"></div></div>
             </div>
           </div>
         </sc-for>
@@ -141,10 +126,12 @@
           <div style="font-size:19px;font-weight:800">{{ sel.name }}</div>
           <div style="font-size:12.5px;color:rgba(245,243,236,.6);margin-top:3px">{{ sel.kota }} · {{ sel.prov }}</div>
           <div style="display:flex;justify-content:center;gap:8px;margin-top:16px">
+            <sc-if value="{{ isStaff }}" hint-placeholder-val="{{ true }}">
             <div style="background:rgba(255,255,255,.06);border-radius:11px;padding:10px 4px;flex:1">
               <div style="font-size:26px;font-weight:800;color:{{ sel.gColor }};line-height:1">{{ sel.gLetter }}</div>
               <div style="font-size:9.5px;color:rgba(245,243,236,.6);margin-top:3px;font-weight:600">{{ sel.gName }}</div>
             </div>
+            </sc-if>
             <div style="background:rgba(255,255,255,.06);border-radius:11px;padding:10px 4px;flex:1">
               <div style="font-size:26px;font-weight:800;color:#e8c24a;line-height:1">{{ sel.juz }}</div>
               <div style="font-size:9.5px;color:rgba(245,243,236,.6);margin-top:3px;font-weight:600">dari 15 Juz</div>
@@ -157,6 +144,7 @@
         </div>
         <!-- right column -->
         <div style="display:flex;flex-direction:column;gap:20px">
+          <sc-if value="{{ isStaff }}" hint-placeholder-val="{{ true }}">
           <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:20px 22px">
             <div style="font-weight:800;font-size:14px;margin-bottom:16px">Profil Kemampuan</div>
             <div style="display:grid;grid-template-columns:170px 1fr;gap:20px;align-items:center">
@@ -171,6 +159,7 @@
               </div>
             </div>
           </div>
+          </sc-if>
           <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:20px 22px">
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px"><span style="font-weight:800;font-size:14px">Roadmap Tahfidz — 15 Juz</span><span style="font-size:12px;color:#6b7280">{{ sel.juz }}/15 juz · {{ sel.juzPct }}%</span></div>
             <div style="display:grid;grid-template-columns:repeat(15,1fr);gap:6px">
@@ -513,7 +502,7 @@ class Component extends DCLogic {
     const og=grade(overall), tier=tierOf(overall), v=this.cardVisual(theme,tier);
     const initials=r.nick.slice(0,2).toUpperCase();
     return {...r, initials, overall, gLetter:og.l, gName:og.name, gColor:og.c, tier,
-      juzPct:Math.round(r.juz/15*100), musyrif:HALAQAH[r.hal],
+      juzPct:Math.round(r.juz/15*100), musyrif:HALAQAH[r.hal], book:this.bookSvg(r.juz, r.id),
       pillars:scores.map(s=>({abbr:s.abbr, label:s.label, score:s.score, letter:s.g.l, color:s.g.c})),
       cardStyle:v.card, nameStyle:v.name, subStyle:v.sub, ratingStyle:v.rating, ratingSubStyle:v.ratingSub,
       chipStyle:v.chip, statLabelStyle:v.statLabel, statValStyle:v.statVal,
@@ -523,6 +512,34 @@ class Component extends DCLogic {
       onOpen:()=>this.setState({selectedId:r.id, view:'detail'}),
       onEntry:()=>this.setState({view:'entry', entry:{...this.state.entry, studentId:r.id, juz:String(r.juz)}}),
     };
+  }
+
+  // Open mushaf whose pages fill with gold as memorization (juz/15) progresses.
+  bookSvg(juz, uid){
+    const E=(t,p,c)=>React.createElement(t,p,c);
+    const max=15, pct=Math.max(0,Math.min(1,(juz||0)/max));
+    const gid='bg_'+uid, cid='bc_'+uid;
+    const pageTop=24, pageBot=82, fillTop=pageBot-pct*(pageBot-pageTop);
+    const left='10,20 70,34 70,80 12,84', right='130,20 70,34 70,80 128,84';
+    const lines=[];
+    for(let i=0;i<6;i++){ const y=32+i*8;
+      lines.push(E('line',{key:'tl'+i,x1:10,y1:y,x2:130,y2:y,stroke:'#cbb887',strokeWidth:1.3,opacity:.55,clipPath:'url(#'+cid+')'})); }
+    return E('svg',{viewBox:'0 0 140 104',width:'100%',height:'100%'},[
+      E('defs',{key:'d'},[
+        E('linearGradient',{key:'g',id:gid,x1:'0',y1:'1',x2:'0',y2:'0'},[
+          E('stop',{key:'a',offset:'0%',stopColor:'#c6a052'}),
+          E('stop',{key:'b',offset:'100%',stopColor:'#ecd79a'})]),
+        E('clipPath',{key:'c',id:cid},[
+          E('polygon',{key:'l',points:left}),
+          E('polygon',{key:'r',points:right})])]),
+      E('ellipse',{key:'sh',cx:70,cy:92,rx:52,ry:5,fill:'rgba(120,95,30,.13)'}),
+      E('polygon',{key:'lp',points:left,fill:'#fbf6ea',stroke:'#e0cfa4',strokeWidth:1.2}),
+      E('polygon',{key:'rp',points:right,fill:'#fbf6ea',stroke:'#e0cfa4',strokeWidth:1.2}),
+      E('rect',{key:'fl',x:0,y:fillTop,width:140,height:104,fill:'url(#'+gid+')',clipPath:'url(#'+cid+')',opacity:.9}),
+      ...lines,
+      E('line',{key:'sp',x1:70,y1:33,x2:70,y2:81,stroke:'#b2934a',strokeWidth:2}),
+      E('rect',{key:'rb',x:67,y:14,width:6,height:22,rx:1,fill:'#0a4631'}),
+    ]);
   }
 
   radar(s){
