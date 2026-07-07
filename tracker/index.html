@@ -49,9 +49,8 @@
             <span style="color:rgba(245,243,236,.4);font-size:20px">\u2192</span>
           </button>
           <button onClick="{{ loginPublic }}" style="display:flex;align-items:center;gap:14px;padding:15px 17px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;cursor:pointer;transition:.15s" style-hover="background:rgba(255,255,255,.1)">
-            <span style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.12);display:grid;place-items:center;font-weight:800;color:#fff;flex:none">P</span>
-            <span style="flex:1"><span style="display:block;font-weight:700;font-size:15px">Lihat Galeri Publik</span><span style="font-size:12px;color:rgba(245,243,236,.55)">Kartu santri untuk orang tua &amp; tamu</span></span>
-            <span style="color:rgba(245,243,236,.4);font-size:20px">\u2192</span>
+            <span style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.12);display:grid;place-items:center;font-weight:800;color:#fff;flex:none">\u2190</span>
+            <span style="flex:1"><span style="display:block;font-weight:700;font-size:15px">Kembali ke Galeri Publik</span><span style="font-size:12px;color:rgba(245,243,236,.55)">Batal \u2014 lihat kartu santri (tanpa masuk)</span></span>
           </button>
         </div>
         <a href="../index.html" style="display:inline-block;margin-top:22px;font-size:12.5px;color:rgba(245,243,236,.55);text-decoration:none;font-weight:600">\u2190 Kembali ke Beranda</a>
@@ -80,7 +79,13 @@
           <div style="font-weight:800;font-size:16px;line-height:1.1">RTA Al-Qalam \u2014 Galeri Santri</div>
           <div style="font-size:12px;color:#6b7280">Angkatan I \u00b7 Tahun Ajaran 2026/2027</div>
         </div>
-        <button onClick="{{ logout }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Keluar</button>
+        <sc-if value="{{ isStaff }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ goDashboard }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Dashboard</button>
+          <button onClick="{{ logout }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Keluar</button>
+        </sc-if>
+        <sc-if value="{{ isPublic }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ goLogin }}" style="padding:9px 18px;border-radius:999px;border:none;background:#16264d;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer">Masuk Staff</button>
+        </sc-if>
       </div>
 
       <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:22px">
@@ -434,7 +439,7 @@ const TIER_ACCENT = {gold:'#cfa02c', silver:'#8593a8', bronze:'#b07a4a'};
 
 class Component extends DCLogic {
   state = {
-    view:'login', role:null, selectedId:null, theme:'minimal', search:'',
+    view:'gallery', role:'public', selectedId:null, theme:'minimal', search:'',
     formId:'1FAIpQLScSAMPLEFORMIDxxxxxxxxxxxxxxxxxxxxxxx',
     entry:{ studentId:'s1', tanggal:'2026-09-06', mode:'hafalan',
       jenis:'Ziyadah', juz:'8', halaman:'3', tajwid:'A', kelancaran:'A',
@@ -603,6 +608,8 @@ class Component extends DCLogic {
       isLogin:v==='login', isGallery:v==='gallery', isDetail:v==='detail', isDashboard:v==='dashboard', isEntry:v==='entry',
       canManage: st.role==='admin'||st.role==='mudir'||st.role==='musyrif',
       canManageSecular: st.role==='admin',
+      isStaff: st.role==='admin'||st.role==='mudir'||st.role==='musyrif',
+      isPublic: st.role==='public',
       theme:st.theme,
       themeMinimal:themeBtn('minimal'), themeGold:themeBtn('gold'), themeNavy:themeBtn('navy'), themeCrest:themeBtn('crest'),
       gallery, galleryCount:gallery.length, roster, rosterCount:roster.length,
@@ -615,7 +622,8 @@ class Component extends DCLogic {
       goGallery:()=>this.setState({view:'gallery'}),
       goDashboard:()=>this.setState({view:'dashboard'}),
       goEntry:()=>this.setState({view:'entry'}),
-      logout:()=>this.setState({view:'login', role:null, selectedId:null}),
+      goLogin:()=>this.setState({view:'login'}),
+      logout:()=>this.setState({view:'gallery', role:'public', selectedId:null}),
       back:()=>this.setState({view: st.role==='public'?'gallery':'dashboard'}),
       loginAdmin:()=>this.setState({role:'admin', view:'dashboard'}),
       loginMudir:()=>this.setState({role:'mudir', view:'dashboard'}),
