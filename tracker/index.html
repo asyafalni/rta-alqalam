@@ -81,6 +81,7 @@
           <div style="font-size:12px;color:#6b7280">Angkatan I · Tahun Ajaran 2026/2027</div>
         </div>
         <sc-if value="{{ isStaff }}" hint-placeholder-val="{{ false }}">
+          <span style="font-size:12.5px;color:#6b7280;font-weight:600;white-space:nowrap">{{ greeting }}</span>
           <button onClick="{{ goDashboard }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Dashboard</button>
           <button onClick="{{ logout }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Keluar</button>
         </sc-if>
@@ -184,6 +185,7 @@
           <div style="font-weight:800;font-size:16px;line-height:1.1">Dashboard {{ roleLabel }}</div>
           <div style="font-size:12px;color:#6b7280">Pemantauan hafalan &amp; nilai · Angkatan I</div>
         </div>
+        <span style="font-size:12.5px;color:#6b7280;font-weight:600;white-space:nowrap;margin-right:2px">{{ greeting }}</span>
         <button onClick="{{ goGallery }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Capaian Santri</button>
         <button onClick="{{ goEntry }}" style="padding:8px 14px;border-radius:9px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer">+ Input Nilai</button>
         <button onClick="{{ logout }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Keluar</button>
@@ -430,7 +432,7 @@ class Component extends DCLogic {
       mapel:'Matematika', nilai:'85', aspek:'Adab & Sopan Santun', predikat:'A',
       catatan:'' },
     sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
-    clerkReady:false,
+    clerkReady:false, userName:'',
   };
 
   // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
@@ -459,11 +461,12 @@ class Component extends DCLogic {
     if(u){
       const raw=(u.publicMetadata&&u.publicMetadata.role)||'';
       const role=['admin','mudir','musyrif'].indexOf(raw)>=0?raw:'musyrif';
-      const patch={role, loginOpen:false};
+      const name=u.firstName||u.fullName||(u.primaryEmailAddress&&u.primaryEmailAddress.emailAddress)||'Staff';
+      const patch={role, userName:name, loginOpen:false};
       if(this._afterSignIn){ this._afterSignIn=false; patch.view='dashboard'; }
       this.setState(patch);
     } else if(this.state.role!=='public'){
-      this.setState({role:'public', view:'gallery'});
+      this.setState({role:'public', userName:'', view:'gallery'});
     }
   }
 
@@ -652,7 +655,7 @@ class Component extends DCLogic {
     const roleLabel = st.role==='admin'?'Admin':st.role==='mudir'?'Mudir':st.role==='musyrif'?'Musyrif':'Publik';
 
     return {
-      view:v, role:st.role, roleLabel,
+      view:v, role:st.role, roleLabel, userName:st.userName, greeting: st.userName?('Halo, '+st.userName):'',
       isLogin:v==='login', isGallery:v==='gallery', isDetail:v==='detail', isDashboard:v==='dashboard', isEntry:v==='entry',
       canManage: st.role==='admin'||st.role==='mudir'||st.role==='musyrif',
       canManageSecular: st.role==='admin',
@@ -673,7 +676,7 @@ class Component extends DCLogic {
       goLogin:()=>{ const C=window.Clerk; if(C){ this._afterSignIn=true; if(C.loaded){ C.openSignIn(); } else { C.load().then(()=>C.openSignIn()).catch(()=>this.setState({loginOpen:true})); } } else { this.setState({loginOpen:true}); } },
       closeLogin:()=>this.setState({loginOpen:false}),
       stopLogin:(ev)=>{ ev && ev.stopPropagation && ev.stopPropagation(); },
-      logout:()=>{ try{ if(window.Clerk && window.Clerk.user) window.Clerk.signOut(); }catch(e){} this.setState({view:'gallery', role:'public', loginOpen:false, selectedId:null}); },
+      logout:()=>{ try{ if(window.Clerk && window.Clerk.user) window.Clerk.signOut(); }catch(e){} this.setState({view:'gallery', role:'public', loginOpen:false, selectedId:null, userName:''}); },
       back:()=>this.setState({view: st.role==='public'?'gallery':'dashboard'}),
       loginAdmin:()=>this.setState({role:'admin', view:'dashboard', loginOpen:false}),
       loginMudir:()=>this.setState({role:'mudir', view:'dashboard', loginOpen:false}),
