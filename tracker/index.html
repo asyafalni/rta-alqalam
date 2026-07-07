@@ -46,7 +46,7 @@
   @media(min-width:480px){.juz-map{grid-template-columns:repeat(10,1fr)}}
   @media(min-width:720px){.juz-map{grid-template-columns:repeat(15,1fr)}}
   .roster-head{display:none}
-  @media(min-width:760px){.roster-head{display:grid;grid-template-columns:48px 1.7fr 1.5fr 1fr 60px 84px;gap:12px}}
+  @media(min-width:760px){.roster-head{display:grid;grid-template-columns:36px 1.7fr 1.5fr 1fr 60px 84px;gap:12px}}
   .roster-row{display:grid;gap:9px 10px;align-items:center;grid-template-columns:auto 1fr auto auto;grid-template-areas:'tier santri grade act' 'prog prog prog prog'}
   .roster-row>.r-tier{grid-area:tier}
   .roster-row>.r-santri{grid-area:santri;min-width:0}
@@ -54,7 +54,7 @@
   .roster-row>.r-asal{grid-area:asal;display:none}
   .roster-row>.r-grade{grid-area:grade}
   .roster-row>.r-act{grid-area:act}
-  @media(min-width:760px){.roster-row{grid-template-columns:48px 1.7fr 1.5fr 1fr 60px 84px;grid-template-areas:'tier santri prog asal grade act'}.roster-row>.r-asal{display:block}}
+  @media(min-width:760px){.roster-row{grid-template-columns:36px 1.7fr 1.5fr 1fr 60px 84px;grid-template-areas:'tier santri prog asal grade act'}.roster-row>.r-asal{display:block}}
 </style>
 </helmet>
 
@@ -230,13 +230,13 @@
 
       <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;overflow:hidden">
         <div class="roster-head" style="padding:13px 18px;background:#f7f6f2;border-bottom:1px solid #e6e1d5;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#9aa1ad">
-          <span>#</span><span>Santri</span><span>Progres Hafalan</span><span>Asal</span><span style="text-align:center">Nilai</span><span></span>
+          <span>#</span><span onClick="{{ sortName }}" style="cursor:pointer;user-select:none">Santri{{ arrowName }}</span><span onClick="{{ sortProg }}" style="cursor:pointer;user-select:none">Progres Hafalan{{ arrowProg }}</span><span onClick="{{ sortAsal }}" style="cursor:pointer;user-select:none">Asal{{ arrowAsal }}</span><span onClick="{{ sortNilai }}" style="text-align:center;cursor:pointer;user-select:none">Nilai{{ arrowNilai }}</span><span></span>
         </div>
         <sc-for list="{{ roster }}" as="s" hint-placeholder-count="10">
           <div class="roster-row" style="padding:12px 18px;border-bottom:1px solid #f0ede4">
-            <span class="r-tier" title="{{ s.tier }}" style="width:46px;height:50px;display:grid;place-items:center;background:url('{{ s.tierEmblem }}') center/contain no-repeat;font-size:14px;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.45)">{{ s.rank }}</span>
+            <span class="r-tier" style="width:26px;display:grid;place-items:center;font-size:12.5px;font-weight:800;color:#b7a77f">{{ s.rank }}</span>
             <div class="r-santri" style="display:flex;align-items:center;gap:10px;min-width:0">
-              <span style="width:34px;height:34px;border-radius:50%;background:#0a4631;color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800;flex:none">{{ s.initials }}</span>
+              <span title="{{ s.tier }}" style="width:34px;height:34px;border-radius:50%;background:{{ s.tierColor }};color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.12)">{{ s.initials }}</span>
               <div style="min-width:0"><div style="font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.nick }}</div><div style="font-size:11px;color:#9aa1ad">Halaqah {{ s.hal }}</div></div>
             </div>
             <div class="r-prog">
@@ -358,6 +358,7 @@ const TIER_ACCENT = {gold:'#cfa02c', silver:'#8593a8', bronze:'#b07a4a'};
 class Component extends DCLogic {
   state = {
     view:'gallery', role:'public', loginOpen:false, selectedId:null, theme:'minimal', search:'',
+    sortKey:'juz', sortDir:'desc',
     formId:'1FAIpQLScSAMPLEFORMIDxxxxxxxxxxxxxxxxxxxxxxx',
     sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
     clerkReady:false, userName:'', entryOpen:false, configOpen:false,
@@ -421,6 +422,12 @@ class Component extends DCLogic {
       haf:num(o.haf), tah:num(o.tah), mur:num(o.mur), ilm:num(o.ilm), akh:num(o.akh), akd:num(o.akd), bhs:num(o.bhs) };
   }
 
+  sortBy(key){
+    const {sortKey,sortDir}=this.state;
+    if(sortKey===key) this.setState({sortDir:sortDir==='asc'?'desc':'asc'});
+    else this.setState({sortKey:key, sortDir:(key==='nick'||key==='kota')?'asc':'desc'});
+  }
+
   cardVisual(theme, tier){
     const accent = TIER_ACCENT[tier];
     if(theme==='gold'){
@@ -465,7 +472,7 @@ class Component extends DCLogic {
     const overall=Math.round(scores.reduce((a,s)=>a+s.score,0)/scores.length);
     const og=grade(overall), tier=tierOf(overall), v=this.cardVisual(theme,tier);
     const initials=r.nick.slice(0,2).toUpperCase();
-    return {...r, initials, overall, gLetter:og.l, gName:og.name, gColor:og.c, tier, tierEmblem:'../assets/'+tier+'.webp',
+    return {...r, initials, overall, gLetter:og.l, gName:og.name, gColor:og.c, tier, tierColor:TIER_ACCENT[tier],
       juz:juzCount, curjuz:curJuz, juzDone,
       juzPct:Math.min(100,Math.round(juzCount/15*100)), musyrif:HALAQAH[r.hal],
       curArab:String(curJuz).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d)),
@@ -541,7 +548,10 @@ class Component extends DCLogic {
     gallery=gallery.slice().sort((a,b)=>b.overall-a.overall);
     // dashboard roster (for now all staff roles see every halaqah; musyrif scope TODO)
     let roster=all.slice();
-    roster.sort((a,b)=>b.juz-a.juz);
+    const sk=st.sortKey||'juz', sd=st.sortDir||'desc';
+    const cmpBy={ nick:(a,b)=>a.nick.localeCompare(b.nick), juz:(a,b)=>a.juz-b.juz, kota:(a,b)=>(a.kota||'').localeCompare(b.kota||''), overall:(a,b)=>a.overall-b.overall };
+    const cmp=cmpBy[sk]||cmpBy.juz;
+    roster.sort((a,b)=>sd==='asc'?cmp(a,b):-cmp(a,b));
     roster=roster.map((s,i)=>({...s, rank:i+1}));
     const totalJuz=roster.reduce((a,s)=>a+s.juz,0);
     const avgJuz=roster.length?(totalJuz/roster.length):0;
@@ -562,6 +572,11 @@ class Component extends DCLogic {
       mumtazCount:all.filter(s=>s.gLetter==='A').length,
       sel, selRadar: sel?this.radar(sel):null, selJuz: sel?this.juzCells(sel):[],
       search:st.search, onSearch:(ev)=>this.setState({search:ev.target.value}),
+      sortName:()=>this.sortBy('nick'), sortProg:()=>this.sortBy('juz'), sortAsal:()=>this.sortBy('kota'), sortNilai:()=>this.sortBy('overall'),
+      arrowName: st.sortKey==='nick'?(st.sortDir==='asc'?' ↑':' ↓'):'',
+      arrowProg: st.sortKey==='juz'?(st.sortDir==='asc'?' ↑':' ↓'):'',
+      arrowAsal: st.sortKey==='kota'?(st.sortDir==='asc'?' ↑':' ↓'):'',
+      arrowNilai: st.sortKey==='overall'?(st.sortDir==='asc'?' ↑':' ↓'):'',
       // nav
       login:(role)=>this.setState({role, view: role==='public'?'gallery':'dashboard'}),
       goGallery:()=>this.setState({view:'gallery'}),
