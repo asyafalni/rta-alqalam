@@ -28,6 +28,13 @@
   .disp{font-family:'Marcellus',serif;font-weight:400}
   .book-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px}
   @media(max-width:420px){.book-grid{grid-template-columns:repeat(2,1fr);gap:12px}}
+  /* slide-over sheet: bottom sheet on mobile, right drawer on desktop */
+  .sheet-backdrop{position:fixed;inset:0;z-index:70;background:rgba(6,28,18,.5);backdrop-filter:blur(2px);animation:dcFade .2s ease}
+  .sheet{position:fixed;z-index:71;background:#f6efe0;box-shadow:0 -12px 44px rgba(0,0,0,.28);display:flex;flex-direction:column;overflow:hidden;left:0;right:0;bottom:0;height:90vh;border-radius:20px 20px 0 0;animation:dcUp .3s cubic-bezier(.2,.8,.2,1)}
+  @media(min-width:640px){.sheet{top:0;bottom:0;right:0;left:auto;height:100%;width:min(500px,100%);border-radius:0;animation:dcRight .3s cubic-bezier(.2,.8,.2,1)}}
+  @keyframes dcUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  @keyframes dcRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
+  @keyframes dcFade{from{opacity:0}to{opacity:1}}
 </style>
 </helmet>
 
@@ -227,25 +234,25 @@
     </div>
   </sc-if>
 
-  <!-- ============ INPUT NILAI ============ -->
-  <sc-if value="{{ isEntry }}" hint-placeholder-val="{{ false }}">
-    <div style="max-width:860px;margin:0 auto;padding:16px 20px 40px">
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">
-        <button onClick="{{ back }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">← Kembali</button>
-        <h1 style="font-size:20px;font-weight:800;margin:0;flex:1;min-width:120px">Input Nilai</h1>
-        <a href="{{ formOpenUrl }}" target="_blank" rel="noopener" style="font-size:12.5px;font-weight:700;color:#0c6240;white-space:nowrap">Buka di tab baru ↗</a>
+  <!-- ============ INPUT NILAI (slide-over sheet) ============ -->
+  <sc-if value="{{ entryOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeEntry }}" class="sheet-backdrop"></div>
+    <div class="sheet">
+      <div style="display:flex;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid #e6ddc8;background:#fff">
+        <h1 style="font-size:17px;font-weight:800;margin:0;flex:1;color:#0a4631">Input Nilai</h1>
+        <a href="{{ formOpenUrl }}" target="_blank" rel="noopener" title="Buka di tab baru" style="font-size:15px;font-weight:700;color:#0c6240;padding:4px 6px">↗</a>
+        <button onClick="{{ closeEntry }}" title="Tutup" style="width:32px;height:32px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;cursor:pointer;font-size:18px;line-height:1">×</button>
       </div>
-      <p style="font-size:13px;color:#6b7280;margin:0 0 16px;line-height:1.5">Isi form di bawah — jawaban langsung tersimpan ke Google Sheet.</p>
       <sc-if value="{{ formConfigured }}" hint-placeholder-val="{{ true }}">
-        <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(20,30,60,.06)">
-          <iframe src="{{ formEmbedUrl }}" title="Input Nilai" style="width:100%;height:80vh;min-height:520px;border:none;display:block"></iframe>
-        </div>
+        <iframe src="{{ formEmbedUrl }}" title="Input Nilai" style="flex:1;width:100%;border:none;display:block;background:#fff"></iframe>
       </sc-if>
       <sc-if value="{{ formNotConfigured }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#fbf7ea;border:1px solid #ecdfae;border-radius:14px;padding:26px 22px;text-align:center">
-          <div style="font-size:14px;font-weight:800;color:#8a6d1e">Google Form belum dikonfigurasi</div>
-          <p style="font-size:12.5px;color:#6b7280;margin:8px auto 16px;max-width:380px;line-height:1.5">Masukkan ID Google Form pada halaman Konfigurasi agar form input muncul di sini.</p>
-          <button onClick="{{ goConfig }}" style="padding:11px 20px;border-radius:10px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Buka Konfigurasi</button>
+        <div style="flex:1;display:grid;place-items:center;padding:26px;text-align:center">
+          <div style="max-width:340px">
+            <div style="font-size:14px;font-weight:800;color:#8a6d1e">Google Form belum dikonfigurasi</div>
+            <p style="font-size:12.5px;color:#6b7280;margin:8px 0 16px;line-height:1.5">Masukkan ID Google Form pada halaman Konfigurasi agar form input muncul di sini.</p>
+            <button onClick="{{ goConfig }}" style="padding:11px 20px;border-radius:10px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Buka Konfigurasi</button>
+          </div>
         </div>
       </sc-if>
     </div>
@@ -322,7 +329,7 @@ class Component extends DCLogic {
     view:'gallery', role:'public', loginOpen:false, selectedId:null, theme:'minimal', search:'',
     formId:'1FAIpQLScSAMPLEFORMIDxxxxxxxxxxxxxxxxxxxxxxx',
     sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
-    clerkReady:false, userName:'',
+    clerkReady:false, userName:'', entryOpen:false,
   };
 
   // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
@@ -438,7 +445,7 @@ class Component extends DCLogic {
       divStyle:{borderColor:v.divider},
       barTrack:{background:theme==='minimal'?'#eef0f4':'rgba(255,255,255,.14)'},
       onOpen:()=>this.setState({selectedId:r.id, view:'detail'}),
-      onEntry:()=>this.setState({view:'entry', entry:{...this.state.entry, studentId:r.id, juz:String(curJuz)}}),
+      onEntry:()=>this.setState({entryOpen:true}),
     };
   }
 
@@ -526,8 +533,9 @@ class Component extends DCLogic {
       login:(role)=>this.setState({role, view: role==='public'?'gallery':'dashboard'}),
       goGallery:()=>this.setState({view:'gallery'}),
       goDashboard:()=>this.setState({view:'dashboard'}),
-      goEntry:()=>this.setState({view:'entry'}),
-      goConfig:()=>this.setState({view:'config'}),
+      goEntry:()=>this.setState({entryOpen:true}),
+      closeEntry:()=>this.setState({entryOpen:false}),
+      goConfig:()=>this.setState({view:'config', entryOpen:false}),
       goLogin:()=>{ const C=window.Clerk; if(C){ this._afterSignIn=true; const here=window.location.href, o={afterSignInUrl:here, afterSignUpUrl:here, signInForceRedirectUrl:here, signUpForceRedirectUrl:here}; if(C.loaded){ C.openSignIn(o); } else { C.load().then(()=>C.openSignIn(o)).catch(()=>this.setState({loginOpen:true})); } } else { this.setState({loginOpen:true}); } },
       closeLogin:()=>this.setState({loginOpen:false}),
       stopLogin:(ev)=>{ ev && ev.stopPropagation && ev.stopPropagation(); },
