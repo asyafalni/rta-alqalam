@@ -503,8 +503,8 @@ class Component extends DCLogic {
 
   // Open book (gold cover, white pages) with a loading bar across the pages
   // whose green fill tracks memorization progress (juz / 15).
-  // A 15-juz Qur'an: the current juz number shown big and centered on the
-  // open page in Aref Ruqaa, with the word جُزْء above it.
+  // A 15-juz Qur'an: big current juz number centered on the LEFT page,
+  // the word جُزْء centered on the RIGHT page (Aref Ruqaa).
   bookSvg(juz, uid){
     const E=(t,p,c)=>React.createElement(t,p,c);
     const j=Math.max(0,Math.min(15,juz||0));
@@ -520,8 +520,8 @@ class Component extends DCLogic {
       E('path',{key:'cr',d:'M70,108 L70,26 Q98,16 131,26 L126,100 Q96,94 70,108 Z',...cover}),
       E('path',{key:'pl',d:'M70,99 L70,32 Q45,23 17,30 L21,90 Q45,85 70,99 Z',...page}),
       E('path',{key:'pr',d:'M70,99 L70,32 Q95,23 123,30 L119,90 Q95,85 70,99 Z',...page}),
-      E('text',{key:'jw',x:70,y:47,textAnchor:'middle',dominantBaseline:'central',fontSize:15,fontWeight:700,fill:'#b98f3e',fontFamily:ARB},'جُزْء'),
-      E('text',{key:'nm',x:70,y:73,textAnchor:'middle',dominantBaseline:'central',fontSize:two?34:42,fontWeight:700,fill:INK,fontFamily:ARB},arb),
+      E('text',{key:'jw',x:97,y:63,textAnchor:'middle',dominantBaseline:'central',fontSize:20,fontWeight:700,fill:INK,fontFamily:ARB},'جُزْء'),
+      E('text',{key:'nm',x:43,y:63,textAnchor:'middle',dominantBaseline:'central',fontSize:two?30:38,fontWeight:700,fill:INK,fontFamily:ARB},arb),
     ]);
   }
 
