@@ -393,6 +393,35 @@ const PILLARS = [
   {key:'akd', abbr:'AKD', label:'Akademik', grp:'akademik'},
   {key:'bhs', abbr:'BHS', label:'Bahasa', grp:'akademik'},
 ];
+
+// ============================================================================
+//  GOOGLE FORM FIELD IDS  ——  replace every 'entry.100xxxx' placeholder below
+//  with the REAL id from your Form. How: Form → ⋮ → "Get pre-filled link",
+//  fill sample answers, copy the link; the entry.NNNNN numbers are the ids.
+//  Assumes ONE combined Form (with a "Bidang/Jenis Input" question) whose id
+//  goes in Konfigurasi → Google Form ID. See GUIDE.md §5.
+// ============================================================================
+const FORM_FIELDS = {
+  // shared by every entry type
+  santri:     'entry.1000101',   // Nama santri
+  tanggal:    'entry.1000102',   // Tanggal
+  catatan:    'entry.1000108',   // Catatan
+  // 📖 Setoran Hafalan
+  jenis:      'entry.1000103',   // Jenis setoran (Ziyadah / Muroja'ah)
+  juz:        'entry.1000104',   // Juz
+  halaman:    'entry.1000105',   // Halaman / baris
+  tajwid:     'entry.1000106',   // Nilai Tajwid
+  kelancaran: 'entry.1000107',   // Nilai Kelancaran
+  // 📘 Nilai Akademik
+  bidangAkd:  'entry.1000201',   // Bidang (nilai tetap "Akademik")
+  mapel:      'entry.1000202',   // Mata pelajaran
+  nilai:      'entry.1000203',   // Nilai angka
+  // 🌟 Nilai Akhlak
+  bidangAkh:  'entry.1000301',   // Bidang (nilai tetap "Akhlak")
+  aspek:      'entry.1000302',   // Aspek akhlak
+  predikat:   'entry.1000303',   // Predikat
+};
+
 function grade(n){
   if(n>=90) return {l:'A', name:'Mumtaz', c:'#1f7a34'};
   if(n>=80) return {l:'B', name:'Jayyid Jiddan', c:'#3f9a49'};
@@ -520,19 +549,20 @@ class Component extends DCLogic {
     const roster=this.activeRoster();
     const e=this.state.entry, s=roster.find(x=>x.id===e.studentId)||roster[0];
     const base='https://docs.google.com/forms/d/e/'+this.state.formId+'/viewform?usp=pp_url';
+    const F=FORM_FIELDS;
     let map;
     if(e.mode==='akademik'){
-      map={ 'entry.1000101':s.name,'entry.1000102':e.tanggal,'entry.1000201':'Akademik',
-        'entry.1000202':e.mapel,'entry.1000203':e.nilai,'entry.1000108':e.catatan };
+      map={ [F.santri]:s.name, [F.tanggal]:e.tanggal, [F.bidangAkd]:'Akademik',
+        [F.mapel]:e.mapel, [F.nilai]:e.nilai, [F.catatan]:e.catatan };
     } else if(e.mode==='akhlak'){
-      map={ 'entry.1000101':s.name,'entry.1000102':e.tanggal,'entry.1000301':'Akhlak',
-        'entry.1000302':e.aspek,'entry.1000303':e.predikat,'entry.1000108':e.catatan };
+      map={ [F.santri]:s.name, [F.tanggal]:e.tanggal, [F.bidangAkh]:'Akhlak',
+        [F.aspek]:e.aspek, [F.predikat]:e.predikat, [F.catatan]:e.catatan };
     } else {
-      map={ 'entry.1000101':s.name,'entry.1000102':e.tanggal,'entry.1000103':e.jenis,
-        'entry.1000104':e.juz,'entry.1000105':e.halaman,'entry.1000106':e.tajwid,
-        'entry.1000107':e.kelancaran,'entry.1000108':e.catatan };
+      map={ [F.santri]:s.name, [F.tanggal]:e.tanggal, [F.jenis]:e.jenis,
+        [F.juz]:e.juz, [F.halaman]:e.halaman, [F.tajwid]:e.tajwid,
+        [F.kelancaran]:e.kelancaran, [F.catatan]:e.catatan };
     }
-    const q=Object.entries(map).filter(([k,v])=>v!=='').map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
+    const q=Object.entries(map).filter(([k,v])=>v!==''&&v!=null).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
     return base+'&'+q;
   }
 

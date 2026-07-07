@@ -140,9 +140,15 @@ Set it up so submissions land in the **Private** sheet's `Setoran` tab:
 2. Link it to the **Private** spreadsheet (Form → Responses → Link to Sheets).
 3. **Get the real field IDs:** Form → ⋮ → *Get pre-filled link*, fill sample answers, copy the link.
    The `entry.XXXXXXX` numbers in that link are your real field IDs.
-4. Replace the placeholder IDs in the tracker: `tracker/index.html` → `buildUrl()` → the `map = { … }`
-   objects (currently `entry.1000101` … these are placeholders). Also paste the Form ID into the
-   tracker's **Konfigurasi → Google Form ID** box.
+4. Replace the placeholders in **one place** — `tracker/index.html` → the `const FORM_FIELDS = { … }`
+   block near the top of the `<script>` (each line is labelled: santri, tanggal, juz, mapel, …).
+   Swap every `entry.100xxxx` for the matching real id. `buildUrl()` reads them all from there.
+5. Paste the Form ID into the tracker's **Konfigurasi → Google Form ID** box.
+
+> This assumes **one combined Form** with a "Bidang / Jenis Input" question (Hafalan / Akhlak /
+> Akademik) — the `bidangAkd` / `bidangAkh` fields carry that value. If you use a **separate Form
+> per mode** instead, you'd also need a per-mode Form ID (currently the tracker uses one `formId`
+> for all three) — tell the dev and it's a small change.
 
 ---
 
