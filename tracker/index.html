@@ -10,7 +10,7 @@
 <helmet>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Marcellus&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
   body{margin:0;background:#f6efe0;font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;color:#26302a}
@@ -510,7 +510,7 @@ class Component extends DCLogic {
     const j=Math.max(0,Math.min(15,juz||0));
     const done=j>=15, cur=done?15:j+1;
     const arb=String(cur).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d));
-    const OUT='#b98f3e', GOLD='#e8bd57', INK='#0a4631', PAGE='#fdf8ec', AMIRI="'Amiri',serif";
+    const OUT='#b98f3e', GOLD='#e8bd57', INK='#0a4631', PAGE='#fdf8ec', AMIRI="'Aref Ruqaa','Amiri',serif";
     const cover={fill:GOLD, stroke:OUT, strokeWidth:2.2, strokeLinejoin:'round'};
     const page={fill:PAGE, stroke:OUT, strokeWidth:1.6, strokeLinejoin:'round'};
     // 15 page markers: done (gold), current (green), remaining (faint)
@@ -530,7 +530,7 @@ class Component extends DCLogic {
       E('path',{key:'pr',d:'M70,99 L70,32 Q95,23 123,30 L119,90 Q95,85 70,99 Z',...page}),
       E('line',{key:'st',x1:70,y1:33,x2:70,y2:97,stroke:'#ecdcb4',strokeWidth:1.2}),
       E('text',{key:'nm',x:43,y:68,textAnchor:'middle',fontSize:30,fontWeight:700,fill:INK,fontFamily:AMIRI},arb),
-      E('text',{key:'jw',x:98,y:60,textAnchor:'middle',fontSize:17,fontWeight:700,fill:INK,fontFamily:AMIRI},'جزء'),
+      E('text',{key:'jw',x:98,y:62,textAnchor:'middle',fontSize:19,fontWeight:700,fill:INK,fontFamily:AMIRI},'جُزْء'),
       ...dots,
     ]);
   }
