@@ -128,7 +128,7 @@
           <div onClick="{{ s.onOpen }}" style="background:#fffdf7;border:1px solid #ece3cf;border-radius:18px;padding:15px 14px 17px;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 6px 20px rgba(120,95,30,.08);position:relative;display:flex;flex-direction:column;align-items:center;text-align:center" style-hover="transform:translateY(-5px);box-shadow:0 16px 32px rgba(120,95,30,.17)">
             <img src="../assets/quran-icon.png" alt="Al-Qur'an" style="width:106px;height:auto;margin:2px auto 0;display:block" />
             <div class="disp" style="font-size:19px;color:#0a4631;line-height:1.15;margin-top:8px">{{ s.nick }}</div>
-            <div style="font-size:11.5px;color:#9a8c6a;margin-top:3px">{{ s.kota }}</div>
+            <div style="font-size:11.5px;color:#9a8c6a;margin-top:3px">{{ s.kota }} · Kelas {{ s.kelas }}</div>
             <div class="arb" style="margin-top:9px;font-size:15px;font-weight:700;color:#0a4631;background:#f5ecd3;border:1px solid #e6d3a0;padding:3px 15px;border-radius:999px" dir="rtl">جُزْء {{ s.curArab }}</div>
             <div style="width:100%;margin-top:12px">
               <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;color:#b7a77f;text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px"><span>Hafalan</span><span style="color:#c6a052">{{ s.juzPct }}%</span></div>
@@ -163,8 +163,10 @@
             </div>
           </div>
           <div style="margin-top:16px;text-align:left;font-size:11.5px;color:rgba(245,243,236,.55);line-height:1.7">
-            <div style="display:flex;justify-content:space-between"><span>Halaqah</span><span style="color:#f5f3ec;font-weight:600">Halaqah {{ sel.hal }}</span></div>
-            <div style="display:flex;justify-content:space-between"><span>Musyrif</span><span style="color:#f5f3ec;font-weight:600">{{ sel.musyrif }}</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span>Kelas</span><span style="color:#f5f3ec;font-weight:600;text-align:right">Kelas {{ sel.kelas }}</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span>Halaqah</span><span style="color:#f5f3ec;font-weight:600;text-align:right">Halaqah {{ sel.hal }}</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span>Musyrif</span><span style="color:#f5f3ec;font-weight:600;text-align:right">{{ sel.musyrif }}</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span>Mudir</span><span style="color:#f5f3ec;font-weight:600;text-align:right">{{ sel.mudir }}</span></div>
           </div>
         </div>
         <!-- right column -->
@@ -238,7 +240,7 @@
           <div class="roster-row" style="padding:12px 18px;border-bottom:1px solid #f0ede4">
             <div class="r-santri" style="display:flex;align-items:center;gap:10px;min-width:0">
               <span title="{{ s.tier }}" style="width:34px;height:34px;border-radius:50%;background:{{ s.tierColor }};color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.12)">{{ s.initials }}</span>
-              <div style="min-width:0"><div style="font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.nick }}</div><div style="font-size:11px;color:#9aa1ad">Halaqah {{ s.hal }}</div></div>
+              <div style="min-width:0"><div style="display:flex;align-items:center;gap:6px;min-width:0"><span style="font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.nick }}</span><span style="flex:none;font-size:9.5px;font-weight:800;color:#8a6d1e;background:#f5ecd3;border:1px solid #e6d3a0;padding:1px 6px;border-radius:6px">{{ s.kelas }}</span></div><div style="font-size:11px;color:#9aa1ad">Halaqah {{ s.hal }}</div></div>
             </div>
             <div class="r-prog">
               <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:4px"><span>{{ s.juz }}/15 Juz</span><span>{{ s.juzPct }}%</span></div>
@@ -328,18 +330,21 @@ const NAVY='#16264d', NAVY2='#0f1c3a', GREEN='#2f8f3a', GOLD='#cfa02c', CREAM='#
 // juzdone = which specific juz are memorized (list, any order) → juz count &
 // progress derive from it. curjuz = the juz currently being worked on.
 const RAW = [
-  {id:'s1', name:'Ahmad Fauzan Ramadhani', nick:'Fauzan', kota:'Depok', prov:'Jawa Barat', hal:1, haf:88,tah:91,mur:85,ilm:85,akh:90,akd:84,bhs:86, juzdone:'1,2,3,4,5,6,7,8', curjuz:9},
-  {id:'s2', name:'Muhammad Rifki Hakim', nick:'Rifki', kota:'Bogor', prov:'Jawa Barat', hal:1, haf:82,tah:83,mur:78,ilm:80,akh:86,akd:88,bhs:84, juzdone:'25,26,27,28,29,30', curjuz:24},
-  {id:'s3', name:'Zaid Abdullah Faris', nick:'Zaid', kota:'Bekasi', prov:'Jawa Barat', hal:1, haf:94,tah:94,mur:90,ilm:92,akh:93,akd:88,bhs:90, juzdone:'1,2,3,4,5,6,7,8,9,10', curjuz:11},
-  {id:'s4', name:'Yusuf Ar-Ramadhan', nick:'Yusuf', kota:'Subang', prov:'Jawa Barat', hal:1, haf:70,tah:73,mur:68,ilm:70,akh:78,akd:76,bhs:72, juzdone:'27,28,29,30', curjuz:26},
-  {id:'s5', name:'Hafizh Anwar Syafiq', nick:'Hafizh', kota:'Bandung', prov:'Jawa Barat', hal:1, haf:86,tah:87,mur:82,ilm:84,akh:88,akd:80,bhs:83, juzdone:'1,2,3,4,5,6,7', curjuz:8},
-  {id:'s6', name:'Ibrahim Malik Ibrahim', nick:'Ibrahim', kota:'Cirebon', prov:'Jawa Barat', hal:2, haf:78,tah:78,mur:74,ilm:77,akh:82,akd:82,bhs:79, juzdone:'1,2,28,29,30', curjuz:27},
-  {id:'s7', name:'Umar Hidayatullah', nick:'Umar', kota:'Sukabumi', prov:'Jawa Barat', hal:2, haf:64,tah:68,mur:62,ilm:66,akh:74,akd:72,bhs:68, juzdone:'1,2,3', curjuz:4},
-  {id:'s8', name:'Bilal Saputra Nugroho', nick:'Bilal', kota:'Depok', prov:'Jawa Barat', hal:2, haf:80,tah:83,mur:79,ilm:80,akh:85,akd:78,bhs:81, juzdone:'25,26,27,28,29,30', curjuz:24},
-  {id:'s9', name:'Fathan Nasution', nick:'Fathan', kota:'Asahan', prov:'Sumatera Utara', hal:2, haf:90,tah:89,mur:86,ilm:88,akh:90,akd:85,bhs:87, juzdone:'1,2,3,4,5,6,7,8,9', curjuz:10},
-  {id:'s10',name:'Rasyid Pratama Wijaya', nick:'Rasyid', kota:'Sungailiat', prov:'Kep. Bangka Belitung', hal:2, haf:74,tah:77,mur:72,ilm:75,akh:80,akd:80,bhs:76, juzdone:'1,2,3,29,30', curjuz:28},
+  {id:'s1', name:'Ahmad Fauzan Ramadhani', nick:'Fauzan', kelas:'VIII', kota:'Depok', prov:'Jawa Barat', hal:1, haf:88,tah:91,mur:85,ilm:85,akh:90,akd:84,bhs:86, juzdone:'1,2,3,4,5,6,7,8', curjuz:9},
+  {id:'s2', name:'Muhammad Rifki Hakim', nick:'Rifki', kelas:'VII', kota:'Bogor', prov:'Jawa Barat', hal:1, haf:82,tah:83,mur:78,ilm:80,akh:86,akd:88,bhs:84, juzdone:'25,26,27,28,29,30', curjuz:24},
+  {id:'s3', name:'Zaid Abdullah Faris', nick:'Zaid', kelas:'VII', kota:'Bekasi', prov:'Jawa Barat', hal:1, haf:94,tah:94,mur:90,ilm:92,akh:93,akd:88,bhs:90, juzdone:'1,2,3,4,5,6,7,8,9,10', curjuz:11},
+  {id:'s4', name:'Yusuf Ar-Ramadhan', nick:'Yusuf', kelas:'VIII', kota:'Subang', prov:'Jawa Barat', hal:1, haf:70,tah:73,mur:68,ilm:70,akh:78,akd:76,bhs:72, juzdone:'27,28,29,30', curjuz:26},
+  {id:'s5', name:'Hafizh Anwar Syafiq', nick:'Hafizh', kelas:'VII', kota:'Bandung', prov:'Jawa Barat', hal:1, haf:86,tah:87,mur:82,ilm:84,akh:88,akd:80,bhs:83, juzdone:'1,2,3,4,5,6,7', curjuz:8},
+  {id:'s6', name:'Ibrahim Malik Ibrahim', nick:'Ibrahim', kelas:'VIII', kota:'Cirebon', prov:'Jawa Barat', hal:2, haf:78,tah:78,mur:74,ilm:77,akh:82,akd:82,bhs:79, juzdone:'1,2,28,29,30', curjuz:27},
+  {id:'s7', name:'Umar Hidayatullah', nick:'Umar', kelas:'VII', kota:'Sukabumi', prov:'Jawa Barat', hal:2, haf:64,tah:68,mur:62,ilm:66,akh:74,akd:72,bhs:68, juzdone:'1,2,3', curjuz:4},
+  {id:'s8', name:'Bilal Saputra Nugroho', nick:'Bilal', kelas:'VII', kota:'Depok', prov:'Jawa Barat', hal:2, haf:80,tah:83,mur:79,ilm:80,akh:85,akd:78,bhs:81, juzdone:'25,26,27,28,29,30', curjuz:24},
+  {id:'s9', name:'Fathan Nasution', nick:'Fathan', kelas:'VIII', kota:'Asahan', prov:'Sumatera Utara', hal:2, haf:90,tah:89,mur:86,ilm:88,akh:90,akd:85,bhs:87, juzdone:'1,2,3,4,5,6,7,8,9', curjuz:10},
+  {id:'s10',name:'Rasyid Pratama Wijaya', nick:'Rasyid', kelas:'VII', kota:'Sungailiat', prov:'Kep. Bangka Belitung', hal:2, haf:74,tah:77,mur:72,ilm:75,akh:80,akd:80,bhs:76, juzdone:'1,2,3,29,30', curjuz:28},
 ];
-const HALAQAH = {1:'Ustadz Salman Al-Farisi', 2:'Ustadz Hamzah Abdurrahman'};
+// Each halaqah can have one or more musyrif (add names as you hire).
+const HALAQAH = { 1:['Ustadz Salman Al-Farisi'], 2:['Ustadz Hamzah Abdurrahman'] };
+// One mudir for the whole school.
+const MUDIR = 'Ustadz Abdul Hakim, Lc.';
 const PILLARS = [
   {key:'haf', abbr:'HAF', label:'Hafalan', grp:'diniyah'},
   {key:'tah', abbr:'TAH', label:'Tahsin', grp:'diniyah'},
@@ -424,7 +429,7 @@ class Component extends DCLogic {
     const num=x=>{ const n=Number(x); return isFinite(n)?n:0; };
     return { id:String(o.id!=null?o.id:''), name:o.name||o.nama||'',
       nick:o.nick||o.panggilan||(o.name?String(o.name).split(' ')[0]:''),
-      kota:o.kota||'', prov:o.prov||o.provinsi||'', hal:num(o.hal!=null?o.hal:1), juz:num(o.juz), curjuz:num(o.curjuz), juzdone:o.juzdone!=null?String(o.juzdone):'',
+      kota:o.kota||'', prov:o.prov||o.provinsi||'', kelas:o.kelas!=null?String(o.kelas):'', hal:num(o.hal!=null?o.hal:1), juz:num(o.juz), curjuz:num(o.curjuz), juzdone:o.juzdone!=null?String(o.juzdone):'',
       haf:num(o.haf), tah:num(o.tah), mur:num(o.mur), ilm:num(o.ilm), akh:num(o.akh), akd:num(o.akd), bhs:num(o.bhs) };
   }
 
@@ -480,7 +485,7 @@ class Component extends DCLogic {
     const initials=r.nick.slice(0,2).toUpperCase();
     return {...r, initials, overall, gLetter:og.l, gName:og.name, gColor:og.c, tier, tierColor:TIER_ACCENT[tier],
       juz:juzCount, curjuz:curJuz, juzDone,
-      juzPct:Math.min(100,Math.round(juzCount/15*100)), musyrif:HALAQAH[r.hal],
+      juzPct:Math.min(100,Math.round(juzCount/15*100)), musyrif:(HALAQAH[r.hal]||[]).join(', '), mudir:MUDIR, kelas:r.kelas||'—',
       curArab:String(curJuz).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d)),
       pillars:scores.map(s=>({abbr:s.abbr, label:s.label, score:s.score, letter:s.g.l, color:s.g.c})),
       cardStyle:v.card, nameStyle:v.name, subStyle:v.sub, ratingStyle:v.rating, ratingSubStyle:v.ratingSub,

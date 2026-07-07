@@ -20,13 +20,13 @@ academics, reporting).
  ┌───────────────────────────────┐
  │  PRIVATE sheet  (source truth)│   restricted access — staff only
  │  ├─ tab: Setoran (Form resp.) │   raw per-event submissions
- │  └─ tab: Master               │   one row per santri (public cols A–O + private cols P+)
+ │  └─ tab: Master               │   one row per santri (public cols A–P + private cols Q+)
  └───────────────┬───────────────┘
                  │  IMPORTRANGE (one-way, authorized once)
                  ▼
  ┌───────────────────────────────┐
  │  PUBLIC sheet   (reference)   │   "Anyone with link → Viewer"
- │  └─ tab: Roster               │   ONLY the 15 public columns, mirrored live
+ │  └─ tab: Roster               │   ONLY the 16 public columns, mirrored live
  └───────────────┬───────────────┘
                  │  GViz JSON (no API key)
                  ▼
@@ -48,7 +48,7 @@ Auto-created when you link the Google Form. Leave it as-is — it logs every sub
 (timestamp, santri, tanggal, jenis, juz, halaman, taqdir, catatan, …).
 
 ### 2b. Tab `Master` (one row per santri) — **this is what gets mirrored**
-Put the **15 public columns first (A–O)**, then any **private-only columns from P onward**.
+Put the **16 public columns first (A–P)**, then any **private-only columns from Q onward**.
 Header names in row 1 **must be exactly** these lowercase keys (the tracker matches by header):
 
 | Col | Header | Meaning | Type | Filled by |
@@ -68,11 +68,16 @@ Header names in row 1 **must be exactly** these lowercase keys (the tracker matc
 | M | `bhs`  | Bahasa — Indonesia/Inggris (0–100) | number | **Admin** |
 | N | `juzdone` | which juz are memorized — a list in any order, e.g. `1,2,3,28,29,30` (juz count & progress derive from it) | text | Musyrif/Mudir |
 | O | `curjuz` | juz **currently** being memorized (1–30; independent — many start from Juz 30 back) | number | Musyrif/Mudir |
-| P+ | `wali`, `nohp`, `alamat`, `status`, `catatan_musyrif`, `catatan_mudir`, … | **PRIVATE — never mirrored** | any | staff |
+| P | `kelas` | class level, e.g. `VII` / `VIII` | text | staff |
+| Q+ | `wali`, `nohp`, `alamat`, `status`, `catatan_musyrif`, `catatan_mudir`, … | **PRIVATE — never mirrored** | any | staff |
 
 > The score columns (G–M) can be typed directly by staff, or computed from the `Setoran` tab
 > with your own formulas. Keeping `Master` current (manual vs formula) is your choice — the
 > tracker only needs this row-per-santri shape.
+>
+> **Musyrif & Mudir** are set in code, not the sheet: edit the `HALAQAH` map
+> (halaqah → list of musyrif names; add names as you hire) and the `MUDIR`
+> constant near the top of `tracker/index.html`’s `<script>`.
 
 Example header row + first data row:
 
@@ -90,7 +95,7 @@ exactly `Roster`** with a single formula in cell **A1** that mirrors the public 
 
 ```
 =QUERY(
-  IMPORTRANGE("<PRIVATE_SHEET_ID>", "Master!A1:O"),
+  IMPORTRANGE("<PRIVATE_SHEET_ID>", "Master!A1:P"),
   "where Col1 is not null",
   1
 )
@@ -98,16 +103,16 @@ exactly `Roster`** with a single formula in cell **A1** that mirrors the public 
 
 - Replace `<PRIVATE_SHEET_ID>` with the id from the Private sheet URL:
   `https://docs.google.com/spreadsheets/d/`**`THIS_PART`**`/edit`
-- `Master!A1:O` imports **only** the 15 public columns — private columns (P+) are never referenced,
+- `Master!A1:P` imports **only** the 16 public columns — private columns (Q+) are never referenced,
   so they can never leak.
 - `where Col1 is not null` drops blank rows; the trailing `1` keeps the header row.
 - **First run:** the cell shows `#REF!` with an **"Allow access"** button — click it once to
   authorize the Private→Public link. After that it stays in sync automatically.
 
 > Prefer to reorder/rename in the mirror? Use an explicit select, e.g.
-> `"select Col1, Col2, Col3, Col4, Col5, Col6, Col7, Col8, Col9, Col10, Col11, Col12, Col13, Col14, Col15 where Col1 is not null"`.
+> `"select Col1, Col2, Col3, Col4, Col5, Col6, Col7, Col8, Col9, Col10, Col11, Col12, Col13, Col14, Col15, Col16 where Col1 is not null"`.
 > Column order does not matter to the tracker (it matches by header name), but the headers must
-> stay exactly `id, name, nick, …, juzdone, curjuz`.
+> stay exactly `id, name, nick, …, juzdone, curjuz, kelas`.
 
 ---
 
@@ -159,8 +164,8 @@ If unconfigured or unreachable, it falls back to the built-in demo data automati
 
 - [ ] Private sheet: restricted to staff only.
 - [ ] Public sheet: **Viewer** for anyone with link; **Edit** for staff only.
-- [ ] Public `Roster` imports **only** `Master!A1:O` — no private columns referenced.
-- [ ] No private fields (wali, phone, address, economic status, internal notes) in columns A–O.
+- [ ] Public `Roster` imports **only** `Master!A1:P` — no private columns referenced.
+- [ ] No private fields (wali, phone, address, economic status, internal notes) in columns A–P.
 - [ ] Tracker points at the **PUBLIC** Sheet ID, never the Private one.
 
 ### Known limitation
