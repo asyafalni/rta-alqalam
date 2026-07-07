@@ -358,17 +358,19 @@
 const NAVY='#16264d', NAVY2='#0f1c3a', GREEN='#2f8f3a', GOLD='#cfa02c', CREAM='#f5f3ec', PAPER='#ffffff', LINE='#e6e1d5', INK='#16264d', MUT='#6b7280';
 
 // Score keys: haf/tah/mur/ilm/akh = diniyah (musyrif/mudir) · akd/bhs = akademik (admin)
+// juz = total juz memorized (drives progress); curjuz = the specific juz the
+// student is currently working on (independent — many start from Juz 30 back).
 const RAW = [
-  {id:'s1', name:'Ahmad Fauzan Ramadhani', nick:'Fauzan', kota:'Depok', prov:'Jawa Barat', hal:1, haf:88,tah:91,mur:85,ilm:85,akh:90,akd:84,bhs:86, juz:8},
-  {id:'s2', name:'Muhammad Rifki Hakim', nick:'Rifki', kota:'Bogor', prov:'Jawa Barat', hal:1, haf:82,tah:83,mur:78,ilm:80,akh:86,akd:88,bhs:84, juz:6},
-  {id:'s3', name:'Zaid Abdullah Faris', nick:'Zaid', kota:'Bekasi', prov:'Jawa Barat', hal:1, haf:94,tah:94,mur:90,ilm:92,akh:93,akd:88,bhs:90, juz:10},
-  {id:'s4', name:'Yusuf Ar-Ramadhan', nick:'Yusuf', kota:'Subang', prov:'Jawa Barat', hal:1, haf:70,tah:73,mur:68,ilm:70,akh:78,akd:76,bhs:72, juz:4},
-  {id:'s5', name:'Hafizh Anwar Syafiq', nick:'Hafizh', kota:'Bandung', prov:'Jawa Barat', hal:1, haf:86,tah:87,mur:82,ilm:84,akh:88,akd:80,bhs:83, juz:7},
-  {id:'s6', name:'Ibrahim Malik Ibrahim', nick:'Ibrahim', kota:'Cirebon', prov:'Jawa Barat', hal:2, haf:78,tah:78,mur:74,ilm:77,akh:82,akd:82,bhs:79, juz:5},
-  {id:'s7', name:'Umar Hidayatullah', nick:'Umar', kota:'Sukabumi', prov:'Jawa Barat', hal:2, haf:64,tah:68,mur:62,ilm:66,akh:74,akd:72,bhs:68, juz:3},
-  {id:'s8', name:'Bilal Saputra Nugroho', nick:'Bilal', kota:'Depok', prov:'Jawa Barat', hal:2, haf:80,tah:83,mur:79,ilm:80,akh:85,akd:78,bhs:81, juz:6},
-  {id:'s9', name:'Fathan Nasution', nick:'Fathan', kota:'Asahan', prov:'Sumatera Utara', hal:2, haf:90,tah:89,mur:86,ilm:88,akh:90,akd:85,bhs:87, juz:9},
-  {id:'s10',name:'Rasyid Pratama Wijaya', nick:'Rasyid', kota:'Sungailiat', prov:'Kep. Bangka Belitung', hal:2, haf:74,tah:77,mur:72,ilm:75,akh:80,akd:80,bhs:76, juz:5},
+  {id:'s1', name:'Ahmad Fauzan Ramadhani', nick:'Fauzan', kota:'Depok', prov:'Jawa Barat', hal:1, haf:88,tah:91,mur:85,ilm:85,akh:90,akd:84,bhs:86, juz:8, curjuz:9},
+  {id:'s2', name:'Muhammad Rifki Hakim', nick:'Rifki', kota:'Bogor', prov:'Jawa Barat', hal:1, haf:82,tah:83,mur:78,ilm:80,akh:86,akd:88,bhs:84, juz:6, curjuz:25},
+  {id:'s3', name:'Zaid Abdullah Faris', nick:'Zaid', kota:'Bekasi', prov:'Jawa Barat', hal:1, haf:94,tah:94,mur:90,ilm:92,akh:93,akd:88,bhs:90, juz:10, curjuz:11},
+  {id:'s4', name:'Yusuf Ar-Ramadhan', nick:'Yusuf', kota:'Subang', prov:'Jawa Barat', hal:1, haf:70,tah:73,mur:68,ilm:70,akh:78,akd:76,bhs:72, juz:4, curjuz:30},
+  {id:'s5', name:'Hafizh Anwar Syafiq', nick:'Hafizh', kota:'Bandung', prov:'Jawa Barat', hal:1, haf:86,tah:87,mur:82,ilm:84,akh:88,akd:80,bhs:83, juz:7, curjuz:8},
+  {id:'s6', name:'Ibrahim Malik Ibrahim', nick:'Ibrahim', kota:'Cirebon', prov:'Jawa Barat', hal:2, haf:78,tah:78,mur:74,ilm:77,akh:82,akd:82,bhs:79, juz:5, curjuz:26},
+  {id:'s7', name:'Umar Hidayatullah', nick:'Umar', kota:'Sukabumi', prov:'Jawa Barat', hal:2, haf:64,tah:68,mur:62,ilm:66,akh:74,akd:72,bhs:68, juz:3, curjuz:4},
+  {id:'s8', name:'Bilal Saputra Nugroho', nick:'Bilal', kota:'Depok', prov:'Jawa Barat', hal:2, haf:80,tah:83,mur:79,ilm:80,akh:85,akd:78,bhs:81, juz:6, curjuz:28},
+  {id:'s9', name:'Fathan Nasution', nick:'Fathan', kota:'Asahan', prov:'Sumatera Utara', hal:2, haf:90,tah:89,mur:86,ilm:88,akh:90,akd:85,bhs:87, juz:9, curjuz:10},
+  {id:'s10',name:'Rasyid Pratama Wijaya', nick:'Rasyid', kota:'Sungailiat', prov:'Kep. Bangka Belitung', hal:2, haf:74,tah:77,mur:72,ilm:75,akh:80,akd:80,bhs:76, juz:5, curjuz:27},
 ];
 const HALAQAH = {1:'Ustadz Salman Al-Farisi', 2:'Ustadz Hamzah Abdurrahman'};
 const PILLARS = [
@@ -483,7 +485,7 @@ class Component extends DCLogic {
     const num=x=>{ const n=Number(x); return isFinite(n)?n:0; };
     return { id:String(o.id!=null?o.id:''), name:o.name||o.nama||'',
       nick:o.nick||o.panggilan||(o.name?String(o.name).split(' ')[0]:''),
-      kota:o.kota||'', prov:o.prov||o.provinsi||'', hal:num(o.hal!=null?o.hal:1), juz:num(o.juz),
+      kota:o.kota||'', prov:o.prov||o.provinsi||'', hal:num(o.hal!=null?o.hal:1), juz:num(o.juz), curjuz:num(o.curjuz),
       haf:num(o.haf), tah:num(o.tah), mur:num(o.mur), ilm:num(o.ilm), akh:num(o.akh), akd:num(o.akd), bhs:num(o.bhs) };
   }
 
@@ -527,7 +529,7 @@ class Component extends DCLogic {
     const initials=r.nick.slice(0,2).toUpperCase();
     return {...r, initials, overall, gLetter:og.l, gName:og.name, gColor:og.c, tier,
       juzPct:Math.round(r.juz/15*100), musyrif:HALAQAH[r.hal],
-      curArab:String(r.juz>=15?15:(r.juz||0)+1).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d)),
+      curArab:String((r.curjuz>0)?r.curjuz:(r.juz>=15?15:(r.juz||0)+1)).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d)),
       pillars:scores.map(s=>({abbr:s.abbr, label:s.label, score:s.score, letter:s.g.l, color:s.g.c})),
       cardStyle:v.card, nameStyle:v.name, subStyle:v.sub, ratingStyle:v.rating, ratingSubStyle:v.ratingSub,
       chipStyle:v.chip, statLabelStyle:v.statLabel, statValStyle:v.statVal,
