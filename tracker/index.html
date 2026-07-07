@@ -463,7 +463,8 @@ class Component extends DCLogic {
       const role=['admin','mudir','musyrif'].indexOf(raw)>=0?raw:'musyrif';
       const name=u.firstName||u.fullName||(u.primaryEmailAddress&&u.primaryEmailAddress.emailAddress)||'Staff';
       const patch={role, userName:name, loginOpen:false};
-      if(this._afterSignIn){ this._afterSignIn=false; patch.view='dashboard'; }
+      if(this._afterSignIn || !this._applied){ patch.view='dashboard'; }
+      this._applied=true; this._afterSignIn=false;
       this.setState(patch);
     } else if(this.state.role!=='public'){
       this.setState({role:'public', userName:'', view:'gallery'});
@@ -673,7 +674,7 @@ class Component extends DCLogic {
       goGallery:()=>this.setState({view:'gallery'}),
       goDashboard:()=>this.setState({view:'dashboard'}),
       goEntry:()=>this.setState({view:'entry'}),
-      goLogin:()=>{ const C=window.Clerk; if(C){ this._afterSignIn=true; if(C.loaded){ C.openSignIn(); } else { C.load().then(()=>C.openSignIn()).catch(()=>this.setState({loginOpen:true})); } } else { this.setState({loginOpen:true}); } },
+      goLogin:()=>{ const C=window.Clerk; if(C){ this._afterSignIn=true; const here=window.location.href, o={afterSignInUrl:here, afterSignUpUrl:here, signInForceRedirectUrl:here, signUpForceRedirectUrl:here}; if(C.loaded){ C.openSignIn(o); } else { C.load().then(()=>C.openSignIn(o)).catch(()=>this.setState({loginOpen:true})); } } else { this.setState({loginOpen:true}); } },
       closeLogin:()=>this.setState({loginOpen:false}),
       stopLogin:(ev)=>{ ev && ev.stopPropagation && ev.stopPropagation(); },
       logout:()=>{ try{ if(window.Clerk && window.Clerk.user) window.Clerk.signOut(); }catch(e){} this.setState({view:'gallery', role:'public', loginOpen:false, selectedId:null, userName:''}); },
