@@ -503,25 +503,23 @@ class Component extends DCLogic {
 
   // Open book (gold cover, white pages) with a loading bar across the pages
   // whose green fill tracks memorization progress (juz / 15).
-  // A 15-page Qur'an. Left page: current juz number in Arabic-Indic digits;
-  // right page: the word "juz" (جزء); a 15-marker row tracks progress.
+  // A 15-juz Qur'an. Left page: an ornate 8-point star medallion (a mushaf
+  // verse-marker) holding the current juz number in Arabic-Indic digits;
+  // right page: the word جُزْء.
   bookSvg(juz, uid){
     const E=(t,p,c)=>React.createElement(t,p,c);
     const j=Math.max(0,Math.min(15,juz||0));
-    const done=j>=15, cur=done?15:j+1;
+    const cur=j>=15?15:j+1;
     const arb=String(cur).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d));
-    const OUT='#b98f3e', GOLD='#e8bd57', INK='#0a4631', PAGE='#fdf8ec', AMIRI="'Aref Ruqaa','Amiri',serif";
+    const two=cur>=10;
+    const OUT='#b98f3e', GOLD='#e8bd57', GOLD2='#d9a93f', INK='#0a4631', PAGE='#fdf8ec', ARB="'Aref Ruqaa','Amiri',serif";
     const cover={fill:GOLD, stroke:OUT, strokeWidth:2.2, strokeLinejoin:'round'};
     const page={fill:PAGE, stroke:OUT, strokeWidth:1.6, strokeLinejoin:'round'};
-    // 15 page markers: done (gold), current (green), remaining (faint)
-    const dots=[]; const x0=28, x1=112;
-    for(let i=1;i<=15;i++){
-      const x=x0+(x1-x0)*(i-1)/14;
-      let fill='#e2d8bf', rad=1.6;
-      if(i<=j){ fill='#c6a052'; }
-      else if(!done && i===cur){ fill='#34a85a'; rad=2.6; }
-      dots.push(E('circle',{key:'dt'+i,cx:x,cy:84,r:rad,fill}));
-    }
+    // n-point star polygon points (outer/inner radius, optional rotation)
+    const sp=(cx,cy,oR,iR,n,rot)=>{ let s=''; const a0=(rot||0)-Math.PI/2;
+      for(let i=0;i<n*2;i++){ const rr=i%2?iR:oR, a=a0+i*Math.PI/n; s+=(cx+Math.cos(a)*rr).toFixed(1)+','+(cy+Math.sin(a)*rr).toFixed(1)+' '; }
+      return s.trim(); };
+    const mx=43, my=62;
     return E('svg',{viewBox:'0 0 140 122',width:'100%',height:'100%'},[
       E('path',{key:'or',d:'M70,7 L75,15 L70,23 L65,15 Z',fill:GOLD,stroke:OUT,strokeWidth:1.4,strokeLinejoin:'round'}),
       E('path',{key:'cl',d:'M70,108 L70,26 Q42,16 9,26 L14,100 Q44,94 70,108 Z',...cover}),
@@ -529,9 +527,13 @@ class Component extends DCLogic {
       E('path',{key:'pl',d:'M70,99 L70,32 Q45,23 17,30 L21,90 Q45,85 70,99 Z',...page}),
       E('path',{key:'pr',d:'M70,99 L70,32 Q95,23 123,30 L119,90 Q95,85 70,99 Z',...page}),
       E('line',{key:'st',x1:70,y1:33,x2:70,y2:97,stroke:'#ecdcb4',strokeWidth:1.2}),
-      E('text',{key:'nm',x:43,y:68,textAnchor:'middle',fontSize:30,fontWeight:700,fill:INK,fontFamily:AMIRI},arb),
-      E('text',{key:'jw',x:98,y:62,textAnchor:'middle',fontSize:19,fontWeight:700,fill:INK,fontFamily:AMIRI},'جُزْء'),
-      ...dots,
+      E('text',{key:'jw',x:97,y:62,textAnchor:'middle',dominantBaseline:'central',fontSize:21,fontWeight:700,fill:INK,fontFamily:ARB},'جُزْء'),
+      // ornate star medallion around the juz number
+      E('polygon',{key:'m2',points:sp(mx,my,22,9,8,Math.PI/8),fill:GOLD2}),
+      E('polygon',{key:'m1',points:sp(mx,my,23,10,8,0),fill:GOLD,stroke:OUT,strokeWidth:1.5,strokeLinejoin:'round'}),
+      E('circle',{key:'m4',cx:mx,cy:my,r:11.5,fill:'none',stroke:'#f2e6c4',strokeWidth:1}),
+      E('circle',{key:'m3',cx:mx,cy:my,r:11,fill:PAGE,stroke:OUT,strokeWidth:1.3}),
+      E('text',{key:'nm',x:mx,y:my+0.5,textAnchor:'middle',dominantBaseline:'central',fontSize:two?13.5:17,fontWeight:700,fill:INK,fontFamily:ARB},arb),
     ]);
   }
 
