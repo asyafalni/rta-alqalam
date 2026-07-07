@@ -35,6 +35,20 @@
   @keyframes dcUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
   @keyframes dcRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
   @keyframes dcFade{from{opacity:0}to{opacity:1}}
+  /* report card (rapor) — printable */
+  .rapor-overlay{position:fixed;inset:0;z-index:80;background:#e9e3d4;display:flex;flex-direction:column;animation:dcFade .2s ease}
+  .rapor-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;background:#fff;border-bottom:1px solid #e6e1d5}
+  .rapor-scroll{flex:1;overflow:auto;padding:24px 14px;display:flex;justify-content:center}
+  .rapor-page{width:210mm;max-width:100%;background:#fff;color:#16264d;padding:24mm 20mm;box-shadow:0 8px 30px rgba(0,0,0,.15);box-sizing:border-box}
+  @media print{
+    body *{visibility:hidden!important}
+    .rapor-overlay,.rapor-overlay *{visibility:visible!important}
+    .rapor-overlay{position:absolute;background:#fff;display:block}
+    .rapor-toolbar,.no-print{display:none!important}
+    .rapor-scroll{overflow:visible;padding:0;display:block}
+    .rapor-page{width:auto;max-width:none;box-shadow:none;padding:0}
+    @page{size:A4;margin:14mm}
+  }
   /* responsive staff-screen grids */
   .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
   @media(min-width:700px){.stat-grid{grid-template-columns:repeat(4,1fr);gap:14px}}
@@ -85,6 +99,59 @@
           </button>
         </div>
         <p style="font-size:10.5px;color:rgba(245,243,236,.4);margin-top:15px;line-height:1.6">Prototipe · login demo (nanti diganti Clerk).</p>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ RAPOR (printable report card) ============ -->
+  <sc-if value="{{ raporOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="rapor-overlay">
+      <div class="rapor-toolbar no-print">
+        <button onClick="{{ closeRapor }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">← Tutup</button>
+        <div style="font-weight:700;color:#0a4631;font-size:14px">Rapor Santri</div>
+        <button onClick="{{ printRapor }}" style="padding:9px 18px;border-radius:9px;border:none;background:#0a4631;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer">Cetak / Simpan PDF</button>
+      </div>
+      <div class="rapor-scroll">
+        <div class="rapor-page">
+          <div style="text-align:center;border-bottom:3px double #0a4631;padding-bottom:14px;margin-bottom:18px">
+            <img src="../assets/logo-rta.png" alt="RTA Al-Qalam" style="height:54px;margin:0 auto 6px;display:block" />
+            <div class="arb" style="font-size:16px;color:#0a4631">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+            <div class="disp" style="font-size:22px;color:#0a4631;margin-top:6px">Laporan Hasil Belajar Santri</div>
+            <div style="font-size:12px;color:#6b7280">Rumah Tahfidz Al-Qur’an Al-Qalam · Darul Huffadz</div>
+            <div style="font-size:12.5px;color:#8a6d1e;font-weight:700;margin-top:3px">{{ term }}</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 24px;font-size:12.5px;margin-bottom:20px">
+            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Nama</span><span style="font-weight:700">: {{ sel.name }}</span></div>
+            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Kelas</span><span style="font-weight:700">: {{ sel.kelas }}</span></div>
+            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Halaqah</span><span style="font-weight:700">: Halaqah {{ sel.hal }}</span></div>
+            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Musyrif</span><span style="font-weight:700">: {{ sel.musyrif }}</span></div>
+            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Asal</span><span style="font-weight:700">: {{ sel.kota }}, {{ sel.prov }}</span></div>
+            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Mudir</span><span style="font-weight:700">: {{ sel.mudir }}</span></div>
+          </div>
+          <div style="font-weight:800;font-size:13px;color:#0a4631;margin-bottom:6px">A. Bidang Tahfidz &amp; Diniyah</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px">
+            <thead><tr style="background:#eef4ee"><th style="text-align:left;padding:7px 10px;border:1px solid #d8e3d8">Aspek Penilaian</th><th style="width:64px;padding:7px 10px;border:1px solid #d8e3d8">Nilai</th><th style="width:130px;padding:7px 10px;border:1px solid #d8e3d8">Predikat</th></tr></thead>
+            <tbody><sc-for list="{{ raporDiniyah }}" as="p" hint-placeholder-count="5">
+              <tr><td style="padding:7px 10px;border:1px solid #e6e1d5">{{ p.label }}</td><td style="text-align:center;font-weight:700;padding:7px 10px;border:1px solid #e6e1d5">{{ p.score }}</td><td style="text-align:center;font-weight:700;color:{{ p.color }};padding:7px 10px;border:1px solid #e6e1d5">{{ p.pname }}</td></tr>
+            </sc-for></tbody>
+          </table>
+          <div style="font-weight:800;font-size:13px;color:#0a4631;margin-bottom:6px">B. Bidang Akademik</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px">
+            <thead><tr style="background:#eef4ee"><th style="text-align:left;padding:7px 10px;border:1px solid #d8e3d8">Mata Pelajaran</th><th style="width:64px;padding:7px 10px;border:1px solid #d8e3d8">Nilai</th><th style="width:130px;padding:7px 10px;border:1px solid #d8e3d8">Predikat</th></tr></thead>
+            <tbody><sc-for list="{{ raporAkademik }}" as="p" hint-placeholder-count="2">
+              <tr><td style="padding:7px 10px;border:1px solid #e6e1d5">{{ p.label }}</td><td style="text-align:center;font-weight:700;padding:7px 10px;border:1px solid #e6e1d5">{{ p.score }}</td><td style="text-align:center;font-weight:700;color:{{ p.color }};padding:7px 10px;border:1px solid #e6e1d5">{{ p.pname }}</td></tr>
+            </sc-for></tbody>
+          </table>
+          <div style="background:#fbf7ea;border:1px solid #ecdfae;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12.5px;line-height:1.6"><span style="font-weight:800;color:#8a6d1e">Capaian Hafalan:</span> {{ sel.juz }} dari 15 juz ({{ sel.juzPct }}%) · sedang menghafal Juz {{ sel.curjuz }} · Predikat umum: <b>{{ sel.gName }}</b></div>
+          <div style="font-weight:800;font-size:13px;color:#0a4631;margin-bottom:4px">Catatan Musyrif &amp; Mudir</div>
+          <p style="font-size:12.5px;line-height:1.6;color:#333;border:1px solid #e6e1d5;border-radius:8px;padding:12px 14px;min-height:52px;margin:0 0 26px">{{ raporNote }}</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;text-align:center;font-size:12px">
+            <div><div style="color:#6b7280">Orang Tua / Wali</div><div style="height:54px"></div><div style="border-top:1px solid #333;padding-top:5px">(............................)</div></div>
+            <div><div style="color:#6b7280">Musyrif</div><div style="height:54px"></div><div style="border-top:1px solid #333;padding-top:5px;font-weight:700">{{ sel.musyrif }}</div></div>
+            <div><div style="color:#6b7280">Mudir</div><div style="height:54px"></div><div style="border-top:1px solid #333;padding-top:5px;font-weight:700">{{ sel.mudir }}</div></div>
+          </div>
+          <div style="text-align:right;font-size:11.5px;color:#6b7280;margin-top:12px">Bekasi, ....................... 20....</div>
+        </div>
       </div>
     </div>
   </sc-if>
@@ -198,9 +265,31 @@
               <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;border:1px solid #e6e1d5"></span>Belum</span>
             </div>
           </div>
-          <sc-if value="{{ canManage }}" hint-placeholder-val="{{ true }}">
-            <button onClick="{{ sel.onEntry }}" style="align-self:flex-start;padding:11px 20px;border-radius:10px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:13px;cursor:pointer">+ Setor Hafalan / Nilai</button>
-          </sc-if>
+          <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:20px 22px">
+            <div style="font-weight:800;font-size:14px;margin-bottom:6px">Riwayat Nilai & Ujian</div>
+            <sc-if value="{{ hasNilai }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column">
+                <sc-for list="{{ selNilai }}" as="n" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid #f0ede4">
+                    <span style="flex:none;font-size:9.5px;font-weight:800;color:#0a4631;background:#eef4ee;border:1px solid #cfe3d0;padding:2px 8px;border-radius:6px">{{ n.bidang }}</span>
+                    <div style="flex:1;min-width:130px"><div style="font-weight:700;font-size:13px;color:#16264d">{{ n.mapel }}</div><div style="font-size:11px;color:#9aa1ad">{{ n.jenis }} · {{ n.tanggal }}</div></div>
+                    <div style="text-align:right;white-space:nowrap"><span style="font-size:15px;font-weight:800;color:{{ n.pcolor }}">{{ n.nilai }}</span> <span style="font-size:10.5px;font-weight:700;color:{{ n.pcolor }}">{{ n.pred }}</span></div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noNilai }}" hint-placeholder-val="{{ false }}">
+              <p style="font-size:12.5px;color:#9aa1ad;margin:6px 0 0">Belum ada nilai atau ujian yang tercatat.</p>
+            </sc-if>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <sc-if value="{{ canManage }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ sel.onEntry }}" style="padding:11px 20px;border-radius:10px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:13px;cursor:pointer">+ Input Nilai</button>
+            </sc-if>
+            <sc-if value="{{ canRapor }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ openRapor }}" style="padding:11px 20px;border-radius:10px;border:1px solid #cfa02c;background:#fbf7ea;color:#8a6d1e;font-weight:700;font-size:13px;cursor:pointer">Cetak Rapor</button>
+            </sc-if>
+          </div>
         </div>
       </div>
     </div>
@@ -345,6 +434,25 @@ const RAW = [
 const HALAQAH = { 1:['Ustadz Salman Al-Farisi'], 2:['Ustadz Hamzah Abdurrahman'] };
 // One mudir for the whole school.
 const MUDIR = 'Ustadz Abdul Hakim, Lc.';
+// Ongoing academic term (for the report card).
+const TERM = 'Semester Ganjil · Tahun Ajaran 2026/2027';
+// Per-test records (Islamic + secular). Same shape as the Google Sheet 'Nilai' tab.
+const NILAI = [
+  {id:'s1', tanggal:'2026-09-05', bidang:'Diniyah', mapel:'Tahfidz (Ziyadah)', jenis:'Setoran', nilai:90},
+  {id:'s1', tanggal:'2026-09-12', bidang:'Diniyah', mapel:'Tahsin & Tajwid', jenis:'Ujian', nilai:88},
+  {id:'s1', tanggal:'2026-09-19', bidang:'Akademik', mapel:'Matematika', jenis:'Ulangan Harian', nilai:84},
+  {id:'s1', tanggal:'2026-09-24', bidang:'Akademik', mapel:'Bahasa Inggris', jenis:'Ujian', nilai:86},
+  {id:'s3', tanggal:'2026-09-06', bidang:'Diniyah', mapel:'Tahfidz (Ziyadah)', jenis:'Setoran', nilai:95},
+  {id:'s3', tanggal:'2026-09-14', bidang:'Diniyah', mapel:'Mutun Ilmiyah', jenis:'Hafalan', nilai:92},
+  {id:'s3', tanggal:'2026-09-20', bidang:'Akademik', mapel:'IPA (Sains)', jenis:'Ujian', nilai:88},
+  {id:'s3', tanggal:'2026-09-25', bidang:'Akademik', mapel:'Matematika', jenis:'Ulangan Harian', nilai:90},
+  {id:'s4', tanggal:'2026-09-10', bidang:'Diniyah', mapel:'Muraja’ah', jenis:'Setoran', nilai:72},
+  {id:'s4', tanggal:'2026-09-18', bidang:'Akademik', mapel:'Matematika', jenis:'Ujian', nilai:76},
+  {id:'s5', tanggal:'2026-09-09', bidang:'Diniyah', mapel:'Tahfidz (Ziyadah)', jenis:'Setoran', nilai:87},
+  {id:'s5', tanggal:'2026-09-22', bidang:'Akademik', mapel:'Bahasa Indonesia', jenis:'Ulangan Harian', nilai:83},
+  {id:'s2', tanggal:'2026-09-11', bidang:'Diniyah', mapel:'Tahsin & Tajwid', jenis:'Ujian', nilai:84},
+  {id:'s2', tanggal:'2026-09-21', bidang:'Akademik', mapel:'IPS', jenis:'Ujian', nilai:85},
+];
 const PILLARS = [
   {key:'haf', abbr:'HAF', label:'Hafalan', grp:'diniyah'},
   {key:'tah', abbr:'TAH', label:'Tahsin', grp:'diniyah'},
@@ -372,11 +480,12 @@ class Component extends DCLogic {
     formId:'1FAIpQLScSAMPLEFORMIDxxxxxxxxxxxxxxxxxxxxxxx',
     sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
     clerkReady:false, userName:'', entryOpen:false, configOpen:false,
+    nilai:null, raporOpen:false,
   };
 
   // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
   //      the demo RAW until a viewable sheet + "Roster" tab are configured.
-  componentDidMount(){ if((this.state.sheetId||'').trim()) this.loadRoster(); this.initClerk(); }
+  componentDidMount(){ if((this.state.sheetId||'').trim()){ this.loadRoster(); this.loadNilai(); } this.initClerk(); }
 
   // ---- Auth: Clerk (client-side). Reads the signed-in user's role from
   //      publicMetadata.role (admin/mudir/musyrif); falls back to the demo
@@ -423,6 +532,20 @@ class Component extends DCLogic {
       const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); return this.mapRow(o); }).filter(s=>s.id&&s.name);
       this.setState(rows.length?{students:rows, loadState:'live'}:{students:null, loadState:'error'});
     }catch(e){ console.error('loadRoster failed', e); this.setState({students:null, loadState:'error'}); }
+  }
+
+  async loadNilai(){
+    const id=(this.state.sheetId||'').trim();
+    if(!id){ this.setState({nilai:null}); return; }
+    try{
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&sheet=Nilai';
+      const text=await (await fetch(url)).text();
+      const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
+      const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
+      const num=x=>{ const n=Number(x); return isFinite(n)?n:0; };
+      const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); return {id:String(o.id!=null?o.id:''), tanggal:o.tanggal!=null?String(o.tanggal):'', bidang:o.bidang||'', mapel:o.mapel||'', jenis:o.jenis||'', nilai:num(o.nilai)}; }).filter(x=>x.id&&x.mapel);
+      this.setState({nilai:rows.length?rows:null});
+    }catch(e){ console.error('loadNilai failed', e); this.setState({nilai:null}); }
   }
 
   mapRow(o){
@@ -487,7 +610,7 @@ class Component extends DCLogic {
       juz:juzCount, curjuz:curJuz, juzDone,
       juzPct:Math.min(100,Math.round(juzCount/15*100)), musyrif:(HALAQAH[r.hal]||[]).join(', '), mudir:MUDIR, kelas:r.kelas||'—',
       curArab:String(curJuz).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d)),
-      pillars:scores.map(s=>({abbr:s.abbr, label:s.label, score:s.score, letter:s.g.l, color:s.g.c})),
+      pillars:scores.map(s=>({abbr:s.abbr, label:s.label, score:s.score, letter:s.g.l, color:s.g.c, grp:s.grp, pname:s.g.name})),
       cardStyle:v.card, nameStyle:v.name, subStyle:v.sub, ratingStyle:v.rating, ratingSubStyle:v.ratingSub,
       chipStyle:v.chip, statLabelStyle:v.statLabel, statValStyle:v.statVal,
       avStyle:{background:v.avBg, color:v.avColor, border:'2px solid '+v.ring},
@@ -568,6 +691,8 @@ class Component extends DCLogic {
     const sel = all.find(s=>s.id===st.selectedId)||null;
 
     const roleLabel = st.role==='admin'?'Admin':st.role==='mudir'?'Mudir':st.role==='musyrif'?'Musyrif':'Publik';
+    const activeNilai = (st.nilai&&st.nilai.length)?st.nilai:NILAI;
+    const selNilaiRows = sel ? activeNilai.filter(n=>n.id===sel.id).slice().sort((a,b)=>(b.tanggal||'').localeCompare(a.tanggal||'')).map(n=>{ const g=grade(n.nilai); return {...n, pred:g.name, pcolor:g.c}; }) : [];
 
     return {
       view:v, role:st.role, roleLabel, userName:st.userName, greeting: st.userName?('Halo, '+st.userName):'',
@@ -581,6 +706,16 @@ class Component extends DCLogic {
       totalJuz, avgJuz:avgJuz.toFixed(1),
       mumtazCount:all.filter(s=>s.gLetter==='A').length,
       sel, selRadar: sel?this.radar(sel):null, selJuz: sel?this.juzCells(sel):[],
+      // per-subject test records (Islamic + secular)
+      selNilai:selNilaiRows, hasNilai:selNilaiRows.length>0, noNilai:!selNilaiRows.length,
+      // report card (admin only)
+      term:TERM, canRapor: st.role==='admin', raporOpen:st.raporOpen,
+      raporDiniyah: sel ? sel.pillars.filter(p=>p.grp==='diniyah') : [],
+      raporAkademik: sel ? sel.pillars.filter(p=>p.grp==='akademik') : [],
+      raporNote: sel ? ('Alhamdulillah, capaian '+sel.nick+' pada semester ini tergolong '+sel.gName+'. '+(sel.overall>=85?'Pertahankan dan tingkatkan terus, istiqamah dalam menghafal serta belajar.':'Teruslah bersemangat memperbaiki hafalan, muraja’ah, dan nilai akademik.')) : '',
+      openRapor:()=>this.setState({raporOpen:true}),
+      closeRapor:()=>this.setState({raporOpen:false}),
+      printRapor:()=>{ try{ window.print(); }catch(e){} },
       search:st.search, onSearch:(ev)=>this.setState({search:ev.target.value}),
       sortName:()=>this.sortBy('nick'), sortProg:()=>this.sortBy('juz'), sortAsal:()=>this.sortBy('kota'), sortNilai:()=>this.sortBy('overall'),
       arrowName: st.sortKey==='nick'?(st.sortDir==='asc'?' ↑':' ↓'):'',
@@ -612,7 +747,7 @@ class Component extends DCLogic {
       setFormId:(ev)=>this.setState({formId:ev.target.value}),
       dataStatus, sheetId:st.sheetId,
       setSheetId:(ev)=>this.setState({sheetId:ev.target.value}),
-      reloadRoster:()=>this.loadRoster(),
+      reloadRoster:()=>{ this.loadRoster(); this.loadNilai(); },
     };
   }
 }

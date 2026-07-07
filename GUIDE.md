@@ -88,6 +88,23 @@ s1  Ahmad Fauzan Ramadhani   Fauzan  Depok   Jawa Barat   1    88  91  85  85  9
 
 ---
 
+### 2c. Tab `Nilai` (per-test records) — powers "Riwayat Nilai" & the Rapor
+One row per test/exam, Islamic **or** secular. Headers in row 1:
+
+| id | tanggal | bidang | mapel | jenis | nilai |
+|----|---------|--------|-------|-------|-------|
+| s1 | 2026-09-19 | Akademik | Matematika | Ujian | 84 |
+| s1 | 2026-09-12 | Diniyah | Tahsin & Tajwid | Setoran | 88 |
+
+- `id` matches the santri id in `Master`. `bidang` = `Diniyah` or `Akademik`. `nilai` is 0–100.
+- Mirror it to the **PUBLIC** sheet as a second tab named exactly `Nilai`:
+  `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Nilai!A1:F"), "where Col1 is not null", 1)`
+- The tracker reads it automatically (same Sheet ID) → shown on each student’s detail as
+  **Riwayat Nilai**, and used by the **Rapor** (report card, Admin only) together with the roster
+  scores. Until the tab exists, the tracker uses built-in demo records.
+
+---
+
 ## 3. PUBLIC sheet — the reference (mirror)
 
 Create a **second** spreadsheet (e.g. **"RTA Tracker — PUBLIC"**). It contains **one tab named
