@@ -188,6 +188,7 @@
         <span style="font-size:12.5px;color:#6b7280;font-weight:600;white-space:nowrap;margin-right:2px">{{ greeting }}</span>
         <button onClick="{{ goGallery }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Capaian Santri</button>
         <button onClick="{{ goEntry }}" style="padding:8px 14px;border-radius:9px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer">+ Input Nilai</button>
+        <button onClick="{{ goConfig }}" title="Konfigurasi" style="padding:8px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:13px;cursor:pointer">⚙️</button>
         <button onClick="{{ logout }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Keluar</button>
       </div>
 
@@ -226,130 +227,51 @@
     </div>
   </sc-if>
 
-  <!-- ============ ENTRY ============ -->
+  <!-- ============ INPUT NILAI ============ -->
   <sc-if value="{{ isEntry }}" hint-placeholder-val="{{ false }}">
-    <div style="max-width:760px;margin:0 auto;padding:16px 20px 60px">
-      <button onClick="{{ back }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer;margin-bottom:18px">← Kembali</button>
-      <h1 style="font-size:20px;font-weight:800;margin:0 0 4px">Setor Hafalan &amp; Nilai</h1>
-      <p style="font-size:13px;color:#6b7280;margin:0 0 22px;line-height:1.5">Isi data, lalu buka Google Form yang sudah terisi otomatis — tinggal tekan <b>Kirim</b>. Sheet berperan sebagai database.</p>
-
-      <div style="display:flex;flex-wrap:wrap;gap:9px;margin-bottom:16px">
-        <button onClick="{{ modeHafalan.onClick }}" style="{{ modeHafalan.style }}">📖 Setoran Hafalan</button>
-        <button onClick="{{ modeAkhlak.onClick }}" style="{{ modeAkhlak.style }}">🌟 Nilai Akhlak</button>
-        <sc-if value="{{ canManageSecular }}" hint-placeholder-val="{{ true }}">
-          <button onClick="{{ modeAkademik.onClick }}" style="{{ modeAkademik.style }}">📘 Nilai Akademik</button>
-        </sc-if>
+    <div style="max-width:860px;margin:0 auto;padding:16px 20px 40px">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+        <button onClick="{{ back }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">← Kembali</button>
+        <h1 style="font-size:20px;font-weight:800;margin:0;flex:1;min-width:120px">Input Nilai</h1>
+        <a href="{{ formOpenUrl }}" target="_blank" rel="noopener" style="font-size:12.5px;font-weight:700;color:#0c6240;white-space:nowrap">Buka di tab baru ↗</a>
       </div>
-
-      <sc-if value="{{ isModeHafalan }}" hint-placeholder-val="{{ true }}">
-      <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:22px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <label style="grid-column:1/-1;font-size:12px;font-weight:700;color:#16264d">Santri
-          <select value="{{ entry.studentId }}" onChange="{{ setStudent }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d">
-            <sc-for list="{{ entryStudents }}" as="o" hint-placeholder-count="10"><option value="{{ o.id }}">{{ o.name }}</option></sc-for>
-          </select>
-        </label>
-        <label style="font-size:12px;font-weight:700;color:#16264d">Tanggal
-          <input type="date" value="{{ entry.tanggal }}" onChange="{{ setTanggal }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d" />
-        </label>
-        <label style="font-size:12px;font-weight:700;color:#16264d">Jenis Setoran
-          <select value="{{ entry.jenis }}" onChange="{{ setJenis }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d">
-            <option value="Ziyadah">Ziyadah (hafalan baru)</option>
-            <option value="Muroja’ah">Muroja’ah (pengulangan)</option>
-          </select>
-        </label>
-        <label style="font-size:12px;font-weight:700;color:#16264d">Juz
-          <input type="number" value="{{ entry.juz }}" onInput="{{ setJuz }}" min="1" max="30" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d" />
-        </label>
-        <label style="font-size:12px;font-weight:700;color:#16264d">Halaman / Baris
-          <input value="{{ entry.halaman }}" onInput="{{ setHalaman }}" placeholder="mis. 3 hlm" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d" />
-        </label>
-        <label style="font-size:12px;font-weight:700;color:#16264d">Nilai Tajwid
-          <select value="{{ entry.tajwid }}" onChange="{{ setTajwid }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d">
-            <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
-          </select>
-        </label>
-        <label style="font-size:12px;font-weight:700;color:#16264d">Nilai Kelancaran
-          <select value="{{ entry.kelancaran }}" onChange="{{ setKelancaran }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d">
-            <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
-          </select>
-        </label>
-        <label style="grid-column:1/-1;font-size:12px;font-weight:700;color:#16264d">Catatan Musyrif
-          <textarea value="{{ entry.catatan }}" onInput="{{ setCatatan }}" rows="2" placeholder="mis. makhraj huruf perlu diperbaiki…" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d;resize:vertical"></textarea>
-        </label>
-      </div>
-      </sc-if>
-
-      <sc-if value="{{ isModeAkhlak }}" hint-placeholder-val="{{ false }}">
-      <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:22px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <label style="grid-column:1/-1;font-size:12px;font-weight:700;color:#16264d">Santri
-          <select value="{{ entry.studentId }}" onChange="{{ setStudent }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d">
-            <sc-for list="{{ entryStudents }}" as="o" hint-placeholder-count="10"><option value="{{ o.id }}">{{ o.name }}</option></sc-for>
-          </select>
-        </label>
-        <label style="font-size:12px;font-weight:700;color:#16264d">Tanggal
-          <input type="date" value="{{ entry.tanggal }}" onChange="{{ setTanggal }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d" />
-        </label>
-        <label style="font-size:12px;font-weight:700;color:#16264d">Aspek Akhlak
-          <select value="{{ entry.aspek }}" onChange="{{ setAspek }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d">
-            <option>Adab &amp; Sopan Santun</option><option>Kedisiplinan</option><option>Kebersihan &amp; Kerapian</option><option>Kejujuran</option><option>Tanggung Jawab</option><option>Kepedulian &amp; Ukhuwah</option>
-          </select>
-        </label>
-        <label style="font-size:12px;font-weight:700;color:#16264d">Predikat
-          <select value="{{ entry.predikat }}" onChange="{{ setPredikat }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d">
-            <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
-          </select>
-        </label>
-        <label style="grid-column:1/-1;font-size:12px;font-weight:700;color:#16264d">Catatan
-          <textarea value="{{ entry.catatan }}" onInput="{{ setCatatan }}" rows="2" placeholder="mis. konsisten menjaga adab kepada guru" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d;resize:vertical"></textarea>
-        </label>
-      </div>
-      </sc-if>
-
-      <sc-if value="{{ isModeAkademik }}" hint-placeholder-val="{{ false }}">
-      <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:22px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <label style="grid-column:1/-1;font-size:12px;font-weight:700;color:#16264d">Santri
-          <select value="{{ entry.studentId }}" onChange="{{ setStudent }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d">
-            <sc-for list="{{ entryStudents }}" as="o" hint-placeholder-count="10"><option value="{{ o.id }}">{{ o.name }}</option></sc-for>
-          </select>
-        </label>
-        <label style="font-size:12px;font-weight:700;color:#16264d">Tanggal
-          <input type="date" value="{{ entry.tanggal }}" onChange="{{ setTanggal }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d" />
-        </label>
-        <label style="font-size:12px;font-weight:700;color:#16264d">Mata Pelajaran
-          <select value="{{ entry.mapel }}" onChange="{{ setMapel }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d">
-            <option>Matematika</option><option>IPA (Sains)</option><option>IPS</option><option>Bahasa Indonesia</option><option>Bahasa Inggris</option><option>PKn</option><option>Prakarya</option>
-          </select>
-        </label>
-        <label style="font-size:12px;font-weight:700;color:#16264d">Nilai (0-100)
-          <input type="number" value="{{ entry.nilai }}" onInput="{{ setNilai }}" min="0" max="100" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d" />
-        </label>
-        <label style="grid-column:1/-1;font-size:12px;font-weight:700;color:#16264d">Catatan
-          <textarea value="{{ entry.catatan }}" onInput="{{ setCatatan }}" rows="2" placeholder="mis. perlu pendampingan pada bab pecahan" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d;resize:vertical"></textarea>
-        </label>
-      </div>
-      </sc-if>
-
-      <div style="background:#0f1c3a;border-radius:14px;padding:16px 18px;margin-top:16px">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8ea2c9;margin-bottom:8px">URL Google Form Terisi</div>
-        <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#c9d6ee;word-break:break-all;line-height:1.6;max-height:76px;overflow:auto">{{ formUrl }}</div>
-        <div style="display:flex;gap:10px;margin-top:14px">
-          <button onClick="{{ openForm }}" style="padding:11px 20px;border-radius:10px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Buka Form Terisi ↗</button>
-          <button onClick="{{ copyUrl }}" style="padding:11px 18px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:transparent;color:#c9d6ee;font-weight:600;font-size:13px;cursor:pointer">Salin URL</button>
+      <p style="font-size:13px;color:#6b7280;margin:0 0 16px;line-height:1.5">Isi form di bawah — jawaban langsung tersimpan ke Google Sheet.</p>
+      <sc-if value="{{ formConfigured }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(20,30,60,.06)">
+          <iframe src="{{ formEmbedUrl }}" title="Input Nilai" style="width:100%;height:80vh;min-height:520px;border:none;display:block"></iframe>
         </div>
-      </div>
+      </sc-if>
+      <sc-if value="{{ formNotConfigured }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fbf7ea;border:1px solid #ecdfae;border-radius:14px;padding:26px 22px;text-align:center">
+          <div style="font-size:14px;font-weight:800;color:#8a6d1e">Google Form belum dikonfigurasi</div>
+          <p style="font-size:12.5px;color:#6b7280;margin:8px auto 16px;max-width:380px;line-height:1.5">Masukkan ID Google Form pada halaman Konfigurasi agar form input muncul di sini.</p>
+          <button onClick="{{ goConfig }}" style="padding:11px 20px;border-radius:10px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Buka Konfigurasi</button>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
 
-      <div style="margin-top:16px;background:#fbf7ea;border:1px solid #ecdfae;border-radius:12px;padding:14px 16px">
-        <div style="font-size:12px;font-weight:700;color:#8a6d1e;margin-bottom:8px">⚙️ Konfigurasi (untuk developer)</div>
-        <label style="font-size:11.5px;color:#6b7280;display:block">Google Form ID <span style="color:#9aa1ad">— ganti dengan ID form asli; entry.* juga diganti setelah kamu kirim ID field</span>
-          <input value="{{ formId }}" onInput="{{ setFormId }}" style="width:100%;margin-top:6px;padding:9px 11px;border-radius:8px;border:1px solid #ecdfae;background:#fff;font-size:12px;font-family:ui-monospace,monospace;color:#16264d" />
+  <!-- ============ KONFIGURASI ============ -->
+  <sc-if value="{{ isConfig }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:680px;margin:0 auto;padding:16px 20px 60px">
+      <button onClick="{{ back }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer;margin-bottom:18px">← Kembali</button>
+      <h1 style="font-size:20px;font-weight:800;margin:0 0 4px">Konfigurasi</h1>
+      <p style="font-size:13px;color:#6b7280;margin:0 0 22px;line-height:1.5">Hubungkan tracker ke Google Form (jalur input) dan Google Sheet publik (jalur baca).</p>
+      <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:20px 22px;margin-bottom:16px">
+        <div style="font-weight:800;font-size:13.5px;margin-bottom:10px">📝 Google Form — input nilai</div>
+        <label style="font-size:11.5px;color:#6b7280;display:block">Google Form ID <span style="color:#9aa1ad">— bagian ID dari .../forms/d/e/<b>ID</b>/viewform</span>
+          <input value="{{ formId }}" onInput="{{ setFormId }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
         </label>
-        <label style="font-size:11.5px;color:#6b7280;display:block;margin-top:12px">Google Sheet ID <span style="color:#9aa1ad">(baca via GViz — sheet harus dapat dilihat via link, tab bernama "Roster")</span>
+      </div>
+      <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:20px 22px">
+        <div style="font-weight:800;font-size:13.5px;margin-bottom:10px">📊 Google Sheet — baca data santri</div>
+        <label style="font-size:11.5px;color:#6b7280;display:block">Google Sheet ID <span style="color:#9aa1ad">— sheet publik (Viewer), tab bernama "Roster"</span>
           <div style="display:flex;gap:8px;margin-top:6px">
-            <input value="{{ sheetId }}" onInput="{{ setSheetId }}" placeholder="1AbC...xyz — kosongkan untuk data contoh" style="flex:1;padding:9px 11px;border-radius:8px;border:1px solid #ecdfae;background:#fff;font-size:12px;font-family:ui-monospace,monospace;color:#16264d" />
-            <button onClick="{{ reloadRoster }}" style="padding:9px 15px;border-radius:8px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap">Muat Data</button>
+            <input value="{{ sheetId }}" onInput="{{ setSheetId }}" placeholder="1AbC...xyz — kosongkan untuk data contoh" style="flex:1;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
+            <button onClick="{{ reloadRoster }}" style="padding:10px 16px;border-radius:9px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap">Muat Data</button>
           </div>
         </label>
-        <div style="margin-top:10px;font-size:11.5px;color:#8a6d1e;font-weight:600">Status data: <span style="font-weight:800">{{ dataStatus }}</span></div>
+        <div style="margin-top:12px;font-size:12px;color:#6b7280">Status data: <span style="font-weight:800;color:#0a4631">{{ dataStatus }}</span></div>
       </div>
     </div>
   </sc-if>
@@ -657,7 +579,7 @@ class Component extends DCLogic {
 
     return {
       view:v, role:st.role, roleLabel, userName:st.userName, greeting: st.userName?('Halo, '+st.userName):'',
-      isLogin:v==='login', isGallery:v==='gallery', isDetail:v==='detail', isDashboard:v==='dashboard', isEntry:v==='entry',
+      isLogin:v==='login', isGallery:v==='gallery', isDetail:v==='detail', isDashboard:v==='dashboard', isEntry:v==='entry', isConfig:v==='config',
       canManage: st.role==='admin'||st.role==='mudir'||st.role==='musyrif',
       canManageSecular: st.role==='admin',
       isStaff: st.role==='admin'||st.role==='mudir'||st.role==='musyrif',
@@ -674,6 +596,7 @@ class Component extends DCLogic {
       goGallery:()=>this.setState({view:'gallery'}),
       goDashboard:()=>this.setState({view:'dashboard'}),
       goEntry:()=>this.setState({view:'entry'}),
+      goConfig:()=>this.setState({view:'config'}),
       goLogin:()=>{ const C=window.Clerk; if(C){ this._afterSignIn=true; const here=window.location.href, o={afterSignInUrl:here, afterSignUpUrl:here, signInForceRedirectUrl:here, signUpForceRedirectUrl:here}; if(C.loaded){ C.openSignIn(o); } else { C.load().then(()=>C.openSignIn(o)).catch(()=>this.setState({loginOpen:true})); } } else { this.setState({loginOpen:true}); } },
       closeLogin:()=>this.setState({loginOpen:false}),
       stopLogin:(ev)=>{ ev && ev.stopPropagation && ev.stopPropagation(); },
@@ -685,6 +608,10 @@ class Component extends DCLogic {
       loginPublic:()=>this.setState({role:'public', view:'gallery'}),
       // entry
       entry:e, entryStudent, formUrl:this.buildUrl(), formId:st.formId,
+      formEmbedUrl:'https://docs.google.com/forms/d/e/'+st.formId+'/viewform?embedded=true',
+      formOpenUrl:'https://docs.google.com/forms/d/e/'+st.formId+'/viewform',
+      formConfigured: !!st.formId && st.formId.indexOf('SAMPLE')<0,
+      formNotConfigured: !(st.formId && st.formId.indexOf('SAMPLE')<0),
       entryStudents:source.map(r=>({id:r.id, name:r.name})),
       isModeHafalan:e.mode==='hafalan', isModeAkademik:e.mode==='akademik', isModeAkhlak:e.mode==='akhlak',
       modeHafalan:modeBtn('hafalan'), modeAkademik:modeBtn('akademik'), modeAkhlak:modeBtn('akhlak'),
