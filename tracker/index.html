@@ -244,6 +244,15 @@
       <h1 style="font-size:20px;font-weight:800;margin:0 0 4px">Setor Hafalan &amp; Nilai</h1>
       <p style="font-size:13px;color:#6b7280;margin:0 0 22px;line-height:1.5">Isi data, lalu buka Google Form yang sudah terisi otomatis \u2014 tinggal tekan <b>Kirim</b>. Sheet berperan sebagai database.</p>
 
+      <div style="display:flex;flex-wrap:wrap;gap:9px;margin-bottom:16px">
+        <button onClick="{{ modeHafalan.onClick }}" style="{{ modeHafalan.style }}">📖 Setoran Hafalan</button>
+        <button onClick="{{ modeAkhlak.onClick }}" style="{{ modeAkhlak.style }}">🌟 Nilai Akhlak</button>
+        <sc-if value="{{ canManageSecular }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ modeAkademik.onClick }}" style="{{ modeAkademik.style }}">📘 Nilai Akademik</button>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ isModeHafalan }}" hint-placeholder-val="{{ true }}">
       <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:22px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
         <label style="grid-column:1/-1;font-size:12px;font-weight:700;color:#16264d">Santri
           <select value="{{ entry.studentId }}" onChange="{{ setStudent }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d">
@@ -279,6 +288,57 @@
           <textarea value="{{ entry.catatan }}" onInput="{{ setCatatan }}" rows="2" placeholder="mis. makhraj huruf perlu diperbaiki\u2026" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d;resize:vertical"></textarea>
         </label>
       </div>
+      </sc-if>
+
+      <sc-if value="{{ isModeAkhlak }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:22px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <label style="grid-column:1/-1;font-size:12px;font-weight:700;color:#16264d">Santri
+          <select value="{{ entry.studentId }}" onChange="{{ setStudent }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d">
+            <sc-for list="{{ entryStudents }}" as="o" hint-placeholder-count="10"><option value="{{ o.id }}">{{ o.name }}</option></sc-for>
+          </select>
+        </label>
+        <label style="font-size:12px;font-weight:700;color:#16264d">Tanggal
+          <input type="date" value="{{ entry.tanggal }}" onChange="{{ setTanggal }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d" />
+        </label>
+        <label style="font-size:12px;font-weight:700;color:#16264d">Aspek Akhlak
+          <select value="{{ entry.aspek }}" onChange="{{ setAspek }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d">
+            <option>Adab &amp; Sopan Santun</option><option>Kedisiplinan</option><option>Kebersihan &amp; Kerapian</option><option>Kejujuran</option><option>Tanggung Jawab</option><option>Kepedulian &amp; Ukhuwah</option>
+          </select>
+        </label>
+        <label style="font-size:12px;font-weight:700;color:#16264d">Predikat
+          <select value="{{ entry.predikat }}" onChange="{{ setPredikat }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d">
+            <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
+          </select>
+        </label>
+        <label style="grid-column:1/-1;font-size:12px;font-weight:700;color:#16264d">Catatan
+          <textarea value="{{ entry.catatan }}" onInput="{{ setCatatan }}" rows="2" placeholder="mis. konsisten menjaga adab kepada guru" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d;resize:vertical"></textarea>
+        </label>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isModeAkademik }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:22px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <label style="grid-column:1/-1;font-size:12px;font-weight:700;color:#16264d">Santri
+          <select value="{{ entry.studentId }}" onChange="{{ setStudent }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d">
+            <sc-for list="{{ entryStudents }}" as="o" hint-placeholder-count="10"><option value="{{ o.id }}">{{ o.name }}</option></sc-for>
+          </select>
+        </label>
+        <label style="font-size:12px;font-weight:700;color:#16264d">Tanggal
+          <input type="date" value="{{ entry.tanggal }}" onChange="{{ setTanggal }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d" />
+        </label>
+        <label style="font-size:12px;font-weight:700;color:#16264d">Mata Pelajaran
+          <select value="{{ entry.mapel }}" onChange="{{ setMapel }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d">
+            <option>Matematika</option><option>IPA (Sains)</option><option>IPS</option><option>Bahasa Indonesia</option><option>Bahasa Inggris</option><option>PKn</option><option>Prakarya</option>
+          </select>
+        </label>
+        <label style="font-size:12px;font-weight:700;color:#16264d">Nilai (0-100)
+          <input type="number" value="{{ entry.nilai }}" onInput="{{ setNilai }}" min="0" max="100" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d" />
+        </label>
+        <label style="grid-column:1/-1;font-size:12px;font-weight:700;color:#16264d">Catatan
+          <textarea value="{{ entry.catatan }}" onInput="{{ setCatatan }}" rows="2" placeholder="mis. perlu pendampingan pada bab pecahan" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;color:#16264d;resize:vertical"></textarea>
+        </label>
+      </div>
+      </sc-if>
 
       <div style="background:#0f1c3a;border-radius:14px;padding:16px 18px;margin-top:16px">
         <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8ea2c9;margin-bottom:8px">URL Google Form Terisi</div>
@@ -294,6 +354,13 @@
         <label style="font-size:11.5px;color:#6b7280;display:block">Google Form ID <span style="color:#9aa1ad">\u2014 ganti dengan ID form asli; entry.* juga diganti setelah kamu kirim ID field</span>
           <input value="{{ formId }}" onInput="{{ setFormId }}" style="width:100%;margin-top:6px;padding:9px 11px;border-radius:8px;border:1px solid #ecdfae;background:#fff;font-size:12px;font-family:ui-monospace,monospace;color:#16264d" />
         </label>
+        <label style="font-size:11.5px;color:#6b7280;display:block;margin-top:12px">Google Sheet ID <span style="color:#9aa1ad">(baca via GViz — sheet harus dapat dilihat via link, tab bernama "Roster")</span>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <input value="{{ sheetId }}" onInput="{{ setSheetId }}" placeholder="1AbC...xyz — kosongkan untuk data contoh" style="flex:1;padding:9px 11px;border-radius:8px;border:1px solid #ecdfae;background:#fff;font-size:12px;font-family:ui-monospace,monospace;color:#16264d" />
+            <button onClick="{{ reloadRoster }}" style="padding:9px 15px;border-radius:8px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap">Muat Data</button>
+          </div>
+        </label>
+        <div style="margin-top:10px;font-size:11.5px;color:#8a6d1e;font-weight:600">Status data: <span style="font-weight:800">{{ dataStatus }}</span></div>
       </div>
     </div>
   </sc-if>
@@ -303,26 +370,28 @@
 <script type="text/x-dc" data-dc-script>
 const NAVY='#16264d', NAVY2='#0f1c3a', GREEN='#2f8f3a', GOLD='#cfa02c', CREAM='#f5f3ec', PAPER='#ffffff', LINE='#e6e1d5', INK='#16264d', MUT='#6b7280';
 
+// Score keys: haf/tah/mur/ilm/akh = diniyah (musyrif/mudir) · akd/bhs = akademik (admin)
 const RAW = [
-  {id:'s1', name:'Ahmad Fauzan Ramadhani', nick:'Fauzan', kota:'Depok', prov:'Jawa Barat', hal:1, haf:88,taj:92,lan:90,mur:85,akd:84,bhs:86, juz:8},
-  {id:'s2', name:'Muhammad Rifki Hakim', nick:'Rifki', kota:'Bogor', prov:'Jawa Barat', hal:1, haf:82,taj:85,lan:80,mur:78,akd:88,bhs:84, juz:6},
-  {id:'s3', name:'Zaid Abdullah Faris', nick:'Zaid', kota:'Bekasi', prov:'Jawa Barat', hal:1, haf:94,taj:95,lan:93,mur:90,akd:88,bhs:90, juz:10},
-  {id:'s4', name:'Yusuf Ar-Ramadhan', nick:'Yusuf', kota:'Subang', prov:'Jawa Barat', hal:1, haf:70,taj:74,lan:72,mur:68,akd:76,bhs:72, juz:4},
-  {id:'s5', name:'Hafizh Anwar Syafiq', nick:'Hafizh', kota:'Bandung', prov:'Jawa Barat', hal:1, haf:86,taj:88,lan:85,mur:82,akd:80,bhs:83, juz:7},
-  {id:'s6', name:'Ibrahim Malik Ibrahim', nick:'Ibrahim', kota:'Cirebon', prov:'Jawa Barat', hal:2, haf:78,taj:80,lan:76,mur:74,akd:82,bhs:79, juz:5},
-  {id:'s7', name:'Umar Hidayatullah', nick:'Umar', kota:'Sukabumi', prov:'Jawa Barat', hal:2, haf:64,taj:70,lan:66,mur:62,akd:72,bhs:68, juz:3},
-  {id:'s8', name:'Bilal Saputra Nugroho', nick:'Bilal', kota:'Depok', prov:'Jawa Barat', hal:2, haf:80,taj:82,lan:84,mur:79,akd:78,bhs:81, juz:6},
-  {id:'s9', name:'Fathan Nasution', nick:'Fathan', kota:'Asahan', prov:'Sumatera Utara', hal:2, haf:90,taj:89,lan:88,mur:86,akd:85,bhs:87, juz:9},
-  {id:'s10',name:'Rasyid Pratama Wijaya', nick:'Rasyid', kota:'Sungailiat', prov:'Kep. Bangka Belitung', hal:2, haf:74,taj:78,lan:75,mur:72,akd:80,bhs:76, juz:5},
+  {id:'s1', name:'Ahmad Fauzan Ramadhani', nick:'Fauzan', kota:'Depok', prov:'Jawa Barat', hal:1, haf:88,tah:91,mur:85,ilm:85,akh:90,akd:84,bhs:86, juz:8},
+  {id:'s2', name:'Muhammad Rifki Hakim', nick:'Rifki', kota:'Bogor', prov:'Jawa Barat', hal:1, haf:82,tah:83,mur:78,ilm:80,akh:86,akd:88,bhs:84, juz:6},
+  {id:'s3', name:'Zaid Abdullah Faris', nick:'Zaid', kota:'Bekasi', prov:'Jawa Barat', hal:1, haf:94,tah:94,mur:90,ilm:92,akh:93,akd:88,bhs:90, juz:10},
+  {id:'s4', name:'Yusuf Ar-Ramadhan', nick:'Yusuf', kota:'Subang', prov:'Jawa Barat', hal:1, haf:70,tah:73,mur:68,ilm:70,akh:78,akd:76,bhs:72, juz:4},
+  {id:'s5', name:'Hafizh Anwar Syafiq', nick:'Hafizh', kota:'Bandung', prov:'Jawa Barat', hal:1, haf:86,tah:87,mur:82,ilm:84,akh:88,akd:80,bhs:83, juz:7},
+  {id:'s6', name:'Ibrahim Malik Ibrahim', nick:'Ibrahim', kota:'Cirebon', prov:'Jawa Barat', hal:2, haf:78,tah:78,mur:74,ilm:77,akh:82,akd:82,bhs:79, juz:5},
+  {id:'s7', name:'Umar Hidayatullah', nick:'Umar', kota:'Sukabumi', prov:'Jawa Barat', hal:2, haf:64,tah:68,mur:62,ilm:66,akh:74,akd:72,bhs:68, juz:3},
+  {id:'s8', name:'Bilal Saputra Nugroho', nick:'Bilal', kota:'Depok', prov:'Jawa Barat', hal:2, haf:80,tah:83,mur:79,ilm:80,akh:85,akd:78,bhs:81, juz:6},
+  {id:'s9', name:'Fathan Nasution', nick:'Fathan', kota:'Asahan', prov:'Sumatera Utara', hal:2, haf:90,tah:89,mur:86,ilm:88,akh:90,akd:85,bhs:87, juz:9},
+  {id:'s10',name:'Rasyid Pratama Wijaya', nick:'Rasyid', kota:'Sungailiat', prov:'Kep. Bangka Belitung', hal:2, haf:74,tah:77,mur:72,ilm:75,akh:80,akd:80,bhs:76, juz:5},
 ];
 const HALAQAH = {1:'Ustadz Salman Al-Farisi', 2:'Ustadz Hamzah Abdurrahman'};
 const PILLARS = [
-  {key:'haf', abbr:'HAF', label:'Hafalan'},
-  {key:'taj', abbr:'TAJ', label:'Tajwid'},
-  {key:'lan', abbr:'LAN', label:'Kelancaran'},
-  {key:'mur', abbr:'MUR', label:'Muroja\u2019ah'},
-  {key:'akd', abbr:'AKD', label:'Akademik'},
-  {key:'bhs', abbr:'BHS', label:'Bahasa'},
+  {key:'haf', abbr:'HAF', label:'Hafalan', grp:'diniyah'},
+  {key:'tah', abbr:'TAH', label:'Tahsin', grp:'diniyah'},
+  {key:'mur', abbr:'MUR', label:'Muroja\u2019ah', grp:'diniyah'},
+  {key:'ilm', abbr:'ILM', label:'Ilmu & B. Arab', grp:'diniyah'},
+  {key:'akh', abbr:'AKH', label:'Akhlak', grp:'diniyah'},
+  {key:'akd', abbr:'AKD', label:'Akademik', grp:'akademik'},
+  {key:'bhs', abbr:'BHS', label:'Bahasa', grp:'akademik'},
 ];
 function grade(n){
   if(n>=90) return {l:'A', name:'Mumtaz', c:'#1f7a34'};
@@ -338,8 +407,38 @@ class Component extends DCLogic {
   state = {
     view:'login', role:null, selectedId:null, theme:'minimal', search:'',
     formId:'1FAIpQLScSAMPLEFORMIDxxxxxxxxxxxxxxxxxxxxxxx',
-    entry:{ studentId:'s1', tanggal:'2026-09-06', jenis:'Ziyadah', juz:'8', halaman:'3', tajwid:'A', kelancaran:'A', catatan:'' },
+    entry:{ studentId:'s1', tanggal:'2026-09-06', mode:'hafalan',
+      jenis:'Ziyadah', juz:'8', halaman:'3', tajwid:'A', kelancaran:'A',
+      mapel:'Matematika', nilai:'85', aspek:'Adab & Sopan Santun', predikat:'A',
+      catatan:'' },
+    sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
   };
+
+  // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
+  //      the demo RAW until a viewable sheet + "Roster" tab are configured.
+  componentDidMount(){ if((this.state.sheetId||'').trim()) this.loadRoster(); }
+
+  async loadRoster(){
+    const id=(this.state.sheetId||'').trim();
+    if(!id){ this.setState({students:null, loadState:'demo'}); return; }
+    this.setState({loadState:'loading'});
+    try{
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&sheet='+encodeURIComponent(this.state.sheetTab||'Roster');
+      const text=await (await fetch(url)).text();
+      const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
+      const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
+      const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); return this.mapRow(o); }).filter(s=>s.id&&s.name);
+      this.setState(rows.length?{students:rows, loadState:'live'}:{students:null, loadState:'error'});
+    }catch(e){ console.error('loadRoster failed', e); this.setState({students:null, loadState:'error'}); }
+  }
+
+  mapRow(o){
+    const num=x=>{ const n=Number(x); return isFinite(n)?n:0; };
+    return { id:String(o.id!=null?o.id:''), name:o.name||o.nama||'',
+      nick:o.nick||o.panggilan||(o.name?String(o.name).split(' ')[0]:''),
+      kota:o.kota||'', prov:o.prov||o.provinsi||'', hal:num(o.hal!=null?o.hal:1), juz:num(o.juz),
+      haf:num(o.haf), tah:num(o.tah), mur:num(o.mur), ilm:num(o.ilm), akh:num(o.akh), akd:num(o.akd), bhs:num(o.bhs) };
+  }
 
   cardVisual(theme, tier){
     const accent = TIER_ACCENT[tier];
@@ -393,7 +492,7 @@ class Component extends DCLogic {
   }
 
   radar(s){
-    const R=64, cx=80, cy=80, N=6;
+    const R=64, cx=80, cy=80, N=s.pillars.length;
     const pt=(i,rad)=>{ const a=-Math.PI/2 + i*2*Math.PI/N; return [cx+Math.cos(a)*rad, cy+Math.sin(a)*rad]; };
     const rings=[0.25,0.5,0.75,1].map((f,k)=>React.createElement('polygon',{key:'r'+k,
       points:Array.from({length:N},(_,i)=>pt(i,R*f).join(',')).join(' '), fill:'none', stroke:'rgba(20,30,60,.12)', strokeWidth:1}));
@@ -415,19 +514,36 @@ class Component extends DCLogic {
     });
   }
 
+  activeRoster(){ const s=this.state.students; return (s&&s.length)?s:RAW; }
+
   buildUrl(){
-    const e=this.state.entry, s=RAW.find(x=>x.id===e.studentId)||RAW[0];
+    const roster=this.activeRoster();
+    const e=this.state.entry, s=roster.find(x=>x.id===e.studentId)||roster[0];
     const base='https://docs.google.com/forms/d/e/'+this.state.formId+'/viewform?usp=pp_url';
-    const map={ 'entry.1000101':s.name,'entry.1000102':e.tanggal,'entry.1000103':e.jenis,
-      'entry.1000104':e.juz,'entry.1000105':e.halaman,'entry.1000106':e.tajwid,
-      'entry.1000107':e.kelancaran,'entry.1000108':e.catatan };
+    let map;
+    if(e.mode==='akademik'){
+      map={ 'entry.1000101':s.name,'entry.1000102':e.tanggal,'entry.1000201':'Akademik',
+        'entry.1000202':e.mapel,'entry.1000203':e.nilai,'entry.1000108':e.catatan };
+    } else if(e.mode==='akhlak'){
+      map={ 'entry.1000101':s.name,'entry.1000102':e.tanggal,'entry.1000301':'Akhlak',
+        'entry.1000302':e.aspek,'entry.1000303':e.predikat,'entry.1000108':e.catatan };
+    } else {
+      map={ 'entry.1000101':s.name,'entry.1000102':e.tanggal,'entry.1000103':e.jenis,
+        'entry.1000104':e.juz,'entry.1000105':e.halaman,'entry.1000106':e.tajwid,
+        'entry.1000107':e.kelancaran,'entry.1000108':e.catatan };
+    }
     const q=Object.entries(map).filter(([k,v])=>v!=='').map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
     return base+'&'+q;
   }
 
   renderVals(){
     const st=this.state, v=st.view;
-    const all=RAW.map(r=>this.enrich(r));
+    const source=(st.students&&st.students.length)?st.students:RAW;
+    const all=source.map(r=>this.enrich(r));
+    const dataStatus = st.loadState==='live'?'Live · Google Sheet'
+      : st.loadState==='loading'?'Memuat data…'
+      : st.loadState==='error'?'Gagal muat · memakai data contoh'
+      : 'Data contoh (demo)';
     const q=st.search.trim().toLowerCase();
     let gallery=all.filter(s=> !q || s.name.toLowerCase().includes(q) || s.kota.toLowerCase().includes(q));
     gallery=gallery.slice().sort((a,b)=>b.overall-a.overall);
@@ -444,6 +560,11 @@ class Component extends DCLogic {
       style:{padding:'7px 13px', borderRadius:'8px', border:'1px solid '+(st.theme===k?NAVY:LINE),
         background:st.theme===k?NAVY:'#fff', color:st.theme===k?'#fff':NAVY, cursor:'pointer',
         font:'600 12px/1 ui-sans-serif,system-ui', letterSpacing:'.02em'}});
+    const modeBtn=(k)=>({
+      onClick:()=>this.setState({entry:{...st.entry, mode:k}}),
+      style:{padding:'9px 15px', borderRadius:'999px', border:'1px solid '+(st.entry.mode===k?GREEN:LINE),
+        background:st.entry.mode===k?GREEN:'#fff', color:st.entry.mode===k?'#fff':NAVY, cursor:'pointer',
+        font:'700 12.5px/1 ui-sans-serif,system-ui', letterSpacing:'.01em'}});
 
     const roleLabel = st.role==='admin'?'Admin':st.role==='mudir'?'Mudir':st.role==='musyrif'?'Musyrif':'Publik';
 
@@ -472,7 +593,9 @@ class Component extends DCLogic {
       loginPublic:()=>this.setState({role:'public', view:'gallery'}),
       // entry
       entry:e, entryStudent, formUrl:this.buildUrl(), formId:st.formId,
-      entryStudents:RAW.map(r=>({id:r.id, name:r.name})),
+      entryStudents:source.map(r=>({id:r.id, name:r.name})),
+      isModeHafalan:e.mode==='hafalan', isModeAkademik:e.mode==='akademik', isModeAkhlak:e.mode==='akhlak',
+      modeHafalan:modeBtn('hafalan'), modeAkademik:modeBtn('akademik'), modeAkhlak:modeBtn('akhlak'),
       setStudent:(ev)=>this.setState({entry:{...e, studentId:ev.target.value}}),
       setTanggal:(ev)=>this.setState({entry:{...e, tanggal:ev.target.value}}),
       setJenis:(ev)=>this.setState({entry:{...e, jenis:ev.target.value}}),
@@ -480,8 +603,15 @@ class Component extends DCLogic {
       setHalaman:(ev)=>this.setState({entry:{...e, halaman:ev.target.value}}),
       setTajwid:(ev)=>this.setState({entry:{...e, tajwid:ev.target.value}}),
       setKelancaran:(ev)=>this.setState({entry:{...e, kelancaran:ev.target.value}}),
+      setMapel:(ev)=>this.setState({entry:{...e, mapel:ev.target.value}}),
+      setNilai:(ev)=>this.setState({entry:{...e, nilai:ev.target.value}}),
+      setAspek:(ev)=>this.setState({entry:{...e, aspek:ev.target.value}}),
+      setPredikat:(ev)=>this.setState({entry:{...e, predikat:ev.target.value}}),
       setCatatan:(ev)=>this.setState({entry:{...e, catatan:ev.target.value}}),
       setFormId:(ev)=>this.setState({formId:ev.target.value}),
+      dataStatus, sheetId:st.sheetId,
+      setSheetId:(ev)=>this.setState({sheetId:ev.target.value}),
+      reloadRoster:()=>this.loadRoster(),
       openForm:()=>window.open(this.buildUrl(),'_blank'),
       copyUrl:()=>{ try{navigator.clipboard.writeText(this.buildUrl());}catch(x){} },
     };
