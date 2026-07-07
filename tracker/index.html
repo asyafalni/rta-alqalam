@@ -98,15 +98,11 @@
 
       <div class="book-grid">
         <sc-for list="{{ gallery }}" as="s" hint-placeholder-count="8">
-          <div onClick="{{ s.onOpen }}" style="background:#fffdf7;border:1px solid #ece3cf;border-radius:18px;padding:16px 14px 15px;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 6px 20px rgba(120,95,30,.08);position:relative;display:flex;flex-direction:column;align-items:center;text-align:center" style-hover="transform:translateY(-5px);box-shadow:0 16px 32px rgba(120,95,30,.17)">
-            <div style="position:absolute;top:11px;right:11px;font-size:10px;font-weight:700;color:#8a6d1e;background:#f5ecd3;border:1px solid #e6d3a0;padding:3px 9px;border-radius:999px">{{ s.juz }}/15 Juz</div>
-            <div style="width:132px;height:98px;margin:8px auto 2px">{{ s.book }}</div>
-            <div class="disp" style="font-size:19px;color:#0a4631;line-height:1.15;margin-top:8px">{{ s.nick }}</div>
+          <div onClick="{{ s.onOpen }}" style="background:#fffdf7;border:1px solid #ece3cf;border-radius:18px;padding:15px 14px 17px;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 6px 20px rgba(120,95,30,.08);position:relative;display:flex;flex-direction:column;align-items:center;text-align:center" style-hover="transform:translateY(-5px);box-shadow:0 16px 32px rgba(120,95,30,.17)">
+            <div style="width:128px;height:108px;margin:2px auto 0">{{ s.book }}</div>
+            <div class="disp" style="font-size:19px;color:#0a4631;line-height:1.15;margin-top:4px">{{ s.nick }}</div>
             <div style="font-size:11.5px;color:#9a8c6a;margin-top:3px">{{ s.kota }}</div>
-            <div style="width:100%;margin-top:14px">
-              <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;color:#b7a77f;text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px"><span>Hafalan</span><span style="color:#c6a052">{{ s.juzPct }}%</span></div>
-              <div style="height:7px;border-radius:6px;background:#efe7d2;overflow:hidden"><div style="height:100%;width:{{ s.juzPct }}%;background:linear-gradient(90deg,#c6a052,#e6cf8e);border-radius:6px"></div></div>
-            </div>
+            <div style="margin-top:11px;font-size:12px;font-weight:700;color:#8a6d1e;background:#f5ecd3;border:1px solid #e6d3a0;padding:5px 13px;border-radius:999px">{{ s.juz }} / 15 Juz · {{ s.juzPct }}%</div>
           </div>
         </sc-for>
       </div>
@@ -510,31 +506,27 @@ class Component extends DCLogic {
     };
   }
 
-  // Open mushaf whose pages fill with gold as memorization (juz/15) progresses.
+  // Open book (gold cover, white pages) with a loading bar across the pages
+  // whose green fill tracks memorization progress (juz / 15).
   bookSvg(juz, uid){
     const E=(t,p,c)=>React.createElement(t,p,c);
     const max=15, pct=Math.max(0,Math.min(1,(juz||0)/max));
-    const gid='bg_'+uid, cid='bc_'+uid;
-    const pageTop=24, pageBot=82, fillTop=pageBot-pct*(pageBot-pageTop);
-    const left='10,20 70,34 70,80 12,84', right='130,20 70,34 70,80 128,84';
-    const lines=[];
-    for(let i=0;i<6;i++){ const y=32+i*8;
-      lines.push(E('line',{key:'tl'+i,x1:10,y1:y,x2:130,y2:y,stroke:'#cbb887',strokeWidth:1.3,opacity:.55,clipPath:'url(#'+cid+')'})); }
-    return E('svg',{viewBox:'0 0 140 104',width:'100%',height:'100%'},[
-      E('defs',{key:'d'},[
-        E('linearGradient',{key:'g',id:gid,x1:'0',y1:'1',x2:'0',y2:'0'},[
-          E('stop',{key:'a',offset:'0%',stopColor:'#c6a052'}),
-          E('stop',{key:'b',offset:'100%',stopColor:'#ecd79a'})]),
-        E('clipPath',{key:'c',id:cid},[
-          E('polygon',{key:'l',points:left}),
-          E('polygon',{key:'r',points:right})])]),
-      E('ellipse',{key:'sh',cx:70,cy:92,rx:52,ry:5,fill:'rgba(120,95,30,.13)'}),
-      E('polygon',{key:'lp',points:left,fill:'#fbf6ea',stroke:'#e0cfa4',strokeWidth:1.2}),
-      E('polygon',{key:'rp',points:right,fill:'#fbf6ea',stroke:'#e0cfa4',strokeWidth:1.2}),
-      E('rect',{key:'fl',x:0,y:fillTop,width:140,height:104,fill:'url(#'+gid+')',clipPath:'url(#'+cid+')',opacity:.9}),
-      ...lines,
-      E('line',{key:'sp',x1:70,y1:33,x2:70,y2:81,stroke:'#b2934a',strokeWidth:2}),
-      E('rect',{key:'rb',x:67,y:14,width:6,height:22,rx:1,fill:'#0a4631'}),
+    const OUT='#2f3a33', GOLD='#e8bd57', GREEN='#34a85a', TRACK='#dcd6c4';
+    const cover={fill:GOLD, stroke:OUT, strokeWidth:2.2, strokeLinejoin:'round'};
+    const page={fill:'#ffffff', stroke:OUT, strokeWidth:2, strokeLinejoin:'round'};
+    const barX=27, barW=86, barY=55, barH=12, r=barH/2;
+    const insH=barH-5, insY=barY+2.5, insX=barX+2.5, insW=Math.max(insH,(barW-5)*pct);
+    return E('svg',{viewBox:'0 0 140 118',width:'100%',height:'100%'},[
+      // gold cover behind the pages (shows as a rim + rounded base)
+      E('path',{key:'cl',d:'M70,104 L70,30 Q42,19 9,28 L14,96 Q44,90 70,104 Z',...cover}),
+      E('path',{key:'cr',d:'M70,104 L70,30 Q98,19 131,28 L126,96 Q96,90 70,104 Z',...cover}),
+      // white pages
+      E('path',{key:'pl',d:'M70,97 L70,30 Q44,21 16,29 L20,89 Q44,83 70,97 Z',...page}),
+      E('path',{key:'pr',d:'M70,97 L70,30 Q96,21 124,29 L120,89 Q96,83 70,97 Z',...page}),
+      E('line',{key:'sp',x1:70,y1:31,x2:70,y2:96,stroke:OUT,strokeWidth:2}),
+      // loading bar: track + green fill
+      E('rect',{key:'tk',x:barX,y:barY,width:barW,height:barH,rx:r,fill:TRACK,stroke:OUT,strokeWidth:2}),
+      E('rect',{key:'fl',x:insX,y:insY,width:insW,height:insH,rx:insH/2,fill:GREEN,stroke:OUT,strokeWidth:1.4}),
     ]);
   }
 
