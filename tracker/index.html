@@ -307,34 +307,6 @@ const PILLARS = [
   {key:'bhs', abbr:'BHS', label:'Bahasa', grp:'akademik'},
 ];
 
-// ============================================================================
-//  GOOGLE FORM FIELD IDS  ——  replace every 'entry.100xxxx' placeholder below
-//  with the REAL id from your Form. How: Form → ⋮ → "Get pre-filled link",
-//  fill sample answers, copy the link; the entry.NNNNN numbers are the ids.
-//  Assumes ONE combined Form (with a "Bidang/Jenis Input" question) whose id
-//  goes in Konfigurasi → Google Form ID. See GUIDE.md §5.
-// ============================================================================
-const FORM_FIELDS = {
-  // shared by every entry type
-  santri:     'entry.1000101',   // Nama santri
-  tanggal:    'entry.1000102',   // Tanggal
-  catatan:    'entry.1000108',   // Catatan
-  // 📖 Setoran Hafalan
-  jenis:      'entry.1000103',   // Jenis setoran (Ziyadah / Muroja'ah)
-  juz:        'entry.1000104',   // Juz
-  halaman:    'entry.1000105',   // Halaman / baris
-  tajwid:     'entry.1000106',   // Nilai Tajwid
-  kelancaran: 'entry.1000107',   // Nilai Kelancaran
-  // 📘 Nilai Akademik
-  bidangAkd:  'entry.1000201',   // Bidang (nilai tetap "Akademik")
-  mapel:      'entry.1000202',   // Mata pelajaran
-  nilai:      'entry.1000203',   // Nilai angka
-  // 🌟 Nilai Akhlak
-  bidangAkh:  'entry.1000301',   // Bidang (nilai tetap "Akhlak")
-  aspek:      'entry.1000302',   // Aspek akhlak
-  predikat:   'entry.1000303',   // Predikat
-};
-
 function grade(n){
   if(n>=90) return {l:'A', name:'Mumtaz', c:'#1f7a34'};
   if(n>=80) return {l:'B', name:'Jayyid Jiddan', c:'#3f9a49'};
@@ -349,10 +321,6 @@ class Component extends DCLogic {
   state = {
     view:'gallery', role:'public', loginOpen:false, selectedId:null, theme:'minimal', search:'',
     formId:'1FAIpQLScSAMPLEFORMIDxxxxxxxxxxxxxxxxxxxxxxx',
-    entry:{ studentId:'s1', tanggal:'2026-09-06', mode:'hafalan',
-      jenis:'Ziyadah', juz:'8', halaman:'3', tajwid:'A', kelancaran:'A',
-      mapel:'Matematika', nilai:'85', aspek:'Adab & Sopan Santun', predikat:'A',
-      catatan:'' },
     sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
     clerkReady:false, userName:'',
   };
@@ -522,29 +490,6 @@ class Component extends DCLogic {
     });
   }
 
-  activeRoster(){ const s=this.state.students; return (s&&s.length)?s:RAW; }
-
-  buildUrl(){
-    const roster=this.activeRoster();
-    const e=this.state.entry, s=roster.find(x=>x.id===e.studentId)||roster[0];
-    const base='https://docs.google.com/forms/d/e/'+this.state.formId+'/viewform?usp=pp_url';
-    const F=FORM_FIELDS;
-    let map;
-    if(e.mode==='akademik'){
-      map={ [F.santri]:s.name, [F.tanggal]:e.tanggal, [F.bidangAkd]:'Akademik',
-        [F.mapel]:e.mapel, [F.nilai]:e.nilai, [F.catatan]:e.catatan };
-    } else if(e.mode==='akhlak'){
-      map={ [F.santri]:s.name, [F.tanggal]:e.tanggal, [F.bidangAkh]:'Akhlak',
-        [F.aspek]:e.aspek, [F.predikat]:e.predikat, [F.catatan]:e.catatan };
-    } else {
-      map={ [F.santri]:s.name, [F.tanggal]:e.tanggal, [F.jenis]:e.jenis,
-        [F.juz]:e.juz, [F.halaman]:e.halaman, [F.tajwid]:e.tajwid,
-        [F.kelancaran]:e.kelancaran, [F.catatan]:e.catatan };
-    }
-    const q=Object.entries(map).filter(([k,v])=>v!==''&&v!=null).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
-    return base+'&'+q;
-  }
-
   renderVals(){
     const st=this.state, v=st.view;
     const source=(st.students&&st.students.length)?st.students:RAW;
@@ -562,18 +507,6 @@ class Component extends DCLogic {
     const totalJuz=roster.reduce((a,s)=>a+s.juz,0);
     const avgJuz=roster.length?(totalJuz/roster.length):0;
     const sel = all.find(s=>s.id===st.selectedId)||null;
-    const e=st.entry, entryStudent=all.find(s=>s.id===e.studentId)||all[0];
-
-    const themeBtn=(k)=>({
-      onClick:()=>this.setState({theme:k}),
-      style:{padding:'7px 13px', borderRadius:'8px', border:'1px solid '+(st.theme===k?NAVY:LINE),
-        background:st.theme===k?NAVY:'#fff', color:st.theme===k?'#fff':NAVY, cursor:'pointer',
-        font:'600 12px/1 ui-sans-serif,system-ui', letterSpacing:'.02em'}});
-    const modeBtn=(k)=>({
-      onClick:()=>this.setState({entry:{...st.entry, mode:k}}),
-      style:{padding:'9px 15px', borderRadius:'999px', border:'1px solid '+(st.entry.mode===k?GREEN:LINE),
-        background:st.entry.mode===k?GREEN:'#fff', color:st.entry.mode===k?'#fff':NAVY, cursor:'pointer',
-        font:'700 12.5px/1 ui-sans-serif,system-ui', letterSpacing:'.01em'}});
 
     const roleLabel = st.role==='admin'?'Admin':st.role==='mudir'?'Mudir':st.role==='musyrif'?'Musyrif':'Publik';
 
@@ -584,8 +517,6 @@ class Component extends DCLogic {
       canManageSecular: st.role==='admin',
       isStaff: st.role==='admin'||st.role==='mudir'||st.role==='musyrif',
       isPublic: st.role==='public',
-      theme:st.theme,
-      themeMinimal:themeBtn('minimal'), themeGold:themeBtn('gold'), themeNavy:themeBtn('navy'), themeCrest:themeBtn('crest'),
       gallery, galleryCount:gallery.length, roster, rosterCount:roster.length,
       totalJuz, avgJuz:avgJuz.toFixed(1),
       mumtazCount:all.filter(s=>s.gLetter==='A').length,
@@ -606,33 +537,15 @@ class Component extends DCLogic {
       loginMudir:()=>this.setState({role:'mudir', view:'dashboard', loginOpen:false}),
       loginMusyrif:()=>this.setState({role:'musyrif', view:'dashboard', loginOpen:false}),
       loginPublic:()=>this.setState({role:'public', view:'gallery'}),
-      // entry
-      entry:e, entryStudent, formUrl:this.buildUrl(), formId:st.formId,
+      formId:st.formId,
       formEmbedUrl:'https://docs.google.com/forms/d/e/'+st.formId+'/viewform?embedded=true',
       formOpenUrl:'https://docs.google.com/forms/d/e/'+st.formId+'/viewform',
       formConfigured: !!st.formId && st.formId.indexOf('SAMPLE')<0,
       formNotConfigured: !(st.formId && st.formId.indexOf('SAMPLE')<0),
-      entryStudents:source.map(r=>({id:r.id, name:r.name})),
-      isModeHafalan:e.mode==='hafalan', isModeAkademik:e.mode==='akademik', isModeAkhlak:e.mode==='akhlak',
-      modeHafalan:modeBtn('hafalan'), modeAkademik:modeBtn('akademik'), modeAkhlak:modeBtn('akhlak'),
-      setStudent:(ev)=>this.setState({entry:{...e, studentId:ev.target.value}}),
-      setTanggal:(ev)=>this.setState({entry:{...e, tanggal:ev.target.value}}),
-      setJenis:(ev)=>this.setState({entry:{...e, jenis:ev.target.value}}),
-      setJuz:(ev)=>this.setState({entry:{...e, juz:ev.target.value}}),
-      setHalaman:(ev)=>this.setState({entry:{...e, halaman:ev.target.value}}),
-      setTajwid:(ev)=>this.setState({entry:{...e, tajwid:ev.target.value}}),
-      setKelancaran:(ev)=>this.setState({entry:{...e, kelancaran:ev.target.value}}),
-      setMapel:(ev)=>this.setState({entry:{...e, mapel:ev.target.value}}),
-      setNilai:(ev)=>this.setState({entry:{...e, nilai:ev.target.value}}),
-      setAspek:(ev)=>this.setState({entry:{...e, aspek:ev.target.value}}),
-      setPredikat:(ev)=>this.setState({entry:{...e, predikat:ev.target.value}}),
-      setCatatan:(ev)=>this.setState({entry:{...e, catatan:ev.target.value}}),
       setFormId:(ev)=>this.setState({formId:ev.target.value}),
       dataStatus, sheetId:st.sheetId,
       setSheetId:(ev)=>this.setState({sheetId:ev.target.value}),
       reloadRoster:()=>this.loadRoster(),
-      openForm:()=>window.open(this.buildUrl(),'_blank'),
-      copyUrl:()=>{ try{navigator.clipboard.writeText(this.buildUrl());}catch(x){} },
     };
   }
 }
