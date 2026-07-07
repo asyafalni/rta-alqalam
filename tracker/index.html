@@ -278,27 +278,32 @@
     </div>
   </sc-if>
 
-  <!-- ============ KONFIGURASI ============ -->
-  <sc-if value="{{ isConfig }}" hint-placeholder-val="{{ false }}">
-    <div style="max-width:680px;margin:0 auto;padding:16px 20px 60px">
-      <button onClick="{{ back }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer;margin-bottom:18px">← Kembali</button>
-      <h1 style="font-size:20px;font-weight:800;margin:0 0 4px">Konfigurasi</h1>
-      <p style="font-size:13px;color:#6b7280;margin:0 0 22px;line-height:1.5">Hubungkan tracker ke Google Form (jalur input) dan Google Sheet publik (jalur baca).</p>
-      <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:20px 22px;margin-bottom:16px">
-        <div style="font-weight:800;font-size:13.5px;margin-bottom:10px">📝 Google Form — input nilai</div>
-        <label style="font-size:11.5px;color:#6b7280;display:block">Google Form ID <span style="color:#9aa1ad">— bagian ID dari .../forms/d/e/<b>ID</b>/viewform</span>
-          <input value="{{ formId }}" onInput="{{ setFormId }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
-        </label>
+  <!-- ============ KONFIGURASI (slide-over sheet) ============ -->
+  <sc-if value="{{ configOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeConfig }}" class="sheet-backdrop"></div>
+    <div class="sheet">
+      <div style="display:flex;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid #e6ddc8;background:#fff">
+        <h1 style="font-size:17px;font-weight:800;margin:0;flex:1;color:#0a4631">Konfigurasi</h1>
+        <button onClick="{{ closeConfig }}" title="Tutup" style="width:32px;height:32px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;cursor:pointer;font-size:18px;line-height:1">×</button>
       </div>
-      <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:20px 22px">
-        <div style="font-weight:800;font-size:13.5px;margin-bottom:10px">📊 Google Sheet — baca data santri</div>
-        <label style="font-size:11.5px;color:#6b7280;display:block">Google Sheet ID <span style="color:#9aa1ad">— sheet publik (Viewer), tab bernama "Roster"</span>
-          <div style="display:flex;gap:8px;margin-top:6px">
-            <input value="{{ sheetId }}" onInput="{{ setSheetId }}" placeholder="1AbC...xyz — kosongkan untuk data contoh" style="flex:1;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
-            <button onClick="{{ reloadRoster }}" style="padding:10px 16px;border-radius:9px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap">Muat Data</button>
-          </div>
-        </label>
-        <div style="margin-top:12px;font-size:12px;color:#6b7280">Status data: <span style="font-weight:800;color:#0a4631">{{ dataStatus }}</span></div>
+      <div style="flex:1;overflow:auto;padding:18px">
+        <p style="font-size:12.5px;color:#6b7280;margin:0 0 16px;line-height:1.5">Hubungkan tracker ke Google Form (jalur input) dan Google Sheet publik (jalur baca).</p>
+        <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:18px;margin-bottom:14px">
+          <div style="font-weight:800;font-size:13.5px;margin-bottom:10px">📝 Google Form — input nilai</div>
+          <label style="font-size:11.5px;color:#6b7280;display:block">Google Form ID <span style="color:#9aa1ad">— bagian ID dari .../forms/d/e/<b>ID</b>/viewform</span>
+            <input value="{{ formId }}" onInput="{{ setFormId }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
+          </label>
+        </div>
+        <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:18px">
+          <div style="font-weight:800;font-size:13.5px;margin-bottom:10px">📊 Google Sheet — baca data santri</div>
+          <label style="font-size:11.5px;color:#6b7280;display:block">Google Sheet ID <span style="color:#9aa1ad">— sheet publik (Viewer), tab bernama "Roster"</span>
+            <div style="display:flex;gap:8px;margin-top:6px">
+              <input value="{{ sheetId }}" onInput="{{ setSheetId }}" placeholder="1AbC...xyz — kosongkan untuk data contoh" style="flex:1;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
+              <button onClick="{{ reloadRoster }}" style="padding:10px 16px;border-radius:9px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap">Muat Data</button>
+            </div>
+          </label>
+          <div style="margin-top:12px;font-size:12px;color:#6b7280">Status data: <span style="font-weight:800;color:#0a4631">{{ dataStatus }}</span></div>
+        </div>
       </div>
     </div>
   </sc-if>
@@ -349,7 +354,7 @@ class Component extends DCLogic {
     view:'gallery', role:'public', loginOpen:false, selectedId:null, theme:'minimal', search:'',
     formId:'1FAIpQLScSAMPLEFORMIDxxxxxxxxxxxxxxxxxxxxxxx',
     sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
-    clerkReady:false, userName:'', entryOpen:false,
+    clerkReady:false, userName:'', entryOpen:false, configOpen:false,
   };
 
   // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
@@ -539,7 +544,8 @@ class Component extends DCLogic {
 
     return {
       view:v, role:st.role, roleLabel, userName:st.userName, greeting: st.userName?('Halo, '+st.userName):'',
-      isLogin:v==='login', isGallery:v==='gallery', isDetail:v==='detail', isDashboard:v==='dashboard', isEntry:v==='entry', isConfig:v==='config',
+      isLogin:v==='login', isGallery:v==='gallery', isDetail:v==='detail', isDashboard:v==='dashboard',
+      loginOpen:st.loginOpen, entryOpen:st.entryOpen, configOpen:st.configOpen,
       canManage: st.role==='admin'||st.role==='mudir'||st.role==='musyrif',
       canManageSecular: st.role==='admin',
       isStaff: st.role==='admin'||st.role==='mudir'||st.role==='musyrif',
@@ -555,7 +561,8 @@ class Component extends DCLogic {
       goDashboard:()=>this.setState({view:'dashboard'}),
       goEntry:()=>this.setState({entryOpen:true}),
       closeEntry:()=>this.setState({entryOpen:false}),
-      goConfig:()=>this.setState({view:'config', entryOpen:false}),
+      goConfig:()=>this.setState({configOpen:true, entryOpen:false}),
+      closeConfig:()=>this.setState({configOpen:false}),
       goLogin:()=>{ const C=window.Clerk; if(C){ this._afterSignIn=true; const here=window.location.href, o={afterSignInUrl:here, afterSignUpUrl:here, signInForceRedirectUrl:here, signUpForceRedirectUrl:here}; if(C.loaded){ C.openSignIn(o); } else { C.load().then(()=>C.openSignIn(o)).catch(()=>this.setState({loginOpen:true})); } } else { this.setState({loginOpen:true}); } },
       closeLogin:()=>this.setState({loginOpen:false}),
       stopLogin:(ev)=>{ ev && ev.stopPropagation && ev.stopPropagation(); },
