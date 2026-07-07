@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="../support.js"></script>
+<!-- Clerk (client-side auth). Publishable key is public by design. -->
+<script async crossorigin="anonymous"
+  data-clerk-publishable-key="pk_test_YnVzeS1zZXJ2YWwtMjUuY2xlcmsuYWNjb3VudHMuZGV2JA"
+  src="https://busy-serval-25.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+  type="text/javascript"></script>
 </head>
 <body>
 <x-dc>
@@ -422,11 +427,42 @@ class Component extends DCLogic {
       mapel:'Matematika', nilai:'85', aspek:'Adab & Sopan Santun', predikat:'A',
       catatan:'' },
     sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
+    clerkReady:false,
   };
 
   // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
   //      the demo RAW until a viewable sheet + "Roster" tab are configured.
-  componentDidMount(){ if((this.state.sheetId||'').trim()) this.loadRoster(); }
+  componentDidMount(){ if((this.state.sheetId||'').trim()) this.loadRoster(); this.initClerk(); }
+
+  // ---- Auth: Clerk (client-side). Reads the signed-in user's role from
+  //      publicMetadata.role (admin/mudir/musyrif); falls back to the demo
+  //      role-picker modal when Clerk isn't available (e.g. opened as file://).
+  initClerk(){
+    if(this._clerkStarted) return; this._clerkStarted=true;
+    const boot=()=>{
+      const C=window.Clerk;
+      if(!C){ setTimeout(boot,300); return; }
+      C.load().then(()=>{
+        this.setState({clerkReady:true});
+        this.applyClerkUser();
+        C.addListener(()=>this.applyClerkUser());
+      }).catch(e=>console.error('Clerk load failed', e));
+    };
+    boot();
+  }
+
+  applyClerkUser(){
+    const C=window.Clerk, u=C&&C.user;
+    if(u){
+      const raw=(u.publicMetadata&&u.publicMetadata.role)||'';
+      const role=['admin','mudir','musyrif'].indexOf(raw)>=0?raw:'musyrif';
+      const patch={role, loginOpen:false};
+      if(this._afterSignIn){ this._afterSignIn=false; patch.view='dashboard'; }
+      this.setState(patch);
+    } else if(this.state.role!=='public'){
+      this.setState({role:'public', view:'gallery'});
+    }
+  }
 
   async loadRoster(){
     const id=(this.state.sheetId||'').trim();
@@ -622,10 +658,10 @@ class Component extends DCLogic {
       goGallery:()=>this.setState({view:'gallery'}),
       goDashboard:()=>this.setState({view:'dashboard'}),
       goEntry:()=>this.setState({view:'entry'}),
-      goLogin:()=>this.setState({loginOpen:true}),
+      goLogin:()=>{ if(st.clerkReady && window.Clerk){ this._afterSignIn=true; window.Clerk.openSignIn(); } else { this.setState({loginOpen:true}); } },
       closeLogin:()=>this.setState({loginOpen:false}),
       stopLogin:(ev)=>{ ev && ev.stopPropagation && ev.stopPropagation(); },
-      logout:()=>this.setState({view:'gallery', role:'public', loginOpen:false, selectedId:null}),
+      logout:()=>{ try{ if(window.Clerk && window.Clerk.user) window.Clerk.signOut(); }catch(e){} this.setState({view:'gallery', role:'public', loginOpen:false, selectedId:null}); },
       back:()=>this.setState({view: st.role==='public'?'gallery':'dashboard'}),
       loginAdmin:()=>this.setState({role:'admin', view:'dashboard', loginOpen:false}),
       loginMudir:()=>this.setState({role:'mudir', view:'dashboard', loginOpen:false}),
