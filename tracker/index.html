@@ -395,7 +395,8 @@ class Component extends DCLogic {
     if(u){
       const raw=(u.publicMetadata&&u.publicMetadata.role)||'';
       const role=['admin','mudir','musyrif'].indexOf(raw)>=0?raw:'musyrif';
-      const name=u.firstName||u.fullName||(u.primaryEmailAddress&&u.primaryEmailAddress.emailAddress)||'Staff';
+      const email=(u.primaryEmailAddress&&u.primaryEmailAddress.emailAddress)||(u.emailAddresses&&u.emailAddresses[0]&&u.emailAddresses[0].emailAddress)||'';
+      const name=u.fullName||u.firstName||u.username||(email?email.split('@')[0]:'')||'Staff';
       const patch={role, userName:name, loginOpen:false};
       if(this._afterSignIn || !this._applied){ patch.view='dashboard'; }
       this._applied=true; this._afterSignIn=false;
