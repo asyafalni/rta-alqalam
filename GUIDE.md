@@ -127,36 +127,25 @@ what lets a public viewer see data derived from a sheet they cannot open.
 
 ---
 
-## 5. Write path — the Google Form
+## 5. Write path — the Google Form (embedded)
 
-The tracker's **Entry** screen has 3 modes, each building a *prefilled* Google Form URL:
+**Input Nilai** in the tracker **embeds your Google Form** directly (mobile-friendly, native
+validation), so submissions go straight to the linked Sheet. You only need the **Form ID** — there
+is no field-ID mapping to configure in code.
 
-- 📖 **Setoran Hafalan** (all staff) — jenis, juz, halaman, tajwid, kelancaran, catatan
-- 🌟 **Nilai Akhlak** (all staff) — aspek, predikat, catatan
-- 📘 **Nilai Akademik** (Admin only) — mata pelajaran, nilai, catatan
+1. Build **one** Google Form with the questions you want (e.g. a "Jenis Input" question for
+   Hafalan / Akhlak / Akademik, plus santri, tanggal, juz, nilai, catatan, …).
+2. Link it to the **Private** spreadsheet: Form → **Responses** → **Link to Sheets** (creates the
+   `Setoran` tab).
+3. Copy the **Form ID** — the `.../forms/d/e/`**`ID`**`/viewform` part of the form's URL.
+4. In the tracker: **Dashboard → ⚙️ Konfigurasi → Google Form ID** → paste it.
 
-Set it up so submissions land in the **Private** sheet's `Setoran` tab:
-
-1. Build the Google Form (one form with a "Jenis Input" question, or one form per mode).
-2. Link it to the **Private** spreadsheet (Form → Responses → Link to Sheets).
-3. **Get the real field IDs:** Form → ⋮ → *Get pre-filled link*, fill sample answers, copy the link.
-   The `entry.XXXXXXX` numbers in that link are your real field IDs.
-4. Replace the placeholders in **one place** — `tracker/index.html` → the `const FORM_FIELDS = { … }`
-   block near the top of the `<script>` (each line is labelled: santri, tanggal, juz, mapel, …).
-   Swap every `entry.100xxxx` for the matching real id. `buildUrl()` reads them all from there.
-5. Paste the Form ID into the tracker's **Konfigurasi → Google Form ID** box.
-
-> This assumes **one combined Form** with a "Bidang / Jenis Input" question (Hafalan / Akhlak /
-> Akademik) — the `bidangAkd` / `bidangAkh` fields carry that value. If you use a **separate Form
-> per mode** instead, you'd also need a per-mode Form ID (currently the tracker uses one `formId`
-> for all three) — tell the dev and it's a small change.
-
----
+Now **+ Input Nilai** shows the form embedded; staff fill it on desktop or mobile and it writes to
+the Sheet. (Until an ID is set, Input Nilai shows a "belum dikonfigurasi" prompt.)
 
 ## 6. Connect the tracker
 
-1. Open `/tracker/` → log in (Admin / Mudir / Musyrif) → **+ Input Nilai** → scroll to
-   **⚙️ Konfigurasi (untuk developer)**.
+1. Open `/tracker/` → **Masuk Staff** (Clerk) → on the dashboard click **⚙️ Konfigurasi**.
 2. Paste the **PUBLIC** Sheet ID into **Google Sheet ID** and click **Muat Data**.
 3. Status flips from *"Data contoh (demo)"* → *"Live · Google Sheet"*.
 
