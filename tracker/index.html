@@ -215,7 +215,9 @@
         <span style="font-size:12.5px;color:#6b7280;font-weight:600;white-space:nowrap;margin-right:2px">{{ greeting }}</span>
         <button onClick="{{ goGallery }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Capaian Santri</button>
         <button onClick="{{ goEntry }}" style="padding:8px 14px;border-radius:9px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer">+ Input Nilai</button>
-        <button onClick="{{ goConfig }}" title="Konfigurasi" style="padding:8px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:13px;cursor:pointer">⚙️</button>
+        <button onClick="{{ goConfig }}" title="Konfigurasi" style="width:36px;height:34px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#0a4631;cursor:pointer;display:grid;place-items:center;padding:0">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+        </button>
         <button onClick="{{ logout }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Keluar</button>
       </div>
 
@@ -243,9 +245,13 @@
             </div>
             <span class="r-asal" style="font-size:12.5px;color:#6b7280">{{ s.kota }}</span>
             <span class="r-grade" style="justify-self:center;font-size:14px;font-weight:800;color:{{ s.gColor }}">{{ s.gLetter }}</span>
-            <div class="r-act" style="display:flex;gap:6px;justify-self:end">
-              <button onClick="{{ s.onOpen }}" title="Profil" style="width:30px;height:30px;border-radius:8px;border:1px solid #e6e1d5;background:#fff;cursor:pointer;font-size:13px">👁</button>
-              <button onClick="{{ s.onEntry }}" title="Input" style="width:30px;height:30px;border-radius:8px;border:none;background:#2f8f3a;color:#fff;cursor:pointer;font-size:15px;font-weight:700">+</button>
+            <div class="r-act" style="display:flex;gap:6px;justify-self:end;align-items:center">
+              <button onClick="{{ s.onOpen }}" title="Lihat profil" style="width:32px;height:32px;border-radius:8px;border:1px solid #e6e1d5;background:#fff;color:#0a4631;cursor:pointer;display:grid;place-items:center;padding:0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg>
+              </button>
+              <button onClick="{{ s.onEntry }}" title="Input nilai" style="width:32px;height:32px;border-radius:8px;border:none;background:#2f8f3a;color:#fff;cursor:pointer;display:grid;place-items:center;padding:0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
             </div>
           </div>
         </sc-for>
