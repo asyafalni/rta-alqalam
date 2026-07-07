@@ -96,10 +96,11 @@
       <div class="book-grid">
         <sc-for list="{{ gallery }}" as="s" hint-placeholder-count="8">
           <div onClick="{{ s.onOpen }}" style="background:#fffdf7;border:1px solid #ece3cf;border-radius:18px;padding:15px 14px 17px;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 6px 20px rgba(120,95,30,.08);position:relative;display:flex;flex-direction:column;align-items:center;text-align:center" style-hover="transform:translateY(-5px);box-shadow:0 16px 32px rgba(120,95,30,.17)">
-            <div style="width:132px;height:118px;margin:0 auto">{{ s.book }}</div>
-            <div class="disp" style="font-size:19px;color:#0a4631;line-height:1.15;margin-top:6px">{{ s.nick }}</div>
+            <img src="../assets/quran-icon.png" alt="Al-Qur'an" style="width:106px;height:auto;margin:2px auto 0;display:block" />
+            <div class="disp" style="font-size:19px;color:#0a4631;line-height:1.15;margin-top:8px">{{ s.nick }}</div>
             <div style="font-size:11.5px;color:#9a8c6a;margin-top:3px">{{ s.kota }}</div>
-            <div style="width:100%;margin-top:13px">
+            <div class="arb" style="margin-top:9px;font-size:15px;font-weight:700;color:#0a4631;background:#f5ecd3;border:1px solid #e6d3a0;padding:3px 15px;border-radius:999px" dir="rtl">جُزْء {{ s.curArab }}</div>
+            <div style="width:100%;margin-top:12px">
               <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;color:#b7a77f;text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px"><span>Hafalan</span><span style="color:#c6a052">{{ s.juzPct }}%</span></div>
               <div style="height:7px;border-radius:6px;background:#efe7d2;overflow:hidden"><div style="height:100%;width:{{ s.juzPct }}%;background:linear-gradient(90deg,#c6a052,#e6cf8e);border-radius:6px"></div></div>
             </div>
@@ -525,7 +526,8 @@ class Component extends DCLogic {
     const og=grade(overall), tier=tierOf(overall), v=this.cardVisual(theme,tier);
     const initials=r.nick.slice(0,2).toUpperCase();
     return {...r, initials, overall, gLetter:og.l, gName:og.name, gColor:og.c, tier,
-      juzPct:Math.round(r.juz/15*100), musyrif:HALAQAH[r.hal], book:this.bookSvg(r.juz, r.id),
+      juzPct:Math.round(r.juz/15*100), musyrif:HALAQAH[r.hal],
+      curArab:String(r.juz>=15?15:(r.juz||0)+1).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d)),
       pillars:scores.map(s=>({abbr:s.abbr, label:s.label, score:s.score, letter:s.g.l, color:s.g.c})),
       cardStyle:v.card, nameStyle:v.name, subStyle:v.sub, ratingStyle:v.rating, ratingSubStyle:v.ratingSub,
       chipStyle:v.chip, statLabelStyle:v.statLabel, statValStyle:v.statVal,
