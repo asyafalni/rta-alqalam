@@ -72,7 +72,7 @@
       <div style="display:flex;align-items:center;gap:14px;padding:16px 0 14px">
         <img src="../assets/logo-rta.png" style="height:44px;width:auto" />
         <div style="flex:1;min-width:0">
-          <div style="font-weight:800;font-size:16px;line-height:1.1">RTA Al-Qalam — Galeri Santri</div>
+          <div style="font-weight:800;font-size:16px;line-height:1.1">RTA Al-Qalam — Capaian Santri</div>
           <div style="font-size:12px;color:#6b7280">Angkatan I · Tahun Ajaran 2026/2027</div>
         </div>
         <sc-if value="{{ isStaff }}" hint-placeholder-val="{{ false }}">
@@ -178,7 +178,7 @@
           <div style="font-weight:800;font-size:16px;line-height:1.1">Dashboard {{ roleLabel }}</div>
           <div style="font-size:12px;color:#6b7280">Pemantauan hafalan &amp; nilai · Angkatan I</div>
         </div>
-        <button onClick="{{ goGallery }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Galeri Publik</button>
+        <button onClick="{{ goGallery }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Capaian Santri</button>
         <button onClick="{{ goEntry }}" style="padding:8px 14px;border-radius:9px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer">+ Input Nilai</button>
         <button onClick="{{ logout }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Keluar</button>
       </div>
@@ -520,8 +520,8 @@ class Component extends DCLogic {
       E('path',{key:'cr',d:'M70,108 L70,26 Q98,16 131,26 L126,100 Q96,94 70,108 Z',...cover}),
       E('path',{key:'pl',d:'M70,99 L70,32 Q45,23 17,30 L21,90 Q45,85 70,99 Z',...page}),
       E('path',{key:'pr',d:'M70,99 L70,32 Q95,23 123,30 L119,90 Q95,85 70,99 Z',...page}),
-      E('text',{key:'jw',x:97,y:63,textAnchor:'middle',dominantBaseline:'central',fontSize:20,fontWeight:700,fill:INK,fontFamily:ARB},'جُزْء'),
-      E('text',{key:'nm',x:43,y:63,textAnchor:'middle',dominantBaseline:'central',fontSize:two?30:38,fontWeight:700,fill:INK,fontFamily:ARB},arb),
+      E('text',{key:'jw',x:97,y:64,textAnchor:'middle',dominantBaseline:'middle',fontSize:19,fontWeight:700,fill:INK,fontFamily:ARB},'جُزْء'),
+      E('text',{key:'nm',x:43,y:64,textAnchor:'middle',dominantBaseline:'middle',fontSize:two?34:44,fontWeight:700,fill:INK,fontFamily:"'Amiri',serif"},arb),
     ]);
   }
 
