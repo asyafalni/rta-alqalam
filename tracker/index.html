@@ -218,9 +218,27 @@
 
       <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:22px">
         <input value="{{ search }}" onInput="{{ onSearch }}" placeholder="Cari nama atau kota…" style="flex:1;min-width:180px;padding:10px 13px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;outline:none;color:#16264d" />
-        <select value="{{ groupFilter }}" onChange="{{ setGroup }}" style="flex:none;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;font-weight:600;color:#16264d;cursor:pointer;outline:none">
-          <sc-for list="{{ groupOptions }}" as="k" hint-placeholder-count="5"><option value="{{ k.v }}">{{ k.label }}</option></sc-for>
-        </select>
+        <div style="position:relative;flex:none">
+          <button onClick="{{ toggleFilter }}" style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-size:13px;font-weight:600;cursor:pointer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0a4631" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            <span>{{ filterLabel }}</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9aa1ad" stroke-width="2.6" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <sc-if value="{{ filterOpen }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ closeFilter }}" style="position:fixed;inset:0;z-index:40"></div>
+            <div style="position:absolute;top:46px;left:0;z-index:41;min-width:236px;background:#fff;border:1px solid #e6e1d5;border-radius:14px;box-shadow:0 14px 34px rgba(20,30,60,.16);padding:12px;animation:dcFade .12s ease">
+              <button onClick="{{ allChip.onPick }}" style="width:100%;padding:9px 11px;border-radius:9px;border:1px solid {{ allChip.bd }};background:{{ allChip.bg }};color:{{ allChip.fg }};font-size:13px;font-weight:700;cursor:pointer;text-align:left">Semua Santri</button>
+              <div style="font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#9aa1ad;margin:13px 4px 7px">Kelas</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <sc-for list="{{ kelasChips }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.onPick }}" style="padding:6px 13px;border-radius:999px;border:1px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-size:12.5px;font-weight:700;cursor:pointer">{{ c.label }}</button></sc-for>
+              </div>
+              <div style="font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#9aa1ad;margin:13px 4px 7px">Halaqah</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <sc-for list="{{ halChips }}" as="c" hint-placeholder-count="2"><button onClick="{{ c.onPick }}" style="padding:6px 13px;border-radius:999px;border:1px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-size:12.5px;font-weight:700;cursor:pointer">{{ c.label }}</button></sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
       </div>
 
       <div class="book-grid">
@@ -377,10 +395,27 @@
       </div>
 
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <span style="font-size:12.5px;color:#6b7280;font-weight:600">Filter Kelas / Halaqah</span>
-        <select value="{{ groupFilter }}" onChange="{{ setGroup }}" style="padding:9px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;font-size:13px;font-weight:600;color:#16264d;cursor:pointer;outline:none">
-          <sc-for list="{{ groupOptions }}" as="k" hint-placeholder-count="5"><option value="{{ k.v }}">{{ k.label }}</option></sc-for>
-        </select>
+        <div style="position:relative">
+          <button onClick="{{ toggleFilter }}" style="display:flex;align-items:center;gap:8px;padding:9px 13px;border-radius:10px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-size:13px;font-weight:600;cursor:pointer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0a4631" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            <span>{{ filterLabel }}</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9aa1ad" stroke-width="2.6" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <sc-if value="{{ filterOpen }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ closeFilter }}" style="position:fixed;inset:0;z-index:40"></div>
+            <div style="position:absolute;top:46px;left:0;z-index:41;min-width:236px;background:#fff;border:1px solid #e6e1d5;border-radius:14px;box-shadow:0 14px 34px rgba(20,30,60,.16);padding:12px;animation:dcFade .12s ease">
+              <button onClick="{{ allChip.onPick }}" style="width:100%;padding:9px 11px;border-radius:9px;border:1px solid {{ allChip.bd }};background:{{ allChip.bg }};color:{{ allChip.fg }};font-size:13px;font-weight:700;cursor:pointer;text-align:left">Semua Santri</button>
+              <div style="font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#9aa1ad;margin:13px 4px 7px">Kelas</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <sc-for list="{{ kelasChips }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.onPick }}" style="padding:6px 13px;border-radius:999px;border:1px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-size:12.5px;font-weight:700;cursor:pointer">{{ c.label }}</button></sc-for>
+              </div>
+              <div style="font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#9aa1ad;margin:13px 4px 7px">Halaqah</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <sc-for list="{{ halChips }}" as="c" hint-placeholder-count="2"><button onClick="{{ c.onPick }}" style="padding:6px 13px;border-radius:999px;border:1px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-size:12.5px;font-weight:700;cursor:pointer">{{ c.label }}</button></sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
         <span style="font-size:12px;color:#9aa1ad">· {{ rosterCount }} santri</span>
       </div>
       <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;overflow:hidden">
@@ -606,7 +641,7 @@ class Component extends DCLogic {
     setoranFormId:'', nilaiFormId:'', entryKind:'setoran',
     sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
     clerkReady:false, userName:'', entryOpen:false, configOpen:false,
-    nilai:null, setoran:null, mapelDef:null, raporOpen:false, termId:'2026g', groupFilter:'all',
+    nilai:null, setoran:null, mapelDef:null, raporOpen:false, termId:'2026g', groupFilter:'all', filterOpen:false,
   };
 
   // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
@@ -836,9 +871,12 @@ class Component extends DCLogic {
     const groupMatch=s=> gf==='all' ? true : gf.indexOf('kelas:')===0 ? String(s.kelas)===gf.slice(6) : gf.indexOf('hal:')===0 ? String(s.hal)===gf.slice(4) : true;
     const kelasList=Array.from(new Set(all.map(s=>String(s.kelas||'').trim()).filter(k=>k&&k!=='—'))).sort((a,b)=>kelasRank(a)-kelasRank(b));
     const halList=Array.from(new Set(all.map(s=>String(s.hal||'').trim()).filter(Boolean))).sort((a,b)=>(+a)-(+b));
-    const groupOptions=[{v:'all', label:'Semua Santri'}]
-      .concat(kelasList.map(k=>({v:'kelas:'+k, label:'Kelas '+k})))
-      .concat(halList.map(h=>({v:'hal:'+h, label:'Halaqah '+h})));
+    // Popover filter: chips carry their own onPick + active-state colors (like s.onOpen).
+    const mkChip=(v,label)=>{ const active=gf===v; return {v, label, active, bg:active?'#0a4631':'#f7f6f2', fg:active?'#fff':'#16264d', bd:active?'#0a4631':'#e6e1d5', onPick:()=>this.setState({groupFilter:v, filterOpen:false})}; };
+    const allChip=mkChip('all','Semua Santri');
+    const kelasChips=kelasList.map(k=>mkChip('kelas:'+k, k));
+    const halChips=halList.map(h=>mkChip('hal:'+h, h));
+    const filterLabel = gf==='all' ? 'Semua Santri' : gf.indexOf('kelas:')===0 ? 'Kelas '+gf.slice(6) : 'Halaqah '+gf.slice(4);
     let gallery=all.filter(s=> groupMatch(s) && (!q || s.name.toLowerCase().includes(q) || s.kota.toLowerCase().includes(q)));
     gallery=gallery.slice().sort((a,b)=>b.overall-a.overall);
     // dashboard roster (for now all staff roles see every halaqah; musyrif scope TODO)
@@ -901,7 +939,9 @@ class Component extends DCLogic {
       gallery, galleryCount:gallery.length, roster, rosterCount:roster.length,
       totalJuz, avgJuz:avgJuz.toFixed(1),
       mumtazCount:roster.filter(s=>s.gLetter==='A').length,
-      groupFilter:gf, groupOptions, setGroup:(ev)=>this.setState({groupFilter:ev.target.value}),
+      filterOpen:st.filterOpen, filterLabel, allChip, kelasChips, halChips,
+      toggleFilter:()=>this.setState({filterOpen:!this.state.filterOpen}),
+      closeFilter:()=>this.setState({filterOpen:false}),
       sel, selRadar: sel?this.radar(sel):null, selJuz: sel?this.juzCells(sel):[],
       // per-subject test records (Islamic + secular)
       selNilai:selNilaiRows, hasNilai:selNilaiRows.length>0, noNilai:!selNilaiRows.length,
