@@ -222,6 +222,7 @@
           <button onClick="{{ toggleFilter }}" style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-size:13px;font-weight:600;cursor:pointer">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0a4631" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
             <span>{{ filterLabel }}</span>
+            <span style="flex:none;min-width:18px;text-align:center;font-size:10.5px;font-weight:800;color:#0a4631;background:#eef4ee;border:1px solid #cfe3d0;padding:1px 6px;border-radius:999px">{{ filterCount }}</span>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9aa1ad" stroke-width="2.6" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
           </button>
           <sc-if value="{{ filterOpen }}" hint-placeholder-val="{{ false }}">
@@ -399,6 +400,7 @@
           <button onClick="{{ toggleFilter }}" style="display:flex;align-items:center;gap:8px;padding:9px 13px;border-radius:10px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-size:13px;font-weight:600;cursor:pointer">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0a4631" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
             <span>{{ filterLabel }}</span>
+            <span style="flex:none;min-width:18px;text-align:center;font-size:10.5px;font-weight:800;color:#0a4631;background:#eef4ee;border:1px solid #cfe3d0;padding:1px 6px;border-radius:999px">{{ filterCount }}</span>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9aa1ad" stroke-width="2.6" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
           </button>
           <sc-if value="{{ filterOpen }}" hint-placeholder-val="{{ false }}">
@@ -869,6 +871,7 @@ class Component extends DCLogic {
     // One combined filter (shared by gallery + roster): 'all' | 'kelas:VII' | 'hal:1'.
     const gf=st.groupFilter||'all';
     const groupMatch=s=> gf==='all' ? true : gf.indexOf('kelas:')===0 ? String(s.kelas)===gf.slice(6) : gf.indexOf('hal:')===0 ? String(s.hal)===gf.slice(4) : true;
+    const filterCount=all.filter(groupMatch).length;
     const kelasList=Array.from(new Set(all.map(s=>String(s.kelas||'').trim()).filter(k=>k&&k!=='—'))).sort((a,b)=>kelasRank(a)-kelasRank(b));
     const halList=Array.from(new Set(all.map(s=>String(s.hal||'').trim()).filter(Boolean))).sort((a,b)=>(+a)-(+b));
     // Popover filter: chips carry their own onPick + active-state colors (like s.onOpen).
@@ -939,7 +942,7 @@ class Component extends DCLogic {
       gallery, galleryCount:gallery.length, roster, rosterCount:roster.length,
       totalJuz, avgJuz:avgJuz.toFixed(1),
       mumtazCount:roster.filter(s=>s.gLetter==='A').length,
-      filterOpen:st.filterOpen, filterLabel, allChip, kelasChips, halChips,
+      filterOpen:st.filterOpen, filterLabel, filterCount, allChip, kelasChips, halChips,
       toggleFilter:()=>this.setState({filterOpen:!this.state.filterOpen}),
       closeFilter:()=>this.setState({filterOpen:false}),
       sel, selRadar: sel?this.radar(sel):null, selJuz: sel?this.juzCells(sel):[],
