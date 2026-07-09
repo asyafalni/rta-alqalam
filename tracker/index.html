@@ -558,6 +558,7 @@ const RAW = [
   {id:'s8', name:'Bilal Saputra Nugroho', nick:'Bilal', kelas:'VII', kota:'Depok', prov:'Jawa Barat', hal:2, haf:80,tah:83,mur:79,ilm:80,akh:85,akd:78,bhs:81, juzdone:'25,26,27,28,29,30', curpg:468, nis:'2426008'},
   {id:'s9', name:'Fathan Nasution', nick:'Fathan', kelas:'VIII', kota:'Asahan', prov:'Sumatera Utara', hal:2, haf:90,tah:89,mur:86,ilm:88,akh:90,akd:85,bhs:87, juzdone:'1,2,3,4,5,6,7,8,9', curpg:190, nis:'2426009'},
   {id:'s10',name:'Rasyid Pratama Wijaya', nick:'Rasyid', kelas:'VII', kota:'Sungailiat', prov:'Kep. Bangka Belitung', hal:2, haf:74,tah:77,mur:72,ilm:75,akh:80,akd:80,bhs:76, juzdone:'1,2,3,29,30', curpg:550, nis:'2426010'},
+  {id:'s11',name:'Abdullah Hafizhan', nick:'Abdullah', kelas:'VIII', kota:'Garut', prov:'Jawa Barat', hal:1, haf:97,tah:95,mur:94,ilm:95,akh:96,akd:91,bhs:93, juzdone:'26,27,28,29,30,1,2,3,4,5,6,7,8,9,10,11,12,13', curpg:268, nis:'2426011'},
 ];
 // Each halaqah can have one or more musyrif (add names as you hire).
 const HALAQAH = { 1:['Ustadz Salman Al-Farisi'], 2:['Ustadz Hamzah Abdurrahman'] };
@@ -595,6 +596,10 @@ const NILAI = [
   {id:'s3', tanggal:'2026-09-30', bidang:'Ekstrakurikuler', mapel:'Teknologi Informasi (IT)', jenis:'Proyek', nilai:90},
   {id:'s3', tanggal:'2026-10-02', bidang:'Ekstrakurikuler', mapel:'Kewirausahaan', jenis:'Praktik', nilai:88},
   {id:'s1', tanggal:'2026-09-30', bidang:'Ekstrakurikuler', mapel:'Teknologi Informasi (IT)', jenis:'Proyek', nilai:85},
+  {id:'s11', tanggal:'2026-09-14', bidang:'Diniyah', mapel:'Tahfidz (Ziyadah)', jenis:'Setoran', nilai:97},
+  {id:'s11', tanggal:'2026-09-19', bidang:'Diniyah', mapel:'Tahsin & Tajwid', jenis:'Ujian', nilai:95},
+  {id:'s11', tanggal:'2026-09-26', bidang:'Akademik', mapel:'Matematika', jenis:'Ujian', nilai:92},
+  {id:'s11', tanggal:'2026-10-01', bidang:'Ekstrakurikuler', mapel:'Teknologi Informasi (IT)', jenis:'Proyek', nilai:94},
 ];
 // Daily setoran log (Islamic self/staff journal side). Same shape as the public 'Setoran' sheet tab.
 const SETORAN = [
@@ -604,6 +609,8 @@ const SETORAN = [
   {id:'s3', tanggal:'2026-10-02', jenis:'Tahsin', juz:11, halaman:'—', catatan:'Perbaikan makhraj huruf ظ'},
   {id:'s1', tanggal:'2026-10-06', jenis:'Ziyadah', juz:9, halaman:'hal. 5', catatan:'Lancar'},
   {id:'s1', tanggal:'2026-10-05', jenis:'Muroja’ah', juz:8, halaman:'½ juz', catatan:'Baik'},
+  {id:'s11', tanggal:'2026-10-06', jenis:'Ziyadah', juz:14, halaman:'hal. 7', catatan:'Mumtaz, sangat lancar'},
+  {id:'s11', tanggal:'2026-10-05', jenis:'Muroja’ah', juz:12, halaman:'1 juz', catatan:'Kuat'},
 ];
 // Category of a setoran by jenis: 'zi' ziyadah (new hafalan), 'mu' muroja'ah (review), 'ta' tahsin/other.
 function setoranCat(j){ j=String(j||''); if(/ziyad|ziya|tambah|hafal/i.test(j)) return 'zi'; if(/muroj|muraj|ulang|review/i.test(j)) return 'mu'; return 'ta'; }
@@ -618,6 +625,8 @@ const KEHADIRAN = [
   {id:'s3', tanggal:'2026-10-05', status:'Izin', reason:'Izin acara keluarga'}, {id:'s3', tanggal:'2026-10-06', status:'Hadir', reason:''},
   {id:'s1', tanggal:'2026-10-01', status:'Hadir', reason:''}, {id:'s1', tanggal:'2026-10-02', status:'Alpa', reason:'Tanpa keterangan'},
   {id:'s1', tanggal:'2026-10-03', status:'Hadir', reason:''},
+  {id:'s11', tanggal:'2026-10-01', status:'Hadir', reason:''}, {id:'s11', tanggal:'2026-10-02', status:'Hadir', reason:''},
+  {id:'s11', tanggal:'2026-10-03', status:'Izin', reason:'Lomba tahfidz antar pesantren'}, {id:'s11', tanggal:'2026-10-04', status:'Hadir', reason:''},
 ];
 const PILLARS = [
   {key:'haf', abbr:'HAF', label:'Hafalan', grp:'diniyah'},
@@ -918,9 +927,9 @@ class Component extends DCLogic {
     const done=new Set(s.juzDone||[]);
     return Array.from({length:30},(_,i)=>{
       const n=i+1, st = done.has(n)?'done': n===s.curJuz?'current':'todo';
-      const style = st==='done'?{background:GREEN,color:'#fff',borderColor:GREEN}
-        : st==='current'?{background:'#fff',color:GOLD,borderColor:GOLD,borderWidth:'2px'}
-        : {background:'#fff',color:'#c2c7d0',borderColor:LINE};
+      const style = st==='done'?('background:'+GREEN+';color:#fff;border-color:'+GREEN)
+        : st==='current'?('background:#fff;color:'+GOLD+';border-color:'+GOLD+';border-width:2px')
+        : ('background:#fff;color:#c2c7d0;border-color:'+LINE);
       return {n, st, style};
     });
   }
