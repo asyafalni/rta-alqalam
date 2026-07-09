@@ -694,8 +694,11 @@ class Component extends DCLogic {
     const roleLabel = st.role==='admin'?'Admin':st.role==='mudir'?'Mudir':st.role==='musyrif'?'Musyrif':'Publik';
     const activeNilai = (st.nilai&&st.nilai.length)?st.nilai:NILAI;
     const selNilaiRows = sel ? activeNilai.filter(n=>n.id===sel.id).slice().sort((a,b)=>(b.tanggal||'').localeCompare(a.tanggal||'')).map(n=>{ const g=grade(n.nilai); return {...n, pred:g.name, pcolor:g.c}; }) : [];
-    // Rapor Akademik: break down by mata pelajaran from the Nilai records (avg per mapel), not the single aggregate score
-    const akademikRows = sel ? (()=>{ const by={}; activeNilai.filter(n=>n.id===sel.id && /akad/i.test(n.bidang||'')).forEach(n=>{ (by[n.mapel]=by[n.mapel]||[]).push(n.nilai); }); return Object.keys(by).sort((a,b)=>a.localeCompare(b)).map(m=>{ const arr=by[m], avg=Math.round(arr.reduce((x,y)=>x+y,0)/arr.length), g=grade(avg); return {label:m, score:avg, pname:g.name, color:g.c}; }); })() : [];
+    // Rapor tables: break down by mata pelajaran from the Nilai records (avg per mapel), not the single aggregate score
+    const mapelRows = (bidangRe)=> { const by={}; activeNilai.filter(n=>n.id===sel.id && bidangRe.test(n.bidang||'')).forEach(n=>{ (by[n.mapel]=by[n.mapel]||[]).push(n.nilai); }); return Object.keys(by).sort((a,b)=>a.localeCompare(b)).map(m=>{ const arr=by[m], avg=Math.round(arr.reduce((x,y)=>x+y,0)/arr.length), g=grade(avg); return {label:m, score:avg, pname:g.name, color:g.c}; }); };
+    const akademikRows = sel ? mapelRows(/akad/i) : [];
+    // Diniyah: per-mapel test averages, plus Akhlak (an assessment/credit, not a test) from the roster
+    const diniyahRows = sel ? (()=>{ const rows=mapelRows(/dini/i); if(rows.length){ const akh=sel.pillars.find(p=>p.abbr==='AKH'); if(akh && !rows.some(r=>/akhlak/i.test(r.label))) rows.push({label:akh.label, score:akh.score, pname:akh.pname, color:akh.color}); } return rows; })() : [];
 
     return {
       view:v, role:st.role, roleLabel, userName:st.userName, greeting: st.userName?('Halo, '+st.userName):'',
@@ -713,7 +716,7 @@ class Component extends DCLogic {
       selNilai:selNilaiRows, hasNilai:selNilaiRows.length>0, noNilai:!selNilaiRows.length,
       // report card (admin only)
       term:TERM, canRapor: st.role==='admin', raporOpen:st.raporOpen,
-      raporDiniyah: sel ? sel.pillars.filter(p=>p.grp==='diniyah') : [],
+      raporDiniyah: diniyahRows.length ? diniyahRows : (sel ? sel.pillars.filter(p=>p.grp==='diniyah') : []),
       raporAkademik: akademikRows.length ? akademikRows : (sel ? sel.pillars.filter(p=>p.grp==='akademik') : []),
       raporNote: sel ? ('Alhamdulillah, capaian '+sel.nick+' pada semester ini tergolong '+sel.gName+'. '+(sel.overall>=85?'Pertahankan dan tingkatkan terus, istiqamah dalam menghafal serta belajar.':'Teruslah bersemangat memperbaiki hafalan, muraja’ah, dan nilai akademik.')) : '',
       openRapor:()=>this.setState({raporOpen:true}),
