@@ -109,8 +109,13 @@
     <div class="rapor-overlay">
       <div class="rapor-toolbar no-print">
         <button onClick="{{ closeRapor }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">← Tutup</button>
-        <div style="font-weight:700;color:#0a4631;font-size:14px">Rapor Santri</div>
-        <button onClick="{{ printRapor }}" style="padding:9px 18px;border-radius:9px;border:none;background:#0a4631;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer">Cetak / Simpan PDF</button>
+        <div style="display:flex;align-items:center;gap:8px;min-width:0">
+          <span style="font-weight:700;color:#0a4631;font-size:13px;flex:none">Rapor · Semester</span>
+          <select value="{{ termId }}" onChange="{{ setTerm }}" style="max-width:100%;padding:8px 10px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;color:#16264d;font-size:12.5px;font-weight:600;cursor:pointer;outline:none">
+            <sc-for list="{{ terms }}" as="t" hint-placeholder-count="3"><option value="{{ t.id }}">{{ t.label }}</option></sc-for>
+          </select>
+        </div>
+        <button onClick="{{ printRapor }}" style="padding:9px 18px;border-radius:9px;border:none;background:#0a4631;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;flex:none">Cetak / Simpan PDF</button>
       </div>
       <div class="rapor-scroll">
         <div class="rapor-page">
@@ -444,12 +449,17 @@ const RAW = [
 const HALAQAH = { 1:['Ustadz Salman Al-Farisi'], 2:['Ustadz Hamzah Abdurrahman'] };
 // One mudir for the whole school.
 const MUDIR = 'Ustadz Abdul Hakim, Lc.';
-// Ongoing academic term (for the report card). `start`/`end` bound which Nilai rows the
+// Academic terms for the report card (newest first). `start`/`end` bound which Nilai rows the
 // Rapor averages (inclusive, YYYY-MM-DD). Semester Ganjil ≈ Jul–Dec, Genap ≈ Jan–Jun.
-const TERM = { label:'Semester Ganjil · Tahun Ajaran 2026/2027', start:'2026-07-01', end:'2026-12-31' };
+// Admin picks the term from a dropdown on the Rapor; TERMS[0] is the default (current) term.
+const TERMS = [
+  { id:'2026g', label:'Semester Ganjil · Tahun Ajaran 2026/2027', start:'2026-07-01', end:'2026-12-31' },
+  { id:'2025e', label:'Semester Genap · Tahun Ajaran 2025/2026', start:'2026-01-01', end:'2026-06-30' },
+  { id:'2025g', label:'Semester Ganjil · Tahun Ajaran 2025/2026', start:'2025-07-01', end:'2025-12-31' },
+];
 // Normalize a sheet date cell (ISO text or GViz "Date(y,m,d)") to YYYY-MM-DD.
 function ymd(t){ t=String(t||''); const m=t.match(/Date\((\d+),(\d+),(\d+)/); if(m){ return m[1]+'-'+String(+m[2]+1).padStart(2,'0')+'-'+String(+m[3]).padStart(2,'0'); } return t.slice(0,10); }
-function inTerm(t){ const d=ymd(t); return !d || (d>=TERM.start && d<=TERM.end); }
+function inTerm(t, term){ const d=ymd(t); return !d || (d>=term.start && d<=term.end); }
 // Per-test records (Islamic + secular). Same shape as the Google Sheet 'Nilai' tab.
 const NILAI = [
   {id:'s1', tanggal:'2026-09-05', bidang:'Diniyah', mapel:'Tahfidz (Ziyadah)', jenis:'Setoran', nilai:90},
@@ -522,7 +532,7 @@ class Component extends DCLogic {
     formId:'1FAIpQLScSAMPLEFORMIDxxxxxxxxxxxxxxxxxxxxxxx',
     sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
     clerkReady:false, userName:'', entryOpen:false, configOpen:false,
-    nilai:null, mapelDef:null, raporOpen:false,
+    nilai:null, mapelDef:null, raporOpen:false, termId:'2026g',
   };
 
   // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
@@ -752,10 +762,11 @@ class Component extends DCLogic {
     // the three bidang groups are FIXED. Each subject's score is the average of that santri's Nilai
     // records for it; Akhlak (a credit, not a test) falls back to the roster aggregate.
     const activeMapel = (st.mapelDef&&st.mapelDef.length)?st.mapelDef:MAPEL;
+    const term = TERMS.find(t=>t.id===st.termId) || TERMS[0];
     const raporRows = (bidangKey)=>{
       if(!sel) return [];
       const defs = activeMapel.filter(d=>normBidang(d.bidang)===bidangKey).map(d=>d.mapel);
-      const nil = activeNilai.filter(n=>n.id===sel.id && normBidang(n.bidang)===bidangKey && inTerm(n.tanggal));
+      const nil = activeNilai.filter(n=>n.id===sel.id && normBidang(n.bidang)===bidangKey && inTerm(n.tanggal, term));
       const list = defs.length ? defs : Array.from(new Set(nil.map(n=>n.mapel)));
       return list.map(mapel=>{
         const arr = nil.filter(n=>n.mapel===mapel).map(n=>n.nilai);
@@ -784,12 +795,14 @@ class Component extends DCLogic {
       // per-subject test records (Islamic + secular)
       selNilai:selNilaiRows, hasNilai:selNilaiRows.length>0, noNilai:!selNilaiRows.length,
       // report card (admin only)
-      term:TERM.label, canRapor: st.role==='admin', raporOpen:st.raporOpen,
+      term:term.label, termId:term.id, terms:TERMS.map(t=>({id:t.id, label:t.label})),
+      canRapor: st.role==='admin', raporOpen:st.raporOpen,
       raporDiniyah: diniyahRows, raporAkademik: akademikRows,
       raporEkskul: ekskulRows, hasEkskul: ekskulRows.length>0,
       raporNote: sel ? ('Alhamdulillah, capaian '+sel.nick+' pada semester ini tergolong '+sel.gName+'. '+(sel.overall>=85?'Pertahankan dan tingkatkan terus, istiqamah dalam menghafal serta belajar.':'Teruslah bersemangat memperbaiki hafalan, muraja’ah, dan nilai akademik.')) : '',
       openRapor:()=>this.setState({raporOpen:true}),
       closeRapor:()=>this.setState({raporOpen:false}),
+      setTerm:(ev)=>this.setState({termId:ev.target.value}),
       printRapor:()=>{ try{ window.print(); }catch(e){} },
       search:st.search, onSearch:(ev)=>this.setState({search:ev.target.value}),
       sortName:()=>this.sortBy('nick'), sortProg:()=>this.sortBy('juz'), sortAsal:()=>this.sortBy('kota'), sortNilai:()=>this.sortBy('overall'),
