@@ -30,7 +30,8 @@ academics, reporting).
  │  PUBLIC sheet   (reference)   │   "Anyone with link → Viewer"
  │  ├─ tab: Roster               │   ONLY the 16 public columns, mirrored live
  │  ├─ tab: Nilai                │   per-test scores, mirrored live
- │  └─ tab: Mapel                │   subject definitions, mirrored live
+ │  ├─ tab: Mapel                │   subject definitions, mirrored live
+ │  └─ tab: Setoran              │   daily log (id,tanggal,jenis,juz,…), mirrored live
  └───────────────┬───────────────┘
                  │  GViz JSON (no API key)
                  ▼
@@ -52,6 +53,14 @@ Auto-created when you link the **Setoran Harian** form (Form A, §5). Leave it a
 daily submission (timestamp, santri, tanggal, jenis, juz, halaman, taqdir, catatan, …). Use it to
 keep the `Master` hafalan/juz columns current. (Periodic exam scores go through a *separate* form
 into the `Nilai` tab — see §2c and §5.)
+
+**Show the daily log in-app (optional):** the tracker renders a **Riwayat Setoran Harian** card on
+each student's detail (10 most recent) if it finds a **public** tab named exactly `Setoran` with
+these headers: `id, tanggal, jenis, juz, halaman, catatan`. Mirror a clean projection of the raw
+responses into it — reshape/QUERY the form columns and map `santri → id`, e.g.
+`=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Setoran!A1:H"), "select ... where Col2 is not null", 1)`.
+`jenis` colours by keyword (Ziyadah = green, Muroja'ah = gold, Tahsin/other = blue). Until the tab
+exists, the tracker uses built-in demo setoran. Keep it parent-safe — no private notes here.
 
 ### 2b. Tab `Master` (one row per santri) — **this is what gets mirrored**
 Put the **16 public columns first (A–P)**, then any **private-only columns from Q onward**.

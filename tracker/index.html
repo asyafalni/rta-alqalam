@@ -297,6 +297,23 @@
               <p style="font-size:12.5px;color:#9aa1ad;margin:6px 0 0">Belum ada nilai atau ujian yang tercatat.</p>
             </sc-if>
           </div>
+          <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:20px 22px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="font-weight:800;font-size:14px">Riwayat Setoran Harian</span><span style="font-size:11px;color:#9aa1ad">10 terbaru</span></div>
+            <sc-if value="{{ hasSetoran }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column">
+                <sc-for list="{{ selSetoran }}" as="r" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid #f0ede4">
+                    <span style="flex:none;font-size:9.5px;font-weight:800;color:#fff;background:{{ r.jcolor }};padding:2px 8px;border-radius:6px">{{ r.jenis }}</span>
+                    <div style="flex:1;min-width:130px"><div style="font-weight:700;font-size:13px;color:#16264d">Juz {{ r.juz }} · {{ r.halaman }}</div><div style="font-size:11px;color:#9aa1ad">{{ r.tgl }}</div></div>
+                    <div style="flex:1;min-width:120px;font-size:11.5px;color:#6b7280;text-align:right">{{ r.catatan }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noSetoran }}" hint-placeholder-val="{{ false }}">
+              <p style="font-size:12.5px;color:#9aa1ad;margin:6px 0 0">Belum ada setoran harian yang tercatat.</p>
+            </sc-if>
+          </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             <sc-if value="{{ canManage }}" hint-placeholder-val="{{ true }}">
               <button onClick="{{ sel.onEntry }}" style="padding:11px 20px;border-radius:10px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:13px;cursor:pointer">+ Input</button>
@@ -490,6 +507,17 @@ const NILAI = [
   {id:'s3', tanggal:'2026-10-02', bidang:'Ekstrakurikuler', mapel:'Kewirausahaan', jenis:'Praktik', nilai:88},
   {id:'s1', tanggal:'2026-09-30', bidang:'Ekstrakurikuler', mapel:'Teknologi Informasi (IT)', jenis:'Proyek', nilai:85},
 ];
+// Daily setoran log (Islamic self/staff journal side). Same shape as the public 'Setoran' sheet tab.
+const SETORAN = [
+  {id:'s3', tanggal:'2026-10-06', jenis:'Ziyadah', juz:11, halaman:'hal. 3–4', catatan:'Lancar, tajwid baik'},
+  {id:'s3', tanggal:'2026-10-05', jenis:'Muroja’ah', juz:10, halaman:'1 juz', catatan:'Tersendat di ayat panjang'},
+  {id:'s3', tanggal:'2026-10-04', jenis:'Ziyadah', juz:11, halaman:'hal. 1–2', catatan:'Baik'},
+  {id:'s3', tanggal:'2026-10-02', jenis:'Tahsin', juz:11, halaman:'—', catatan:'Perbaikan makhraj huruf ظ'},
+  {id:'s1', tanggal:'2026-10-06', jenis:'Ziyadah', juz:9, halaman:'hal. 5', catatan:'Lancar'},
+  {id:'s1', tanggal:'2026-10-05', jenis:'Muroja’ah', juz:8, halaman:'½ juz', catatan:'Baik'},
+];
+// Color a setoran by its jenis (ziyadah = new hafalan, muroja'ah = review, tahsin = tajwid).
+function setoranColor(j){ j=String(j||''); if(/ziyad|ziya|tambah|hafal/i.test(j)) return '#2f8f3a'; if(/muroj|muraj|ulang|review/i.test(j)) return '#cfa02c'; return '#3f6fa8'; }
 const PILLARS = [
   {key:'haf', abbr:'HAF', label:'Hafalan', grp:'diniyah'},
   {key:'tah', abbr:'TAH', label:'Tahsin', grp:'diniyah'},
@@ -543,12 +571,12 @@ class Component extends DCLogic {
     setoranFormId:'', nilaiFormId:'', entryKind:'setoran',
     sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
     clerkReady:false, userName:'', entryOpen:false, configOpen:false,
-    nilai:null, mapelDef:null, raporOpen:false, termId:'2026g',
+    nilai:null, setoran:null, mapelDef:null, raporOpen:false, termId:'2026g',
   };
 
   // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
   //      the demo RAW until a viewable sheet + "Roster" tab are configured.
-  componentDidMount(){ if((this.state.sheetId||'').trim()){ this.loadRoster(); this.loadNilai(); this.loadMapel(); } this.initClerk(); }
+  componentDidMount(){ if((this.state.sheetId||'').trim()){ this.loadRoster(); this.loadNilai(); this.loadSetoran(); this.loadMapel(); } this.initClerk(); }
 
   // ---- Auth: Clerk (client-side). Reads the signed-in user's role from
   //      publicMetadata.role (admin/mudir/musyrif); falls back to the demo
@@ -609,6 +637,19 @@ class Component extends DCLogic {
       const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); return {id:String(o.id!=null?o.id:''), tanggal:o.tanggal!=null?String(o.tanggal):'', bidang:o.bidang||'', mapel:o.mapel||'', jenis:o.jenis||'', nilai:num(o.nilai)}; }).filter(x=>x.id&&x.mapel);
       this.setState({nilai:rows.length?rows:null});
     }catch(e){ console.error('loadNilai failed', e); this.setState({nilai:null}); }
+  }
+
+  async loadSetoran(){
+    const id=(this.state.sheetId||'').trim();
+    if(!id){ this.setState({setoran:null}); return; }
+    try{
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&sheet=Setoran';
+      const text=await (await fetch(url)).text();
+      const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
+      const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
+      const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); return {id:String(o.id!=null?o.id:''), tanggal:o.tanggal!=null?String(o.tanggal):'', jenis:o.jenis||'', juz:o.juz!=null?o.juz:'', halaman:o.halaman!=null?String(o.halaman):'', catatan:o.catatan!=null?String(o.catatan):''}; }).filter(x=>x.id&&x.jenis);
+      this.setState({setoran:rows.length?rows:null});
+    }catch(e){ console.error('loadSetoran failed', e); this.setState({setoran:null}); }
   }
 
   async loadMapel(){
@@ -769,6 +810,8 @@ class Component extends DCLogic {
     const roleLabel = st.role==='admin'?'Admin':st.role==='mudir'?'Mudir':st.role==='musyrif'?'Musyrif':'Publik';
     const activeNilai = (st.nilai&&st.nilai.length)?st.nilai:NILAI;
     const selNilaiRows = sel ? activeNilai.filter(n=>n.id===sel.id).slice().sort((a,b)=>(b.tanggal||'').localeCompare(a.tanggal||'')).map(n=>{ const g=grade(n.nilai); return {...n, pred:g.name, pcolor:g.c}; }) : [];
+    const activeSetoran = (st.setoran&&st.setoran.length)?st.setoran:SETORAN;
+    const selSetoranRows = sel ? activeSetoran.filter(r=>r.id===sel.id).map(r=>({...r, tgl:ymd(r.tanggal), jcolor:setoranColor(r.jenis)})).sort((a,b)=>(b.tgl||'').localeCompare(a.tgl||'')).slice(0,10) : [];
     // Rapor tables: subjects are DYNAMIC (defined in the "Mapel" sheet, falling back to the demo MAPEL);
     // the three bidang groups are FIXED. Each subject's score is the average of that santri's Nilai
     // records for it; Akhlak (a credit, not a test) falls back to the roster aggregate.
@@ -808,6 +851,7 @@ class Component extends DCLogic {
       sel, selRadar: sel?this.radar(sel):null, selJuz: sel?this.juzCells(sel):[],
       // per-subject test records (Islamic + secular)
       selNilai:selNilaiRows, hasNilai:selNilaiRows.length>0, noNilai:!selNilaiRows.length,
+      selSetoran:selSetoranRows, hasSetoran:selSetoranRows.length>0, noSetoran:!selSetoranRows.length,
       // report card (admin only)
       term:term.label, termId:term.id, terms:TERMS.map(t=>({id:t.id, label:t.label})),
       canRapor: st.role==='admin', raporOpen:st.raporOpen,
@@ -855,7 +899,7 @@ class Component extends DCLogic {
       setNilaiFormId:(ev)=>this.setState({nilaiFormId:ev.target.value}),
       dataStatus, sheetId:st.sheetId,
       setSheetId:(ev)=>this.setState({sheetId:ev.target.value}),
-      reloadRoster:()=>{ this.loadRoster(); this.loadNilai(); this.loadMapel(); },
+      reloadRoster:()=>{ this.loadRoster(); this.loadNilai(); this.loadSetoran(); this.loadMapel(); },
     };
   }
 }
