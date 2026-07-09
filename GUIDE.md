@@ -69,8 +69,8 @@ New to Google Sheets/Forms? Follow these steps top to bottom. Sections §2–§7
 3. In **row 1**, type the headers exactly (lower-case), left to right — the 16 core columns then the
    optional ones (full list & meaning in **§2b**):
    `id  name  nick  kota  prov  hal  haf  tah  mur  ilm  akh  akd  bhs  juzdone  curpg  kelas`
-   then optionally `nis`. *(Use `curpg` = current page 1–604 for page-level progress — recommended —
-   or name that column `curjuz` if you'd rather track just the juz number. §2b.)*
+   then optionally `nis`. *(`curpg` = current page 1–604 on the standard mushaf; the app derives the
+   juz, within-juz progress, and pages-left — §2b.)*
 4. Fill one row per santri from row 2. Give each a **short unique `id`** (`s1`, `s2`, …) — this id is
    how every other tab links to the student, so keep it stable. Put private data (wali, phone, …)
    **from column R onward** (see the ⚠️ in §2b).
@@ -81,9 +81,9 @@ New to Google Sheets/Forms? Follow these steps top to bottom. Sections §2–§7
 2. Add another tab → **`Nilai`**. Row 1: `id  tanggal  bidang  mapel  jenis  nilai` (**§2c**). You can
    leave it empty — **Form B** (Step 4) will fill it.
    *(The `Setoran` tab is created automatically when you link Form A — don't add it by hand.)*
-3. *(Optional)* For attendance, add a **`Kehadiran`** tab. Row 1: `id  tanggal  status` — one row per
-   santri per day, `status` = `Hadir`/`Sakit`/`Izin`/`Alpa` (default `Hadir`). Fill it by hand or from
-   a small third form (**§2f**).
+3. *(Optional)* For attendance, add a **`Kehadiran`** tab. Row 1: `id  tanggal  status  reason` — one
+   row per santri per day, `status` = `Hadir`/`Sakit`/`Izin`/`Alpa` (default `Hadir`), `reason` = why
+   they were absent. Fill it by hand or from a small third form (**§2f**).
 
 ### Step 4 — Build the two input Forms (why two → §5)
 For **each** form: **New → Google Forms** inside the folder.
@@ -199,7 +199,7 @@ keys (the tracker matches by header):
 | L | `akd`  | Akademik — math/IPA/… (0–100) | number | **Admin** |
 | M | `bhs`  | Bahasa — Indonesia/Inggris (0–100) | number | **Admin** |
 | N | `juzdone` | which juz are memorized — a list in any order, e.g. `1,2,3,28,29,30` (juz count & progress derive from it) | text | Musyrif/Mudir |
-| O | `curjuz` *or* `curpg` | current progress — either the juz being memorized (`curjuz`, 1–30) **or, better, the current page** (`curpg`, 1–604 on the standard Madinah/Uthmani mushaf). Use **one** header. With `curpg` the app derives the juz *and* shows within-juz progress + "≈ N pages left to finish the juz". | number | Musyrif/Mudir |
+| O | `curpg` | **current page** (1–604) on the standard Madinah/Uthmani mushaf. The app derives the current juz, the position within it, and "≈ N pages left to finish the juz". | number | Musyrif/Mudir |
 | P | `kelas` | class level, e.g. `VII` / `VIII` | text | staff |
 | Q | `nis` | **optional, public** — the santri's NIS, shown in the Rapor header. Leave blank to show `—`. | text | staff |
 | R+ | `wali`, `nohp`, `alamat`, `status`, `catatan_musyrif`, `catatan_mudir`, … | **PRIVATE — never mirrored** | any | staff |
@@ -217,17 +217,22 @@ keys (the tracker matches by header):
 > (halaqah → list of musyrif names; add names as you hire) and the `MUDIR`
 > constant near the top of `tracker/index.html`’s `<script>`.
 >
-> **Tracking by page (`curpg`, recommended):** the app assumes the standard 604-page
-> Madinah/Uthmani mushaf (Juz 1 = pages 1–21, then 20 pages/juz). Enter the page a santri is
-> currently on and it computes the juz, the position within that juz, and how many pages remain to
-> finish it — a far better progress signal than the juz number alone. `curjuz` stays supported as a
-> fallback for anyone who only tracks juz.
+> **Tracking by page (`curpg`):** the app assumes the standard 604-page Madinah/Uthmani mushaf
+> (Juz 1 = pages 1–21, then 20 pages/juz). Enter the page a santri is currently on and it computes
+> the current juz, the position within that juz, and how many pages remain to finish it — a far
+> better signal than a juz number alone.
+>
+> **Program & completion (`juzdone`):** the 3-year target is **15 juz**, memorized in the manhaj order
+> **30, 29, 28, 27, 26 → 1, 2, … 10** — all 15 = **100%**. Over-achievers continue **11 … 25** (a
+> second lap), so completion can reach **200%**; the progress bar fills **green** to 100% then overlays
+> **gold** for the bonus. `juzdone` (col N) is the source — list the juz a santri has memorized; the
+> count and % derive from it. The program order is a code constant (`PROGRAM` in `tracker/index.html`).
 
 Example header row + first data row:
 
 ```
-id  name                     nick    kota   prov        hal haf tah mur ilm akh akd bhs juzdone           curjuz kelas | nis      | wali
-s1  Ahmad Fauzan Ramadhani   Fauzan  Depok  Jawa Barat  1   88  91  85  85  90  84  86  "1,2,3,4,5,6,7,8" 9      VIII  | 2426001  | Bpk. Ramadhani
+id  name                     nick    kota   prov        hal haf tah mur ilm akh akd bhs juzdone           curpg kelas | nis      | wali
+s1  Ahmad Fauzan Ramadhani   Fauzan  Depok  Jawa Barat  1   88  91  85  85  90  84  86  "1,2,3,4,5,6,7,8" 170   VIII  | 2426001  | Bpk. Ramadhani
 ```
 (A–P core · Q `nis` optional public · R+ private, e.g. `wali`)
 
@@ -364,16 +369,20 @@ as before — now they *reflect* the daily setoran and the exams instead of bein
 
 ### 2f. Tab `Kehadiran` (daily attendance) — powers the Rapor Kehadiran table
 One row per santri per day, with a **single `status` column** (default **Hadir**) instead of four
-count columns. Headers in row 1:
+count columns, plus an optional **`reason`** note. Headers in row 1:
 
-| id | tanggal | status |
-|----|---------|--------|
-| s3 | 2026-10-03 | Sakit |
-| s3 | 2026-10-04 | Hadir |
+| id | tanggal | status | reason |
+|----|---------|--------|--------|
+| s3 | 2026-10-03 | Sakit | Demam, ada surat dokter |
+| s3 | 2026-10-05 | Izin | Izin acara keluarga |
+| s3 | 2026-10-04 | Hadir | |
 
 - `status` is one of **`Hadir` / `Sakit` / `Izin` / `Alpa`** — blank or unrecognised counts as
   **`Hadir`** (also understood: `S`/`I`/`A`, `ijin`, `alfa`, `bolos`).
-- The app tallies these **per status, within the selected Rapor term** → the **Kehadiran** table on
+- **`reason`** (optional) — why the santri was absent, written by the mudir/musyrif/admin. Shown on
+  the Rapor under **"Keterangan Ketidakhadiran"** for each non-Hadir day (ignored for `Hadir` rows).
+  Also accepted under the headers `alasan` / `keterangan` / `catatan`.
+- The app tallies statuses **per status, within the selected Rapor term** → the **Kehadiran** table on
   the report card (Hadir / Sakit / Izin / Alpa + Total Hari). If a santri has no rows in the term,
   the table is hidden.
 - Record it however suits you: a **third Google Form** (question titled `status`, default `Hadir`),
@@ -409,7 +418,7 @@ exactly `Roster`** with a single formula in cell **A1** that mirrors the public 
 
 > Prefer to reorder/rename in the mirror? Use an explicit select (`select Col1, Col2, … Col17 where
 > Col1 is not null`). Column order does not matter to the tracker (it matches by header name), but the
-> headers must stay exactly `id, name, nick, …, juzdone, curjuz, kelas` (plus `nis` if used).
+> headers must stay exactly `id, name, nick, …, juzdone, curpg, kelas` (plus `nis` if used).
 
 ---
 
