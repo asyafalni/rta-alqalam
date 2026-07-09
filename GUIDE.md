@@ -43,6 +43,109 @@ Everything shown in Public also exists in Private.
 
 ---
 
+## Step-by-step setup (do this once, in order)
+
+New to Google Sheets/Forms? Follow these steps top to bottom. Sections §2–§7 are the *reference*
+(exact headers, formulas, rules); this is the *walkthrough*. Budget ~30–45 minutes.
+
+> **The one trick that saves you the most work:** the tracker matches sheet columns by their
+> **header name** (lower-cased), and ignores columns it doesn't recognise. So if you **title each
+> Google Form question exactly like the key** (`id`, `tanggal`, `nilai`, …), the form's own response
+> tab is already app-ready — the automatic `Timestamp` column is simply ignored. No reshaping needed.
+
+### Step 1 — Google Drive: choose the account, make a folder
+1. Sign in to **[drive.google.com](https://drive.google.com)** with the **school / yayasan** Google
+   account — **not** a personal one. Whoever owns these files controls the data; use an account the
+   institution keeps (e.g. `admin@…` or a shared `rtaalqalam@gmail.com`).
+2. **New → Folder** → name it `RTA Tracker`. Keep both spreadsheets and both forms inside it — that
+   folder becomes the single thing you back up / hand over.
+
+### Step 2 — Create the PRIVATE spreadsheet + `Master` tab
+1. Inside the folder: **New → Google Sheets → Blank**. Rename it (top-left) to
+   **`RTA Tracker — PRIVATE`**.
+2. Double-click the bottom tab `Sheet1` → rename it **`Master`**.
+3. In **row 1**, type the headers exactly (lower-case), left to right — the 16 core columns then the
+   optional ones (full list & meaning in **§2b**):
+   `id  name  nick  kota  prov  hal  haf  tah  mur  ilm  akh  akd  bhs  juzdone  curjuz  kelas`
+   then optionally `nis  hadir  sakit  izin  alpa`.
+4. Fill one row per santri from row 2. Give each a **short unique `id`** (`s1`, `s2`, …) — this id is
+   how every other tab links to the student, so keep it stable. Put private data (wali, phone, …)
+   **from column V onward** (see the ⚠️ in §2b).
+
+### Step 3 — Add the `Nilai` and `Mapel` tabs
+1. Bottom-left **＋** to add a tab → name it **`Mapel`**. Row 1: `bidang` , `mapel`. List your
+   subjects, one per row (which `bidang` values are allowed → **§2d**).
+2. Add another tab → **`Nilai`**. Row 1: `id  tanggal  bidang  mapel  jenis  nilai` (**§2c**). You can
+   leave it empty — **Form B** (Step 4) will fill it.
+   *(The `Setoran` tab is created automatically when you link Form A — don't add it by hand.)*
+
+### Step 4 — Build the two input Forms (why two → §5)
+For **each** form: **New → Google Forms** inside the folder.
+
+**Form A — `Setoran Harian`** (daily). Add questions, and **title them exactly**:
+`id`, `tanggal`, `jenis`, `juz`, `halaman`, `catatan`, and optionally `nilai` (daily quality 0–100,
+used by the §2e formulas).
+- Make **`id`** a **Dropdown** question whose options are your santri ids (`s1`, `s2`, …) — this
+  prevents typos and keeps the link to `Master` exact.
+- Make **`tanggal`** a **Date** question; **`jenis`** a Dropdown (`Ziyadah` / `Muroja'ah` / `Tahsin`).
+
+**Form B — `Nilai Ujian/Tes`** (exams). Title the questions exactly:
+`id`, `tanggal`, `bidang`, `mapel`, `jenis`, `nilai`.
+- **`id`** Dropdown (same santri ids). **`bidang`** Dropdown (`Diniyah` / `Akademik` /
+  `Ekstrakurikuler`). **`mapel`** Dropdown of the subjects you listed in `Mapel`. **`nilai`** short
+  answer (0–100).
+
+**Link each form to the PRIVATE sheet:** in the form, **Responses** tab → the green **Sheets** icon
+→ **Select existing spreadsheet** → pick `RTA Tracker — PRIVATE`.
+- Form A creates a response tab — rename that tab to **`Setoran`**.
+- Form B creates a response tab — rename it to **`Nilai`** (delete the empty `Nilai` you made in
+  Step 3 first, or just name Step 3's tab something else and rename this one to `Nilai`). The extra
+  `Timestamp` column it adds is harmless — the app ignores it.
+
+Send yourself one test submission through each form and confirm a row lands in the right tab.
+
+### Step 5 — Create the PUBLIC spreadsheet (the mirror)
+1. In the folder: **New → Google Sheets** → rename to **`RTA Tracker — PUBLIC`**.
+2. Rename `Sheet1` → **`Roster`**. Click cell **A1** and paste (replace `<PRIVATE_SHEET_ID>` — see the
+   *Finding IDs* box below):
+   ```
+   =QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Master!A1:U"),"where Col1 is not null",1)
+   ```
+3. Press Enter → the cell shows **`#REF!`** with an **Allow access** button → click it **once**
+   (this authorises Private→Public forever). Rows should fill in.
+4. Add three more tabs and paste one formula in A1 of each (details/variants in **§2c/§2d/§2a**):
+   - **`Nilai`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Nilai!A1:Z"),"where Col2 is not null",1)`
+   - **`Mapel`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Mapel!A1:B"),"where Col1 is not null",1)`
+   - **`Setoran`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Setoran!A1:Z"),"where Col2 is not null",1)`
+   Click **Allow access** on each the first time.
+
+> Only need the roster to start? Just do the `Roster` tab; add `Nilai`/`Mapel`/`Setoran` later. Any
+> tab you skip, the app fills with demo data.
+
+### Step 6 — Share settings (this is what makes it safe → §4)
+- **PRIVATE** sheet & both forms: **Share** → keep **Restricted**, invite only staff emails
+  (Admin / Mudir / Musyrif) as **Editor**.
+- **PUBLIC** sheet: **Share** → **General access → Anyone with the link → Viewer**. ⚠️ Never give
+  the public **Editor** (§4 explains why that would leak the whole private sheet).
+
+### Step 7 — Connect the tracker (→ §6)
+1. Open `/tracker/` → **Masuk Staff** (log in via Clerk) → on the dashboard, **⚙️ Konfigurasi**.
+2. Paste the **PUBLIC** Sheet ID into **Google Sheet ID** → **Muat Data**. Status flips to
+   **Live · Google Sheet**.
+3. Paste the two **Form IDs** into **Form Setoran Harian** and **Form Nilai Ujian/Tes**.
+
+### Step 8 — Verify
+- Gallery/dashboard show your real santri (not the demo names).
+- Open a santri → **Riwayat Nilai** shows your test rows; **Riwayat Setoran Harian** shows daily rows.
+- **+ Input** → both form toggles load; submit one and confirm it appears after a refresh.
+
+> **Finding the IDs**
+> - **Sheet ID** — from the sheet URL: `docs.google.com/spreadsheets/d/`**`THIS_LONG_PART`**`/edit`.
+> - **Form ID** — open the form, **Send → link (🔗)** or Preview: `…/forms/d/e/`**`THIS_PART`**`/viewform`.
+> - Paste the **PUBLIC** Sheet ID into the tracker — **never** the Private one.
+
+---
+
 ## 2. PRIVATE sheet — the source of truth
 
 Create one spreadsheet (e.g. **"RTA Tracker — PRIVATE"**). Keep it restricted: share only with
@@ -56,9 +159,12 @@ into the `Nilai` tab — see §2c and §5.)
 
 **Show the daily log in-app (optional):** the tracker renders a **Riwayat Setoran Harian** card on
 each student's detail (10 most recent) if it finds a **public** tab named exactly `Setoran` with
-these headers: `id, tanggal, jenis, juz, halaman, catatan`. Mirror a clean projection of the raw
-responses into it — reshape/QUERY the form columns and map `santri → id`, e.g.
-`=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Setoran!A1:H"), "select ... where Col2 is not null", 1)`.
+these headers: `id, tanggal, jenis, juz, halaman, catatan`. If you titled Form A's questions with the
+exact keys and used an **`id` dropdown** (walkthrough Step 4), the linked `Setoran` tab is already
+app-ready — mirror it whole:
+`=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Setoran!A1:Z"), "where Col2 is not null", 1)`
+(`Col2` = `id`; the automatic `Timestamp` column is ignored by the app). If instead your form stored
+the santri **name**, add a reshape that maps `name → id` and selects the needed columns.
 `jenis` colours by keyword (Ziyadah = green, Muroja'ah = gold, Tahsin/other = blue). Until the tab
 exists, the tracker uses built-in demo setoran. Keep it parent-safe — no private notes here.
 
@@ -125,8 +231,12 @@ Headers in row 1:
 - `id` matches the santri id in `Master`. `bidang` = **`Diniyah`**, **`Akademik`**, or
   **`Ekstrakurikuler`** (one of the three fixed groups — see §2d). `mapel` must match a subject you
   defined in the `Mapel` tab. `nilai` is 0–100.
-- Mirror it to the **PUBLIC** sheet as a second tab named exactly `Nilai`:
-  `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Nilai!A1:F"), "where Col1 is not null", 1)`
+- **Where these rows come from:** this tab is Form B's linked response tab (walkthrough Step 4), so
+  column **A is `Timestamp`** and the keys follow — that's fine, the app ignores unknown columns.
+- Mirror it to the **PUBLIC** sheet as a tab named exactly `Nilai`:
+  `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Nilai!A1:Z"), "where Col2 is not null", 1)`
+  (`Col2` = `id`). If you instead keep a hand-built clean tab with `id` in column A, use
+  `Nilai!A1:F` with `where Col1 is not null`.
 - The tracker reads it automatically (same Sheet ID) → shown on each student’s detail as
   **Riwayat Nilai**, and used by the **Rapor** (report card, Admin only) together with the roster
   scores. Until the tab exists, the tracker uses built-in demo records.
@@ -290,17 +400,21 @@ can have its own responders. Both embed in the tracker (mobile-friendly, native 
 only need each **Form ID** — no field-ID mapping in code. In the tracker, **+ Input** opens a
 slide-over with a **Setoran Harian / Nilai Ujian-Tes** toggle, each showing its own embedded form.
 
+> **Title each question exactly like the column key** (`id`, `tanggal`, `nilai`, …) and the form's
+> linked response tab is already app-ready — no reshaping (see the walkthrough's "one trick").
+
 **Form A — Setoran Harian** (daily / frequent; Musyrif & Mudir)
-1. Questions e.g. santri, tanggal, jenis setoran (Ziyadah / Muroja'ah / Tahsin / Akhlak), juz,
-   halaman, kualitas/nilai, catatan.
-2. Link to the **Private** spreadsheet → creates the **`Setoran`** tab (§2a). Use it to keep the
-   `Master` hafalan/juz columns current (manual or formula).
+1. Questions, titled exactly: `id` (Dropdown of santri ids), `tanggal` (Date), `jenis`
+   (Ziyadah / Muroja'ah / Tahsin), `juz`, `halaman`, `catatan`, optional `nilai` (daily quality).
+2. Link to the **Private** spreadsheet → rename the response tab to **`Setoran`** (§2a). Use it to
+   keep the `Master` hafalan/juz columns current (manual or §2e formula).
 
 **Form B — Nilai Ujian/Tes** (periodic: weekly → 6-monthly; Mudir for Diniyah, guru for Akademik)
-1. Questions: santri, tanggal, **bidang** (Diniyah / Akademik / Ekstrakurikuler), **mapel**
-   (match §2d), jenis ujian (Ulangan Harian / UTS / UAS …), **nilai** (0–100), catatan.
-2. Link to the **Private** spreadsheet → responses feed the **`Nilai`** tab (§2c) — reshape/QUERY
-   into the `id, tanggal, bidang, mapel, jenis, nilai` columns the tracker reads.
+1. Questions, titled exactly: `id` (Dropdown), `tanggal` (Date), `bidang`
+   (Diniyah / Akademik / Ekstrakurikuler), `mapel` (match §2d), `jenis` (Ulangan Harian / UTS / UAS …),
+   `nilai` (0–100).
+2. Link to the **Private** spreadsheet → rename the response tab to **`Nilai`** (§2c). No reshape
+   needed — the app reads `id, tanggal, bidang, mapel, jenis, nilai` by header and ignores `Timestamp`.
 
 3. Copy each **Form ID** — the `.../forms/d/e/`**`ID`**`/viewform` part of the URL.
 4. In the tracker: **Dashboard → ⚙️ Konfigurasi → Google Form** → paste both IDs
