@@ -47,9 +47,11 @@ Everything shown in Public also exists in Private.
 Create one spreadsheet (e.g. **"RTA Tracker — PRIVATE"**). Keep it restricted: share only with
 staff (Admin / Mudir / Musyrif). This is where the Google Form delivers responses.
 
-### 2a. Tab `Setoran` (raw Form responses)
-Auto-created when you link the Google Form. Leave it as-is — it logs every submission
-(timestamp, santri, tanggal, jenis, juz, halaman, taqdir, catatan, …).
+### 2a. Tab `Setoran` (raw daily-form responses)
+Auto-created when you link the **Setoran Harian** form (Form A, §5). Leave it as-is — it logs every
+daily submission (timestamp, santri, tanggal, jenis, juz, halaman, taqdir, catatan, …). Use it to
+keep the `Master` hafalan/juz columns current. (Periodic exam scores go through a *separate* form
+into the `Nilai` tab — see §2c and §5.)
 
 ### 2b. Tab `Master` (one row per santri) — **this is what gets mirrored**
 Put the **16 public columns first (A–P)**, then any **private-only columns from Q onward**.
@@ -93,7 +95,8 @@ s1  Ahmad Fauzan Ramadhani   Fauzan  Depok   Jawa Barat   1    88  91  85  85  9
 ---
 
 ### 2c. Tab `Nilai` (per-test records) — powers "Riwayat Nilai" & the Rapor
-One row per test/exam, Islamic **or** secular. Headers in row 1:
+Fed by the **Nilai Ujian/Tes** form (Form B, §5). One row per test/exam, Islamic **or** secular.
+Headers in row 1:
 
 | id | tanggal | bidang | mapel | jenis | nilai |
 |----|---------|--------|-------|-------|-------|
@@ -189,21 +192,31 @@ what lets a public viewer see data derived from a sheet they cannot open.
 
 ---
 
-## 5. Write path — the Google Form (embedded)
+## 5. Write path — **two** Google Forms (embedded)
 
-**Input Nilai** in the tracker **embeds your Google Form** directly (mobile-friendly, native
-validation), so submissions go straight to the linked Sheet. You only need the **Form ID** — there
-is no field-ID mapping to configure in code.
+Input has two cadences, so use **two separate forms** — cleaner data, cleaner to maintain, and each
+can have its own responders. Both embed in the tracker (mobile-friendly, native validation); you
+only need each **Form ID** — no field-ID mapping in code. In the tracker, **+ Input** opens a
+slide-over with a **Setoran Harian / Nilai Ujian-Tes** toggle, each showing its own embedded form.
 
-1. Build **one** Google Form with the questions you want (e.g. a "Jenis Input" question for
-   Hafalan / Akhlak / Akademik, plus santri, tanggal, juz, nilai, catatan, …).
-2. Link it to the **Private** spreadsheet: Form → **Responses** → **Link to Sheets** (creates the
-   `Setoran` tab).
-3. Copy the **Form ID** — the `.../forms/d/e/`**`ID`**`/viewform` part of the form's URL.
-4. In the tracker: **Dashboard → ⚙️ Konfigurasi → Google Form ID** → paste it.
+**Form A — Setoran Harian** (daily / frequent; Musyrif & Mudir)
+1. Questions e.g. santri, tanggal, jenis setoran (Ziyadah / Muroja'ah / Tahsin / Akhlak), juz,
+   halaman, kualitas/nilai, catatan.
+2. Link to the **Private** spreadsheet → creates the **`Setoran`** tab (§2a). Use it to keep the
+   `Master` hafalan/juz columns current (manual or formula).
 
-Now **+ Input Nilai** shows the form embedded; staff fill it on desktop or mobile and it writes to
-the Sheet. (Until an ID is set, Input Nilai shows a "belum dikonfigurasi" prompt.)
+**Form B — Nilai Ujian/Tes** (periodic: weekly → 6-monthly; Mudir for Diniyah, guru for Akademik)
+1. Questions: santri, tanggal, **bidang** (Diniyah / Akademik / Ekstrakurikuler), **mapel**
+   (match §2d), jenis ujian (Ulangan Harian / UTS / UAS …), **nilai** (0–100), catatan.
+2. Link to the **Private** spreadsheet → responses feed the **`Nilai`** tab (§2c) — reshape/QUERY
+   into the `id, tanggal, bidang, mapel, jenis, nilai` columns the tracker reads.
+
+3. Copy each **Form ID** — the `.../forms/d/e/`**`ID`**`/viewform` part of the URL.
+4. In the tracker: **Dashboard → ⚙️ Konfigurasi → Google Form** → paste both IDs
+   (**Form Setoran Harian** and **Form Nilai Ujian/Tes**).
+
+Each toggle shows a "belum dikonfigurasi" prompt until its Form ID is set — you can configure just
+one and add the other later.
 
 ## 6. Connect the tracker
 

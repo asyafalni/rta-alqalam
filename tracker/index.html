@@ -299,7 +299,7 @@
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             <sc-if value="{{ canManage }}" hint-placeholder-val="{{ true }}">
-              <button onClick="{{ sel.onEntry }}" style="padding:11px 20px;border-radius:10px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:13px;cursor:pointer">+ Input Nilai</button>
+              <button onClick="{{ sel.onEntry }}" style="padding:11px 20px;border-radius:10px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:13px;cursor:pointer">+ Input</button>
             </sc-if>
             <sc-if value="{{ canRapor }}" hint-placeholder-val="{{ true }}">
               <button onClick="{{ openRapor }}" style="padding:11px 20px;border-radius:10px;border:1px solid #cfa02c;background:#fbf7ea;color:#8a6d1e;font-weight:700;font-size:13px;cursor:pointer">Cetak Rapor</button>
@@ -322,7 +322,7 @@
         </div>
         <span style="font-size:12.5px;color:#6b7280;font-weight:600;white-space:nowrap;margin-right:2px">{{ greeting }}</span>
         <button onClick="{{ goGallery }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Progres Santri</button>
-        <button onClick="{{ goEntry }}" style="padding:8px 14px;border-radius:9px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer">+ Input Nilai</button>
+        <button onClick="{{ goEntry }}" style="padding:8px 14px;border-radius:9px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer">+ Input</button>
         <button onClick="{{ goConfig }}" title="Konfigurasi" style="width:36px;height:34px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#0a4631;cursor:pointer;display:grid;place-items:center;padding:0">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
         </button>
@@ -372,14 +372,18 @@
     <div onClick="{{ closeEntry }}" class="sheet-backdrop"></div>
     <div class="sheet">
       <div style="display:flex;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid #e6ddc8;background:#fff">
-        <h1 style="font-size:17px;font-weight:800;margin:0;flex:1;color:#0a4631">Input Nilai</h1>
+        <h1 style="font-size:17px;font-weight:800;margin:0;flex:1;color:#0a4631">{{ entryTitle }}</h1>
         <a href="{{ formOpenUrl }}" target="_blank" rel="noopener" title="Buka di tab baru" style="font-size:15px;font-weight:700;color:#0c6240;padding:4px 6px">↗</a>
         <button onClick="{{ closeEntry }}" title="Tutup" style="width:32px;height:32px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;cursor:pointer;display:grid;place-items:center;padding:0">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </button>
       </div>
+      <div style="display:flex;gap:8px;padding:12px 18px;border-bottom:1px solid #e6ddc8;background:#faf8f2">
+        <button onClick="{{ showSetoran }}" style="{{ segSetoranStyle }}">Setoran Harian</button>
+        <button onClick="{{ showNilai }}" style="{{ segNilaiStyle }}">Nilai Ujian/Tes</button>
+      </div>
       <sc-if value="{{ formConfigured }}" hint-placeholder-val="{{ true }}">
-        <iframe src="{{ formEmbedUrl }}" title="Input Nilai" style="flex:1;width:100%;border:none;display:block;background:#fff"></iframe>
+        <iframe src="{{ formEmbedUrl }}" title="{{ entryTitle }}" style="flex:1;width:100%;border:none;display:block;background:#fff"></iframe>
       </sc-if>
       <sc-if value="{{ formNotConfigured }}" hint-placeholder-val="{{ false }}">
         <div style="flex:1;display:grid;place-items:center;padding:26px;text-align:center">
@@ -406,9 +410,13 @@
       <div style="flex:1;overflow:auto;padding:18px">
         <p style="font-size:12.5px;color:#6b7280;margin:0 0 16px;line-height:1.5">Hubungkan tracker ke Google Form (jalur input) dan Google Sheet publik (jalur baca).</p>
         <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:18px;margin-bottom:14px">
-          <div style="font-weight:800;font-size:13.5px;margin-bottom:10px">📝 Google Form — input nilai</div>
-          <label style="font-size:11.5px;color:#6b7280;display:block">Google Form ID <span style="color:#9aa1ad">— bagian ID dari .../forms/d/e/<b>ID</b>/viewform</span>
-            <input value="{{ formId }}" onInput="{{ setFormId }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
+          <div style="font-weight:800;font-size:13.5px;margin-bottom:4px">📝 Google Form — jalur input</div>
+          <p style="font-size:11.5px;color:#9aa1ad;margin:0 0 12px;line-height:1.5">Dua form terpisah: <b>Setoran Harian</b> (Musyrif/Mudir) menulis ke tab <code>Setoran</code>; <b>Nilai Ujian/Tes</b> (Mudir &amp; guru akademik) menulis ke tab <code>Nilai</code>. Isi bagian ID dari .../forms/d/e/<b>ID</b>/viewform.</p>
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Form Setoran Harian
+            <input value="{{ setoranFormId }}" onInput="{{ setSetoranFormId }}" placeholder="ID form setoran harian" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
+          </label>
+          <label style="font-size:11.5px;color:#6b7280;display:block">Form Nilai Ujian/Tes
+            <input value="{{ nilaiFormId }}" onInput="{{ setNilaiFormId }}" placeholder="ID form nilai ujian/tes" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
           </label>
         </div>
         <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:18px">
@@ -499,6 +507,9 @@ const BIDANG = [
   {key:'Ekstrakurikuler', title:'Ekstrakurikuler', head:'Mata Pelajaran'},
 ];
 function normBidang(b){ b=String(b||'').toLowerCase(); if(/ekstra|ekskul/.test(b)) return 'Ekstrakurikuler'; if(/akad/.test(b)) return 'Akademik'; if(/dini|tahfi|diniyah/.test(b)) return 'Diniyah'; return ''; }
+// Segmented-toggle button styles (active / inactive) for the Input sheet.
+const SEG_ON='flex:1;padding:9px 12px;border-radius:9px;border:none;background:#0a4631;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer';
+const SEG_OFF='flex:1;padding:9px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer';
 // Built-in demo subject definitions; overridden by the "Mapel" sheet when configured.
 const MAPEL = [
   {bidang:'Diniyah', mapel:'Tahfidz (Ziyadah)'},
@@ -529,7 +540,7 @@ class Component extends DCLogic {
   state = {
     view:'gallery', role:'public', loginOpen:false, selectedId:null, theme:'minimal', search:'',
     sortKey:'juz', sortDir:'desc',
-    formId:'1FAIpQLScSAMPLEFORMIDxxxxxxxxxxxxxxxxxxxxxxx',
+    setoranFormId:'', nilaiFormId:'', entryKind:'setoran',
     sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
     clerkReady:false, userName:'', entryOpen:false, configOpen:false,
     nilai:null, mapelDef:null, raporOpen:false, termId:'2026g',
@@ -763,6 +774,9 @@ class Component extends DCLogic {
     // records for it; Akhlak (a credit, not a test) falls back to the roster aggregate.
     const activeMapel = (st.mapelDef&&st.mapelDef.length)?st.mapelDef:MAPEL;
     const term = TERMS.find(t=>t.id===st.termId) || TERMS[0];
+    const entryKind = st.entryKind||'setoran';
+    const activeFormId = entryKind==='nilai' ? (st.nilaiFormId||'') : (st.setoranFormId||'');
+    const formConfigured = !!activeFormId && activeFormId.indexOf('SAMPLE')<0;
     const raporRows = (bidangKey)=>{
       if(!sel) return [];
       const defs = activeMapel.filter(d=>normBidang(d.bidang)===bidangKey).map(d=>d.mapel);
@@ -827,12 +841,18 @@ class Component extends DCLogic {
       loginMudir:()=>this.setState({role:'mudir', view:'dashboard', loginOpen:false}),
       loginMusyrif:()=>this.setState({role:'musyrif', view:'dashboard', loginOpen:false}),
       loginPublic:()=>this.setState({role:'public', view:'gallery'}),
-      formId:st.formId,
-      formEmbedUrl:'https://docs.google.com/forms/d/e/'+st.formId+'/viewform?embedded=true',
-      formOpenUrl:'https://docs.google.com/forms/d/e/'+st.formId+'/viewform',
-      formConfigured: !!st.formId && st.formId.indexOf('SAMPLE')<0,
-      formNotConfigured: !(st.formId && st.formId.indexOf('SAMPLE')<0),
-      setFormId:(ev)=>this.setState({formId:ev.target.value}),
+      // Two input forms: daily Setoran (Musyrif/Mudir) + periodic Nilai ujian (Mudir + guru akademik).
+      entryKind, isSetoran: entryKind==='setoran', isNilai: entryKind==='nilai',
+      entryTitle: entryKind==='nilai' ? 'Input Nilai Ujian/Tes' : 'Input Setoran Harian',
+      segSetoranStyle: entryKind==='setoran'?SEG_ON:SEG_OFF, segNilaiStyle: entryKind==='nilai'?SEG_ON:SEG_OFF,
+      showSetoran:()=>this.setState({entryKind:'setoran'}),
+      showNilai:()=>this.setState({entryKind:'nilai'}),
+      setoranFormId:st.setoranFormId, nilaiFormId:st.nilaiFormId,
+      formEmbedUrl:'https://docs.google.com/forms/d/e/'+activeFormId+'/viewform?embedded=true',
+      formOpenUrl:'https://docs.google.com/forms/d/e/'+activeFormId+'/viewform',
+      formConfigured, formNotConfigured: !formConfigured,
+      setSetoranFormId:(ev)=>this.setState({setoranFormId:ev.target.value}),
+      setNilaiFormId:(ev)=>this.setState({nilaiFormId:ev.target.value}),
       dataStatus, sheetId:st.sheetId,
       setSheetId:(ev)=>this.setState({sheetId:ev.target.value}),
       reloadRoster:()=>{ this.loadRoster(); this.loadNilai(); this.loadMapel(); },
