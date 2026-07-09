@@ -656,7 +656,7 @@ class Component extends DCLogic {
     const poly=React.createElement('polygon',{points:dataPts.map(p=>p.join(',')).join(' '), fill:'rgba(47,143,58,.20)', stroke:GREEN, strokeWidth:2});
     const dots=dataPts.map((p,i)=>React.createElement('circle',{key:'d'+i,cx:p[0],cy:p[1],r:2.6,fill:GREEN}));
     const labels=s.pillars.map((p,i)=>{const[x,y]=pt(i,R+15);return React.createElement('text',{key:'l'+i,x,y,fontSize:9,fontWeight:700,fill:NAVY,textAnchor:'middle',dominantBaseline:'middle',fontFamily:'ui-monospace,monospace'},p.abbr);});
-    return React.createElement('svg',{viewBox:'0 0 160 160',width:'100%',height:'100%'},[...rings,...spokes,poly,...dots,...labels]);
+    return React.createElement('svg',{viewBox:'-8 -8 176 176',width:'100%',height:'100%'},[...rings,...spokes,poly,...dots,...labels]);
   }
 
   juzCells(s){
