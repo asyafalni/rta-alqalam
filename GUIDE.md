@@ -87,7 +87,8 @@ Header names in row 1 **must be exactly** these lowercase keys (the tracker matc
 | N | `juzdone` | which juz are memorized — a list in any order, e.g. `1,2,3,28,29,30` (juz count & progress derive from it) | text | Musyrif/Mudir |
 | O | `curjuz` | juz **currently** being memorized (1–30; independent — many start from Juz 30 back) | number | Musyrif/Mudir |
 | P | `kelas` | class level, e.g. `VII` / `VIII` | text | staff |
-| Q+ | `wali`, `nohp`, `alamat`, `status`, `catatan_musyrif`, `catatan_mudir`, … | **PRIVATE — never mirrored** | any | staff |
+| Q–U | `nis`, `hadir`, `sakit`, `izin`, `alpa` | **optional, public** — shown on the **Rapor** (NIS in the header; Hadir/Sakit/Izin/Alpa as the Kehadiran table). Safe to expose — the report card is parent-facing. | text/number | staff |
+| V+ | `wali`, `nohp`, `alamat`, `status`, `catatan_musyrif`, `catatan_mudir`, … | **PRIVATE — never mirrored** | any | staff |
 
 > The score columns (G–M) are what the app's **Profil Kemampuan** radar/bars read. Type them
 > directly, **or** compute them from `Setoran` (daily) + `Nilai` (tests) — see **§2e** for the
