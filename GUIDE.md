@@ -20,7 +20,7 @@ academics, reporting).
  ┌───────────────────────────────┐
  │  PRIVATE sheet  (source truth)│   restricted access — staff only
  │  ├─ tab: Setoran (Form resp.) │   raw per-event submissions
- │  ├─ tab: Master               │   one row per santri (public cols A–P + private cols Q+)
+ │  ├─ tab: Master               │   one row per santri (public A–U · private V+)
  │  ├─ tab: Nilai                │   one row per test (Diniyah/Akademik/Ekstrakurikuler)
  │  └─ tab: Mapel                │   subject definitions per group (bidang, mapel)
  └───────────────┬───────────────┘
@@ -28,7 +28,7 @@ academics, reporting).
                  ▼
  ┌───────────────────────────────┐
  │  PUBLIC sheet   (reference)   │   "Anyone with link → Viewer"
- │  ├─ tab: Roster               │   ONLY the 16 public columns, mirrored live
+ │  ├─ tab: Roster               │   public columns A–U only, mirrored live
  │  ├─ tab: Nilai                │   per-test scores, mirrored live
  │  ├─ tab: Mapel                │   subject definitions, mirrored live
  │  └─ tab: Setoran              │   daily log (id,tanggal,jenis,juz,…), mirrored live
@@ -66,8 +66,9 @@ exists, the tracker uses built-in demo setoran. Keep it parent-safe — no priva
 > §2e formulas use it to compute the Hafalan / Muroja'ah / Tahsin pillars.
 
 ### 2b. Tab `Master` (one row per santri) — **this is what gets mirrored**
-Put the **16 public columns first (A–P)**, then any **private-only columns from Q onward**.
-Header names in row 1 **must be exactly** these lowercase keys (the tracker matches by header):
+Put the **public columns first** — 16 core (A–P) plus the optional Q–U — then any
+**private-only columns from V onward**. Header names in row 1 **must be exactly** these lowercase
+keys (the tracker matches by header):
 
 | Col | Header | Meaning | Type | Filled by |
 |-----|--------|---------|------|-----------|
@@ -87,8 +88,11 @@ Header names in row 1 **must be exactly** these lowercase keys (the tracker matc
 | N | `juzdone` | which juz are memorized — a list in any order, e.g. `1,2,3,28,29,30` (juz count & progress derive from it) | text | Musyrif/Mudir |
 | O | `curjuz` | juz **currently** being memorized (1–30; independent — many start from Juz 30 back) | number | Musyrif/Mudir |
 | P | `kelas` | class level, e.g. `VII` / `VIII` | text | staff |
-| Q–U | `nis`, `hadir`, `sakit`, `izin`, `alpa` | **optional, public** — shown on the **Rapor** (NIS in the header; Hadir/Sakit/Izin/Alpa as the Kehadiran table). Safe to expose — the report card is parent-facing. | text/number | staff |
+| Q–U | `nis`, `hadir`, `sakit`, `izin`, `alpa` | **optional, public** — shown on the **Rapor** (NIS in the header; Hadir/Sakit/Izin/Alpa as the Kehadiran table). Safe to expose — the report card is parent-facing. Leave blank/omit to skip; the app then shows NIS as `—` and hides the Kehadiran table. | text/number | staff |
 | V+ | `wali`, `nohp`, `alamat`, `status`, `catatan_musyrif`, `catatan_mudir`, … | **PRIVATE — never mirrored** | any | staff |
+
+> ⚠️ **Q–U are reserved for the optional public fields above.** Even if you don't use them, start any
+> **private** columns at **V** — the mirror (§3) imports `A:U`, so anything in Q–U becomes public.
 
 > The score columns (G–M) are what the app's **Profil Kemampuan** radar/bars read. Type them
 > directly, **or** compute them from `Setoran` (daily) + `Nilai` (tests) — see **§2e** for the
@@ -102,9 +106,10 @@ Header names in row 1 **must be exactly** these lowercase keys (the tracker matc
 Example header row + first data row:
 
 ```
-id  name                     nick    kota    prov         hal  haf tah mur ilm akh akd bhs juzdone            curjuz | wali
-s1  Ahmad Fauzan Ramadhani   Fauzan  Depok   Jawa Barat   1    88  91  85  85  90  84  86  "1,2,3,4,5,6,7,8"  9    | Bpk. Ramadhani
+id  name                     nick    kota   prov        hal haf tah mur ilm akh akd bhs juzdone           curjuz kelas | nis      hadir sakit izin alpa | wali
+s1  Ahmad Fauzan Ramadhani   Fauzan  Depok  Jawa Barat  1   88  91  85  85  90  84  86  "1,2,3,4,5,6,7,8" 9      VIII  | 2426001  60    0     0    0    | Bpk. Ramadhani
 ```
+(A–P core · Q–U optional public · V+ private, e.g. `wali`)
 
 ---
 
@@ -228,7 +233,7 @@ M (bhs  → any subject containing "Bahasa"):
    above), then make each visible cell `=IF($<override>="", AA2, $<override>)` — a filled override
    column always wins, otherwise the derived value shows.
 
-Nothing else changes: `Master!A1:P` still mirrors to the Public `Roster` (§3), and the app reads G–M
+Nothing else changes: `Master!A1:U` still mirrors to the Public `Roster` (§3), and the app reads G–M
 as before — now they *reflect* the daily setoran and the exams instead of being hand-typed.
 
 ---
@@ -240,7 +245,7 @@ exactly `Roster`** with a single formula in cell **A1** that mirrors the public 
 
 ```
 =QUERY(
-  IMPORTRANGE("<PRIVATE_SHEET_ID>", "Master!A1:P"),
+  IMPORTRANGE("<PRIVATE_SHEET_ID>", "Master!A1:U"),
   "where Col1 is not null",
   1
 )
@@ -248,16 +253,17 @@ exactly `Roster`** with a single formula in cell **A1** that mirrors the public 
 
 - Replace `<PRIVATE_SHEET_ID>` with the id from the Private sheet URL:
   `https://docs.google.com/spreadsheets/d/`**`THIS_PART`**`/edit`
-- `Master!A1:P` imports **only** the 16 public columns — private columns (Q+) are never referenced,
-  so they can never leak.
+- `Master!A1:U` imports **only** the public columns (16 core + the optional nis/attendance) —
+  private columns (V+) are never referenced, so they can never leak. (Use `A1:P` if you're not using
+  the optional Q–U columns at all.)
 - `where Col1 is not null` drops blank rows; the trailing `1` keeps the header row.
 - **First run:** the cell shows `#REF!` with an **"Allow access"** button — click it once to
   authorize the Private→Public link. After that it stays in sync automatically.
 
-> Prefer to reorder/rename in the mirror? Use an explicit select, e.g.
-> `"select Col1, Col2, Col3, Col4, Col5, Col6, Col7, Col8, Col9, Col10, Col11, Col12, Col13, Col14, Col15, Col16 where Col1 is not null"`.
-> Column order does not matter to the tracker (it matches by header name), but the headers must
-> stay exactly `id, name, nick, …, juzdone, curjuz, kelas`.
+> Prefer to reorder/rename in the mirror? Use an explicit select (`select Col1, Col2, … Col21 where
+> Col1 is not null`). Column order does not matter to the tracker (it matches by header name), but the
+> headers must stay exactly `id, name, nick, …, juzdone, curjuz, kelas` (plus `nis, hadir, sakit,
+> izin, alpa` if used).
 
 ---
 
@@ -309,9 +315,10 @@ one and add the other later.
 2. Paste the **PUBLIC** Sheet ID into **Google Sheet ID** and click **Muat Data**.
 3. Status flips from *"Data contoh (demo)"* → *"Live · Google Sheet"*.
 
-The tracker reads the tab named **`Roster`** via GViz:
+From that **one** Public Sheet ID the tracker reads four tabs via GViz — **`Roster`** (santri),
+**`Nilai`** (tests), **`Mapel`** (subjects), **`Setoran`** (daily log) — e.g.
 `https://docs.google.com/spreadsheets/d/<PUBLIC_ID>/gviz/tq?tqx=out:json&sheet=Roster`
-If unconfigured or unreachable, it falls back to the built-in demo data automatically.
+Each tab is optional: any that's missing or unreachable falls back to built-in demo data automatically.
 
 ---
 
@@ -319,8 +326,8 @@ If unconfigured or unreachable, it falls back to the built-in demo data automati
 
 - [ ] Private sheet: restricted to staff only.
 - [ ] Public sheet: **Viewer** for anyone with link; **Edit** for staff only.
-- [ ] Public `Roster` imports **only** `Master!A1:P` — no private columns referenced.
-- [ ] No private fields (wali, phone, address, economic status, internal notes) in columns A–P.
+- [ ] Public `Roster` imports **only** `Master!A1:U` — no private columns referenced.
+- [ ] No private fields (wali, phone, address, economic status, internal notes) in columns A–U — they start at **V**.
 - [ ] Tracker points at the **PUBLIC** Sheet ID, never the Private one.
 
 ### Known limitation
