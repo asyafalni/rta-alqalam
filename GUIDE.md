@@ -20,18 +20,20 @@ academics, reporting).
  ┌───────────────────────────────┐
  │  PRIVATE sheet  (source truth)│   restricted access — staff only
  │  ├─ tab: Setoran (Form resp.) │   raw per-event submissions
- │  ├─ tab: Master               │   one row per santri (public A–U · private V+)
+ │  ├─ tab: Master               │   one row per santri (public A–Q · private R+)
  │  ├─ tab: Nilai                │   one row per test (Diniyah/Akademik/Ekstrakurikuler)
- │  └─ tab: Mapel                │   subject definitions per group (bidang, mapel)
+ │  ├─ tab: Mapel                │   subject definitions per group (bidang, mapel)
+ │  └─ tab: Kehadiran            │   one row per santri per day (id, tanggal, status)
  └───────────────┬───────────────┘
                  │  IMPORTRANGE (one-way, authorized once)
                  ▼
  ┌───────────────────────────────┐
  │  PUBLIC sheet   (reference)   │   "Anyone with link → Viewer"
- │  ├─ tab: Roster               │   public columns A–U only, mirrored live
+ │  ├─ tab: Roster               │   public columns A–Q only, mirrored live
  │  ├─ tab: Nilai                │   per-test scores, mirrored live
  │  ├─ tab: Mapel                │   subject definitions, mirrored live
- │  └─ tab: Setoran              │   daily log (id,tanggal,jenis,juz,…), mirrored live
+ │  ├─ tab: Setoran              │   daily log (id,tanggal,jenis,juz,…), mirrored live
+ │  └─ tab: Kehadiran            │   daily attendance (id,tanggal,status), mirrored live
  └───────────────┬───────────────┘
                  │  GViz JSON (no API key)
                  ▼
@@ -67,10 +69,10 @@ New to Google Sheets/Forms? Follow these steps top to bottom. Sections §2–§7
 3. In **row 1**, type the headers exactly (lower-case), left to right — the 16 core columns then the
    optional ones (full list & meaning in **§2b**):
    `id  name  nick  kota  prov  hal  haf  tah  mur  ilm  akh  akd  bhs  juzdone  curjuz  kelas`
-   then optionally `nis  hadir  sakit  izin  alpa`.
+   then optionally `nis`.
 4. Fill one row per santri from row 2. Give each a **short unique `id`** (`s1`, `s2`, …) — this id is
    how every other tab links to the student, so keep it stable. Put private data (wali, phone, …)
-   **from column V onward** (see the ⚠️ in §2b).
+   **from column R onward** (see the ⚠️ in §2b).
 
 ### Step 3 — Add the `Nilai` and `Mapel` tabs
 1. Bottom-left **＋** to add a tab → name it **`Mapel`**. Row 1: `bidang` , `mapel`. List your
@@ -78,6 +80,9 @@ New to Google Sheets/Forms? Follow these steps top to bottom. Sections §2–§7
 2. Add another tab → **`Nilai`**. Row 1: `id  tanggal  bidang  mapel  jenis  nilai` (**§2c**). You can
    leave it empty — **Form B** (Step 4) will fill it.
    *(The `Setoran` tab is created automatically when you link Form A — don't add it by hand.)*
+3. *(Optional)* For attendance, add a **`Kehadiran`** tab. Row 1: `id  tanggal  status` — one row per
+   santri per day, `status` = `Hadir`/`Sakit`/`Izin`/`Alpa` (default `Hadir`). Fill it by hand or from
+   a small third form (**§2f**).
 
 ### Step 4 — Build the two input Forms (why two → §5)
 For **each** form: **New → Google Forms** inside the folder.
@@ -109,7 +114,7 @@ Send yourself one test submission through each form and confirm a row lands in t
 2. Rename `Sheet1` → **`Roster`**. Click cell **A1** and paste (replace `<PRIVATE_SHEET_ID>` — see the
    *Finding IDs* box below):
    ```
-   =QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Master!A1:U"),"where Col1 is not null",1)
+   =QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Master!A1:Q"),"where Col1 is not null",1)
    ```
 3. Press Enter → the cell shows **`#REF!`** with an **Allow access** button → click it **once**
    (this authorises Private→Public forever). Rows should fill in.
@@ -117,10 +122,11 @@ Send yourself one test submission through each form and confirm a row lands in t
    - **`Nilai`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Nilai!A1:Z"),"where Col2 is not null",1)`
    - **`Mapel`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Mapel!A1:B"),"where Col1 is not null",1)`
    - **`Setoran`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Setoran!A1:Z"),"where Col2 is not null",1)`
+   - **`Kehadiran`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Kehadiran!A1:Z"),"where Col2 is not null",1)`
    Click **Allow access** on each the first time.
 
-> Only need the roster to start? Just do the `Roster` tab; add `Nilai`/`Mapel`/`Setoran` later. Any
-> tab you skip, the app fills with demo data.
+> Only need the roster to start? Just do the `Roster` tab; add `Nilai`/`Mapel`/`Setoran`/`Kehadiran`
+> later. Any tab you skip, the app fills with demo data.
 
 ### Step 6 — Share settings (this is what makes it safe → §4)
 - **PRIVATE** sheet & both forms: **Share** → keep **Restricted**, invite only staff emails
@@ -172,8 +178,8 @@ exists, the tracker uses built-in demo setoran. Keep it parent-safe — no priva
 > §2e formulas use it to compute the Hafalan / Muroja'ah / Tahsin pillars.
 
 ### 2b. Tab `Master` (one row per santri) — **this is what gets mirrored**
-Put the **public columns first** — 16 core (A–P) plus the optional Q–U — then any
-**private-only columns from V onward**. Header names in row 1 **must be exactly** these lowercase
+Put the **public columns first** — 16 core (A–P) plus the optional `nis` (Q) — then any
+**private-only columns from R onward**. Header names in row 1 **must be exactly** these lowercase
 keys (the tracker matches by header):
 
 | Col | Header | Meaning | Type | Filled by |
@@ -194,11 +200,12 @@ keys (the tracker matches by header):
 | N | `juzdone` | which juz are memorized — a list in any order, e.g. `1,2,3,28,29,30` (juz count & progress derive from it) | text | Musyrif/Mudir |
 | O | `curjuz` | juz **currently** being memorized (1–30; independent — many start from Juz 30 back) | number | Musyrif/Mudir |
 | P | `kelas` | class level, e.g. `VII` / `VIII` | text | staff |
-| Q–U | `nis`, `hadir`, `sakit`, `izin`, `alpa` | **optional, public** — shown on the **Rapor** (NIS in the header; Hadir/Sakit/Izin/Alpa as the Kehadiran table). Safe to expose — the report card is parent-facing. Leave blank/omit to skip; the app then shows NIS as `—` and hides the Kehadiran table. | text/number | staff |
-| V+ | `wali`, `nohp`, `alamat`, `status`, `catatan_musyrif`, `catatan_mudir`, … | **PRIVATE — never mirrored** | any | staff |
+| Q | `nis` | **optional, public** — the santri's NIS, shown in the Rapor header. Leave blank to show `—`. | text | staff |
+| R+ | `wali`, `nohp`, `alamat`, `status`, `catatan_musyrif`, `catatan_mudir`, … | **PRIVATE — never mirrored** | any | staff |
 
-> ⚠️ **Q–U are reserved for the optional public fields above.** Even if you don't use them, start any
-> **private** columns at **V** — the mirror (§3) imports `A:U`, so anything in Q–U becomes public.
+> ⚠️ **Column Q is reserved for the optional public `nis`.** Start any **private** columns at **R** —
+> the mirror (§3) imports `A:Q`, so anything in Q becomes public.
+> *(Attendance is no longer a Master column — it lives in its own `Kehadiran` tab, §2f.)*
 
 > The score columns (G–M) are what the app's **Profil Kemampuan** radar/bars read. Type them
 > directly, **or** compute them from `Setoran` (daily) + `Nilai` (tests) — see **§2e** for the
@@ -212,10 +219,10 @@ keys (the tracker matches by header):
 Example header row + first data row:
 
 ```
-id  name                     nick    kota   prov        hal haf tah mur ilm akh akd bhs juzdone           curjuz kelas | nis      hadir sakit izin alpa | wali
-s1  Ahmad Fauzan Ramadhani   Fauzan  Depok  Jawa Barat  1   88  91  85  85  90  84  86  "1,2,3,4,5,6,7,8" 9      VIII  | 2426001  60    0     0    0    | Bpk. Ramadhani
+id  name                     nick    kota   prov        hal haf tah mur ilm akh akd bhs juzdone           curjuz kelas | nis      | wali
+s1  Ahmad Fauzan Ramadhani   Fauzan  Depok  Jawa Barat  1   88  91  85  85  90  84  86  "1,2,3,4,5,6,7,8" 9      VIII  | 2426001  | Bpk. Ramadhani
 ```
-(A–P core · Q–U optional public · V+ private, e.g. `wali`)
+(A–P core · Q `nis` optional public · R+ private, e.g. `wali`)
 
 ---
 
@@ -343,8 +350,32 @@ M (bhs  → any subject containing "Bahasa"):
    above), then make each visible cell `=IF($<override>="", AA2, $<override>)` — a filled override
    column always wins, otherwise the derived value shows.
 
-Nothing else changes: `Master!A1:U` still mirrors to the Public `Roster` (§3), and the app reads G–M
+Nothing else changes: `Master!A1:Q` still mirrors to the Public `Roster` (§3), and the app reads G–M
 as before — now they *reflect* the daily setoran and the exams instead of being hand-typed.
+
+---
+
+### 2f. Tab `Kehadiran` (daily attendance) — powers the Rapor Kehadiran table
+One row per santri per day, with a **single `status` column** (default **Hadir**) instead of four
+count columns. Headers in row 1:
+
+| id | tanggal | status |
+|----|---------|--------|
+| s3 | 2026-10-03 | Sakit |
+| s3 | 2026-10-04 | Hadir |
+
+- `status` is one of **`Hadir` / `Sakit` / `Izin` / `Alpa`** — blank or unrecognised counts as
+  **`Hadir`** (also understood: `S`/`I`/`A`, `ijin`, `alfa`, `bolos`).
+- The app tallies these **per status, within the selected Rapor term** → the **Kehadiran** table on
+  the report card (Hadir / Sakit / Izin / Alpa + Total Hari). If a santri has no rows in the term,
+  the table is hidden.
+- Record it however suits you: a **third Google Form** (question titled `status`, default `Hadir`),
+  or a quick manual/scanned entry. You can log every day, or log only exceptions (S/I/A) and treat the
+  rest as Hadir — then *Total Hari* reflects the days you actually recorded.
+- Mirror to the **PUBLIC** sheet as a tab named exactly `Kehadiran`:
+  `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Kehadiran!A1:Z"), "where Col2 is not null", 1)`
+  (`Col2` = `id` if it's a form response tab with `Timestamp` in A; use `Col1` for a hand-built tab
+  with `id` in A). Until the tab exists, the tracker uses built-in demo attendance.
 
 ---
 
@@ -355,7 +386,7 @@ exactly `Roster`** with a single formula in cell **A1** that mirrors the public 
 
 ```
 =QUERY(
-  IMPORTRANGE("<PRIVATE_SHEET_ID>", "Master!A1:U"),
+  IMPORTRANGE("<PRIVATE_SHEET_ID>", "Master!A1:Q"),
   "where Col1 is not null",
   1
 )
@@ -363,17 +394,15 @@ exactly `Roster`** with a single formula in cell **A1** that mirrors the public 
 
 - Replace `<PRIVATE_SHEET_ID>` with the id from the Private sheet URL:
   `https://docs.google.com/spreadsheets/d/`**`THIS_PART`**`/edit`
-- `Master!A1:U` imports **only** the public columns (16 core + the optional nis/attendance) —
-  private columns (V+) are never referenced, so they can never leak. (Use `A1:P` if you're not using
-  the optional Q–U columns at all.)
+- `Master!A1:Q` imports **only** the public columns (16 core + the optional `nis`) — private columns
+  (R+) are never referenced, so they can never leak. (Use `A1:P` if you're not using `nis` at all.)
 - `where Col1 is not null` drops blank rows; the trailing `1` keeps the header row.
 - **First run:** the cell shows `#REF!` with an **"Allow access"** button — click it once to
   authorize the Private→Public link. After that it stays in sync automatically.
 
-> Prefer to reorder/rename in the mirror? Use an explicit select (`select Col1, Col2, … Col21 where
+> Prefer to reorder/rename in the mirror? Use an explicit select (`select Col1, Col2, … Col17 where
 > Col1 is not null`). Column order does not matter to the tracker (it matches by header name), but the
-> headers must stay exactly `id, name, nick, …, juzdone, curjuz, kelas` (plus `nis, hadir, sakit,
-> izin, alpa` if used).
+> headers must stay exactly `id, name, nick, …, juzdone, curjuz, kelas` (plus `nis` if used).
 
 ---
 
@@ -429,8 +458,8 @@ one and add the other later.
 2. Paste the **PUBLIC** Sheet ID into **Google Sheet ID** and click **Muat Data**.
 3. Status flips from *"Data contoh (demo)"* → *"Live · Google Sheet"*.
 
-From that **one** Public Sheet ID the tracker reads four tabs via GViz — **`Roster`** (santri),
-**`Nilai`** (tests), **`Mapel`** (subjects), **`Setoran`** (daily log) — e.g.
+From that **one** Public Sheet ID the tracker reads five tabs via GViz — **`Roster`** (santri),
+**`Nilai`** (tests), **`Mapel`** (subjects), **`Setoran`** (daily log), **`Kehadiran`** (attendance) — e.g.
 `https://docs.google.com/spreadsheets/d/<PUBLIC_ID>/gviz/tq?tqx=out:json&sheet=Roster`
 Each tab is optional: any that's missing or unreachable falls back to built-in demo data automatically.
 
@@ -440,8 +469,8 @@ Each tab is optional: any that's missing or unreachable falls back to built-in d
 
 - [ ] Private sheet: restricted to staff only.
 - [ ] Public sheet: **Viewer** for anyone with link; **Edit** for staff only.
-- [ ] Public `Roster` imports **only** `Master!A1:U` — no private columns referenced.
-- [ ] No private fields (wali, phone, address, economic status, internal notes) in columns A–U — they start at **V**.
+- [ ] Public `Roster` imports **only** `Master!A1:Q` — no private columns referenced.
+- [ ] No private fields (wali, phone, address, economic status, internal notes) in columns A–Q — they start at **R**.
 - [ ] Tracker points at the **PUBLIC** Sheet ID, never the Private one.
 
 ### Known limitation
