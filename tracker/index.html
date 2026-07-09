@@ -159,7 +159,7 @@
             </sc-for></tbody>
           </table>
           </sc-if>
-          <div style="background:#fbf7ea;border:1px solid #ecdfae;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12.5px;line-height:1.6"><span style="font-weight:800;color:#8a6d1e">Capaian Hafalan:</span> {{ sel.juz }} dari 15 juz ({{ sel.juzPct }}%) · sedang menghafal Juz {{ sel.curjuz }} · Predikat umum: <b>{{ sel.gName }}</b></div>
+          <div style="background:#fbf7ea;border:1px solid #ecdfae;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12.5px;line-height:1.6"><span style="font-weight:800;color:#8a6d1e">Capaian Hafalan:</span> {{ raporHafalanNote }} · Predikat umum: <b>{{ sel.gName }}</b></div>
           <sc-if value="{{ hasAttendance }}" hint-placeholder-val="{{ true }}">
           <div style="font-weight:800;font-size:13px;color:#0a4631;margin-bottom:6px">Kehadiran</div>
           <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px">
@@ -309,6 +309,15 @@
           </div>
           <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:20px 22px">
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px"><span style="font-weight:800;font-size:14px">Peta Hafalan — 30 Juz</span><span style="font-size:12px;color:#6b7280">{{ sel.juz }}/15 juz target · {{ sel.juzPct }}%</span></div>
+            <sc-if value="{{ sel.hasPage }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-bottom:14px;padding:11px 13px;background:#f7f6f2;border:1px solid #ece3cf;border-radius:11px;font-size:12px;color:#16264d">
+                <span style="font-weight:800;color:#0a4631">Halaman {{ sel.curpg }}<span style="color:#9aa1ad;font-weight:600">/604</span></span>
+                <span style="color:#c9cdd4">·</span>
+                <span>Juz {{ sel.curjuz }} — hlm {{ sel.pgInJuz }}/{{ sel.pgLenJuz }} ({{ sel.pgPctJuz }}%)</span>
+                <span style="color:#c9cdd4">·</span>
+                <span style="font-weight:700;color:#8a6d1e">± {{ sel.pgLeft }} hlm lagi ke Juz {{ sel.pgNextJuz }}</span>
+              </div>
+            </sc-if>
             <div class="juz-map">
               <sc-for list="{{ selJuz }}" as="j" hint-placeholder-count="30">
                 <div style="aspect-ratio:1;border-radius:7px;border:1px solid;display:grid;place-items:center;font-size:10.5px;font-weight:700;{{ j.style }}">{{ j.n }}</div>
@@ -531,9 +540,9 @@ const NAVY='#16264d', NAVY2='#0f1c3a', GREEN='#2f8f3a', GOLD='#cfa02c', CREAM='#
 // juzdone = which specific juz are memorized (list, any order) → juz count &
 // progress derive from it. curjuz = the juz currently being worked on.
 const RAW = [
-  {id:'s1', name:'Ahmad Fauzan Ramadhani', nick:'Fauzan', kelas:'VIII', kota:'Depok', prov:'Jawa Barat', hal:1, haf:88,tah:91,mur:85,ilm:85,akh:90,akd:84,bhs:86, juzdone:'1,2,3,4,5,6,7,8', curjuz:9, nis:'2426001'},
+  {id:'s1', name:'Ahmad Fauzan Ramadhani', nick:'Fauzan', kelas:'VIII', kota:'Depok', prov:'Jawa Barat', hal:1, haf:88,tah:91,mur:85,ilm:85,akh:90,akd:84,bhs:86, juzdone:'1,2,3,4,5,6,7,8', curjuz:9, curpg:170, nis:'2426001'},
   {id:'s2', name:'Muhammad Rifki Hakim', nick:'Rifki', kelas:'VII', kota:'Bogor', prov:'Jawa Barat', hal:1, haf:82,tah:83,mur:78,ilm:80,akh:86,akd:88,bhs:84, juzdone:'25,26,27,28,29,30', curjuz:24, nis:'2426002'},
-  {id:'s3', name:'Zaid Abdullah Faris', nick:'Zaid', kelas:'VII', kota:'Bekasi', prov:'Jawa Barat', hal:1, haf:94,tah:94,mur:90,ilm:92,akh:93,akd:88,bhs:90, juzdone:'1,2,3,4,5,6,7,8,9,10', curjuz:11, nis:'2426003'},
+  {id:'s3', name:'Zaid Abdullah Faris', nick:'Zaid', kelas:'VII', kota:'Bekasi', prov:'Jawa Barat', hal:1, haf:94,tah:94,mur:90,ilm:92,akh:93,akd:88,bhs:90, juzdone:'1,2,3,4,5,6,7,8,9,10', curjuz:11, curpg:210, nis:'2426003'},
   {id:'s4', name:'Yusuf Ar-Ramadhan', nick:'Yusuf', kelas:'VIII', kota:'Subang', prov:'Jawa Barat', hal:1, haf:70,tah:73,mur:68,ilm:70,akh:78,akd:76,bhs:72, juzdone:'27,28,29,30', curjuz:26, nis:'2426004'},
   {id:'s5', name:'Hafizh Anwar Syafiq', nick:'Hafizh', kelas:'VII', kota:'Bandung', prov:'Jawa Barat', hal:1, haf:86,tah:87,mur:82,ilm:84,akh:88,akd:80,bhs:83, juzdone:'1,2,3,4,5,6,7', curjuz:8, nis:'2426005'},
   {id:'s6', name:'Ibrahim Malik Ibrahim', nick:'Ibrahim', kelas:'VIII', kota:'Cirebon', prov:'Jawa Barat', hal:2, haf:78,tah:78,mur:74,ilm:77,akh:82,akd:82,bhs:79, juzdone:'1,2,28,29,30', curjuz:27, nis:'2426006'},
@@ -650,6 +659,12 @@ function grade(n){
 }
 function tierOf(n){ return n>=85?'gold': n>=75?'silver':'bronze'; }
 const TIER_ACCENT = {gold:'#cfa02c', silver:'#8593a8', bronze:'#b07a4a'};
+// Standard Madinah/Uthmani mushaf: 604 pages, 30 juz. JUZ_START[i] = first page of Juz i+1.
+const MUSHAF_PAGES = 604;
+const JUZ_START = [1,22,42,62,82,102,122,142,162,182,202,222,242,262,282,302,322,342,362,382,402,422,442,462,482,502,522,542,562,582];
+function juzOfPage(p){ p=Number(p)||0; if(p<1) return 0; let j=1; for(let i=0;i<30;i++){ if(p>=JUZ_START[i]) j=i+1; } return Math.min(30,j); }
+// From a current page → which juz, progress within it, and pages left to finish it.
+function mushafInfo(p){ p=Number(p)||0; if(p<1||p>MUSHAF_PAGES) return null; const j=juzOfPage(p); const start=JUZ_START[j-1]; const end=(j<30?JUZ_START[j]-1:MUSHAF_PAGES); return {juz:j, page:p, inJuz:p-start+1, lenJuz:end-start+1, leftInJuz:end-p, pctJuz:Math.round((p-start+1)/(end-start+1)*100), nextJuz:(j<30?j+1:30)}; }
 
 class Component extends DCLogic {
   state = {
@@ -769,7 +784,7 @@ class Component extends DCLogic {
     const num=x=>{ const n=Number(x); return isFinite(n)?n:0; };
     return { id:String(o.id!=null?o.id:''), name:o.name||o.nama||'',
       nick:o.nick||o.panggilan||(o.name?String(o.name).split(' ')[0]:''),
-      kota:o.kota||'', prov:o.prov||o.provinsi||'', kelas:o.kelas!=null?String(o.kelas):'', hal:num(o.hal!=null?o.hal:1), juz:num(o.juz), curjuz:num(o.curjuz), juzdone:o.juzdone!=null?String(o.juzdone):'',
+      kota:o.kota||'', prov:o.prov||o.provinsi||'', kelas:o.kelas!=null?String(o.kelas):'', hal:num(o.hal!=null?o.hal:1), juz:num(o.juz), curjuz:num(o.curjuz), curpg:num(o.curpg), juzdone:o.juzdone!=null?String(o.juzdone):'',
       haf:num(o.haf), tah:num(o.tah), mur:num(o.mur), ilm:num(o.ilm), akh:num(o.akh), akd:num(o.akd), bhs:num(o.bhs),
       nis:o.nis!=null?String(o.nis):'' };
   }
@@ -819,13 +834,17 @@ class Component extends DCLogic {
       ? String(r.juzdone).split(/[^0-9]+/).map(Number).filter(n=>n>=1&&n<=30)
       : (r.juz>0 ? Array.from({length:Math.min(30,r.juz)},(_,i)=>i+1) : []);
     const juzCount=juzDone.length;
-    const curJuz=(r.curjuz>0)?r.curjuz:(juzCount>=15?15:juzCount+1);
+    // Prefer a current page (curpg) on the standard mushaf → derive juz + within-juz progress.
+    const pg = r.curpg>0 ? r.curpg : 0;
+    const pInfo = pg ? mushafInfo(pg) : null;
+    const curJuz = pInfo ? pInfo.juz : ((r.curjuz>0)?r.curjuz:(juzCount>=15?15:juzCount+1));
     const scores=PILLARS.map(p=>({...p, score:r[p.key], g:grade(r[p.key])}));
     const overall=Math.round(scores.reduce((a,s)=>a+s.score,0)/scores.length);
     const og=grade(overall), tier=tierOf(overall), v=this.cardVisual(theme,tier);
     const initials=r.nick.slice(0,2).toUpperCase();
     return {...r, initials, overall, gLetter:og.l, gName:og.name, gColor:og.c, tier, tierColor:TIER_ACCENT[tier],
       juz:juzCount, curjuz:curJuz, juzDone,
+      curpg:pg, hasPage:!!pInfo, pgInJuz:pInfo?pInfo.inJuz:0, pgLenJuz:pInfo?pInfo.lenJuz:0, pgPctJuz:pInfo?pInfo.pctJuz:0, pgLeft:pInfo?pInfo.leftInJuz:0, pgNextJuz:pInfo?pInfo.nextJuz:0,
       juzPct:Math.min(100,Math.round(juzCount/15*100)), musyrif:(HALAQAH[r.hal]||[]).join(', '), mudir:MUDIR, kelas:r.kelas||'—',
       curArab:String(curJuz).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d)),
       pillars:scores.map(s=>({abbr:s.abbr, label:s.label, score:s.score, letter:s.g.l, color:s.g.c, grp:s.grp, pname:s.g.name})),
@@ -941,6 +960,7 @@ class Component extends DCLogic {
     // the three bidang groups are FIXED. Each subject's score is the average of that santri's Nilai
     // records for it; Akhlak (a credit, not a test) falls back to the roster aggregate.
     const activeMapel = (st.mapelDef&&st.mapelDef.length)?st.mapelDef:MAPEL;
+    const raporHafalanNote = sel ? (sel.juz+' dari 15 juz ('+sel.juzPct+'%) · sedang menghafal Juz '+sel.curjuz + (sel.hasPage?(' · halaman '+sel.curpg+'/'+MUSHAF_PAGES+', ± '+sel.pgLeft+' hlm lagi menuju Juz '+sel.pgNextJuz):'')) : '';
     const entryKind = st.entryKind||'setoran';
     const activeFormId = entryKind==='nilai' ? (st.nilaiFormId||'') : (st.setoranFormId||'');
     const formConfigured = !!activeFormId && activeFormId.indexOf('SAMPLE')<0;
@@ -983,6 +1003,7 @@ class Component extends DCLogic {
       setoranZi:setoranStat.zi, setoranMu:setoranStat.mu, setoranTa:setoranStat.ta, setoranTotal:selSetoranAll.length,
       // report card (admin only)
       term:term.label, termId:term.id, terms:TERMS.map(t=>({id:t.id, label:t.label})),
+      raporHafalanNote,
       selNis: sel ? (sel.nis||'—') : '',
       selRankLabel: (sel&&selRank) ? (selRank+' dari '+selRankTotal+' santri · Kelas '+sel.kelas) : '—',
       hasAttendance, attHadir:att.hadir, attSakit:att.sakit, attIzin:att.izin, attAlpa:att.alpa, attTotal,

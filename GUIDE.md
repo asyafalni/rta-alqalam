@@ -68,8 +68,9 @@ New to Google Sheets/Forms? Follow these steps top to bottom. Sections §2–§7
 2. Double-click the bottom tab `Sheet1` → rename it **`Master`**.
 3. In **row 1**, type the headers exactly (lower-case), left to right — the 16 core columns then the
    optional ones (full list & meaning in **§2b**):
-   `id  name  nick  kota  prov  hal  haf  tah  mur  ilm  akh  akd  bhs  juzdone  curjuz  kelas`
-   then optionally `nis`.
+   `id  name  nick  kota  prov  hal  haf  tah  mur  ilm  akh  akd  bhs  juzdone  curpg  kelas`
+   then optionally `nis`. *(Use `curpg` = current page 1–604 for page-level progress — recommended —
+   or name that column `curjuz` if you'd rather track just the juz number. §2b.)*
 4. Fill one row per santri from row 2. Give each a **short unique `id`** (`s1`, `s2`, …) — this id is
    how every other tab links to the student, so keep it stable. Put private data (wali, phone, …)
    **from column R onward** (see the ⚠️ in §2b).
@@ -198,7 +199,7 @@ keys (the tracker matches by header):
 | L | `akd`  | Akademik — math/IPA/… (0–100) | number | **Admin** |
 | M | `bhs`  | Bahasa — Indonesia/Inggris (0–100) | number | **Admin** |
 | N | `juzdone` | which juz are memorized — a list in any order, e.g. `1,2,3,28,29,30` (juz count & progress derive from it) | text | Musyrif/Mudir |
-| O | `curjuz` | juz **currently** being memorized (1–30; independent — many start from Juz 30 back) | number | Musyrif/Mudir |
+| O | `curjuz` *or* `curpg` | current progress — either the juz being memorized (`curjuz`, 1–30) **or, better, the current page** (`curpg`, 1–604 on the standard Madinah/Uthmani mushaf). Use **one** header. With `curpg` the app derives the juz *and* shows within-juz progress + "≈ N pages left to finish the juz". | number | Musyrif/Mudir |
 | P | `kelas` | class level, e.g. `VII` / `VIII` | text | staff |
 | Q | `nis` | **optional, public** — the santri's NIS, shown in the Rapor header. Leave blank to show `—`. | text | staff |
 | R+ | `wali`, `nohp`, `alamat`, `status`, `catatan_musyrif`, `catatan_mudir`, … | **PRIVATE — never mirrored** | any | staff |
@@ -215,6 +216,12 @@ keys (the tracker matches by header):
 > **Musyrif & Mudir** are set in code, not the sheet: edit the `HALAQAH` map
 > (halaqah → list of musyrif names; add names as you hire) and the `MUDIR`
 > constant near the top of `tracker/index.html`’s `<script>`.
+>
+> **Tracking by page (`curpg`, recommended):** the app assumes the standard 604-page
+> Madinah/Uthmani mushaf (Juz 1 = pages 1–21, then 20 pages/juz). Enter the page a santri is
+> currently on and it computes the juz, the position within that juz, and how many pages remain to
+> finish it — a far better progress signal than the juz number alone. `curjuz` stays supported as a
+> fallback for anyone who only tracks juz.
 
 Example header row + first data row:
 
