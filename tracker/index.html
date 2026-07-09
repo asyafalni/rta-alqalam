@@ -240,6 +240,9 @@
             </div>
           </sc-if>
         </div>
+        <sc-if value="{{ filterActive }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ resetFilter }}" title="Reset filter" style="flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:10px;border:1px solid #e6e1d5;background:#fff;color:#16264d;cursor:pointer;padding:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </sc-if>
       </div>
 
       <div class="book-grid">
@@ -418,6 +421,9 @@
             </div>
           </sc-if>
         </div>
+        <sc-if value="{{ filterActive }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ resetFilter }}" title="Reset filter" style="flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;border:1px solid #e6e1d5;background:#fff;color:#16264d;cursor:pointer;padding:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </sc-if>
         <span style="font-size:12px;color:#9aa1ad">· {{ rosterCount }} santri</span>
       </div>
       <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;overflow:hidden">
@@ -942,9 +948,10 @@ class Component extends DCLogic {
       gallery, galleryCount:gallery.length, roster, rosterCount:roster.length,
       totalJuz, avgJuz:avgJuz.toFixed(1),
       mumtazCount:roster.filter(s=>s.gLetter==='A').length,
-      filterOpen:st.filterOpen, filterLabel, filterCount, allChip, kelasChips, halChips,
+      filterOpen:st.filterOpen, filterLabel, filterCount, filterActive: gf!=='all', allChip, kelasChips, halChips,
       toggleFilter:()=>this.setState({filterOpen:!this.state.filterOpen}),
       closeFilter:()=>this.setState({filterOpen:false}),
+      resetFilter:()=>this.setState({groupFilter:'all', filterOpen:false}),
       sel, selRadar: sel?this.radar(sel):null, selJuz: sel?this.juzCells(sel):[],
       // per-subject test records (Islamic + secular)
       selNilai:selNilaiRows, hasNilai:selNilaiRows.length>0, noNilai:!selNilaiRows.length,
