@@ -444,8 +444,12 @@ const RAW = [
 const HALAQAH = { 1:['Ustadz Salman Al-Farisi'], 2:['Ustadz Hamzah Abdurrahman'] };
 // One mudir for the whole school.
 const MUDIR = 'Ustadz Abdul Hakim, Lc.';
-// Ongoing academic term (for the report card).
-const TERM = 'Semester Ganjil · Tahun Ajaran 2026/2027';
+// Ongoing academic term (for the report card). `start`/`end` bound which Nilai rows the
+// Rapor averages (inclusive, YYYY-MM-DD). Semester Ganjil ≈ Jul–Dec, Genap ≈ Jan–Jun.
+const TERM = { label:'Semester Ganjil · Tahun Ajaran 2026/2027', start:'2026-07-01', end:'2026-12-31' };
+// Normalize a sheet date cell (ISO text or GViz "Date(y,m,d)") to YYYY-MM-DD.
+function ymd(t){ t=String(t||''); const m=t.match(/Date\((\d+),(\d+),(\d+)/); if(m){ return m[1]+'-'+String(+m[2]+1).padStart(2,'0')+'-'+String(+m[3]).padStart(2,'0'); } return t.slice(0,10); }
+function inTerm(t){ const d=ymd(t); return !d || (d>=TERM.start && d<=TERM.end); }
 // Per-test records (Islamic + secular). Same shape as the Google Sheet 'Nilai' tab.
 const NILAI = [
   {id:'s1', tanggal:'2026-09-05', bidang:'Diniyah', mapel:'Tahfidz (Ziyadah)', jenis:'Setoran', nilai:90},
@@ -751,7 +755,7 @@ class Component extends DCLogic {
     const raporRows = (bidangKey)=>{
       if(!sel) return [];
       const defs = activeMapel.filter(d=>normBidang(d.bidang)===bidangKey).map(d=>d.mapel);
-      const nil = activeNilai.filter(n=>n.id===sel.id && normBidang(n.bidang)===bidangKey);
+      const nil = activeNilai.filter(n=>n.id===sel.id && normBidang(n.bidang)===bidangKey && inTerm(n.tanggal));
       const list = defs.length ? defs : Array.from(new Set(nil.map(n=>n.mapel)));
       return list.map(mapel=>{
         const arr = nil.filter(n=>n.mapel===mapel).map(n=>n.nilai);
@@ -780,7 +784,7 @@ class Component extends DCLogic {
       // per-subject test records (Islamic + secular)
       selNilai:selNilaiRows, hasNilai:selNilaiRows.length>0, noNilai:!selNilaiRows.length,
       // report card (admin only)
-      term:TERM, canRapor: st.role==='admin', raporOpen:st.raporOpen,
+      term:TERM.label, canRapor: st.role==='admin', raporOpen:st.raporOpen,
       raporDiniyah: diniyahRows, raporAkademik: akademikRows,
       raporEkskul: ekskulRows, hasEkskul: ekskulRows.length>0,
       raporNote: sel ? ('Alhamdulillah, capaian '+sel.nick+' pada semester ini tergolong '+sel.gName+'. '+(sel.overall>=85?'Pertahankan dan tingkatkan terus, istiqamah dalam menghafal serta belajar.':'Teruslah bersemangat memperbaiki hafalan, muraja’ah, dan nilai akademik.')) : '',

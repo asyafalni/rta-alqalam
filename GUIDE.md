@@ -108,6 +108,10 @@ One row per test/exam, Islamic **or** secular. Headers in row 1:
 - The tracker reads it automatically (same Sheet ID) → shown on each student’s detail as
   **Riwayat Nilai**, and used by the **Rapor** (report card, Admin only) together with the roster
   scores. Until the tab exists, the tracker uses built-in demo records.
+- **Term scope:** the Rapor only averages `Nilai` rows whose `tanggal` falls inside the active
+  academic term. Set that window with the `TERM` constant near the top of `tracker/index.html`'s
+  `<script>` (`label` + `start`/`end` dates) — e.g. `start:'2026-07-01', end:'2026-12-31'` for
+  Semester Ganjil. **Riwayat Nilai** still lists the full history regardless of term.
 
 ---
 
