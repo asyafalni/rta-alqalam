@@ -62,6 +62,9 @@ responses into it — reshape/QUERY the form columns and map `santri → id`, e.
 `jenis` colours by keyword (Ziyadah = green, Muroja'ah = gold, Tahsin/other = blue). Until the tab
 exists, the tracker uses built-in demo setoran. Keep it parent-safe — no private notes here.
 
+> Add a **`nilai`** column (daily quality 0–100) to Form A too — the app card ignores it, but the
+> §2e formulas use it to compute the Hafalan / Muroja'ah / Tahsin pillars.
+
 ### 2b. Tab `Master` (one row per santri) — **this is what gets mirrored**
 Put the **16 public columns first (A–P)**, then any **private-only columns from Q onward**.
 Header names in row 1 **must be exactly** these lowercase keys (the tracker matches by header):
@@ -86,9 +89,10 @@ Header names in row 1 **must be exactly** these lowercase keys (the tracker matc
 | P | `kelas` | class level, e.g. `VII` / `VIII` | text | staff |
 | Q+ | `wali`, `nohp`, `alamat`, `status`, `catatan_musyrif`, `catatan_mudir`, … | **PRIVATE — never mirrored** | any | staff |
 
-> The score columns (G–M) can be typed directly by staff, or computed from the `Setoran` tab
-> with your own formulas. Keeping `Master` current (manual vs formula) is your choice — the
-> tracker only needs this row-per-santri shape.
+> The score columns (G–M) are what the app's **Profil Kemampuan** radar/bars read. Type them
+> directly, **or** compute them from `Setoran` (daily) + `Nilai` (tests) — see **§2e** for the
+> exact, copy-paste formulas per pillar. Keeping `Master` current (manual vs formula) is your
+> choice — the tracker only needs this row-per-santri shape.
 >
 > **Musyrif & Mudir** are set in code, not the sheet: edit the `HALAQAH` map
 > (halaqah → list of musyrif names; add names as you hire) and the `MUDIR`
@@ -154,6 +158,77 @@ The **three groups are fixed in the app** — `Tahfidz & Diniyah`, `Akademik`, `
 - Mirror to the **PUBLIC** sheet as a tab named exactly `Mapel`:
   `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Mapel!A1:B"), "where Col1 is not null", 1)`
 - Until the tab exists, the tracker uses a built-in demo subject list.
+
+---
+
+### 2e. Deriving `Profil Kemampuan` (Master G–M) from the two input streams
+
+The 7 bars/radar the app shows (**Hafalan, Tahsin, Muroja'ah, Ilmu & B. Arab, Akhlak, Akademik,
+Bahasa**) read the `Master` columns **G–M** *directly*. They do **not** auto-update from the forms —
+you either **type** them, or **compute** them from `Setoran` (daily) + `Nilai` (tests) with the
+formulas below. This is deliberate: the musyrif *decides* the semester score, informed by the data —
+not a blind average that swings on one entry.
+
+**Same file → reference tabs directly.** Keep `Master`, `Setoran`, `Nilai` in the **same PRIVATE
+spreadsheet** so formulas are plain tab references (`Nilai!F:F`) — **no `IMPORTRANGE`.** (`IMPORTRANGE`
+is only for the Private→Public mirror in §3.) If a stream lives in a *different* file, first pull it
+into a local helper tab with `IMPORTRANGE`, then reference that tab — don't nest `IMPORTRANGE` inside
+`AVERAGEIFS`.
+
+**Assumed columns** (adjust letters to your sheet):
+`Nilai` → A=`id` B=`tanggal` C=`bidang` D=`mapel` E=`jenis` **F=`nilai`**.
+`Setoran` → A=`id` … C=`jenis` … **F=`nilai`** (daily quality 0–100; add this column to Form A. The
+app's Riwayat card ignores it — it's only for these formulas). If daily uses *taqdir* letters instead
+of a number, add a numeric column: `=IFS(G2="Mumtaz",95,G2="Jayyid Jiddan",85,G2="Jayyid",75,G2="Maqbul",65,TRUE,"")`.
+
+**Put each formula in `Master` row 2 (first santri, id in `$A2`) and fill down.** Each returns blank
+(`""`) when a santri has no matching records yet, so empty stays empty.
+
+| Master col | Bar | Source | Formula (paste in the cell, fill down) |
+|---|---|---|---|
+| **G** `haf` | Hafalan | daily Ziyadah | `=IFERROR(ROUND(AVERAGEIFS(Setoran!$F:$F,Setoran!$A:$A,$A2,Setoran!$C:$C,"Ziyadah")),"")` |
+| **I** `mur` | Muroja'ah | daily Muroja'ah | `=IFERROR(ROUND(AVERAGEIFS(Setoran!$F:$F,Setoran!$A:$A,$A2,Setoran!$C:$C,"Muroja'ah")),"")` |
+| **L** `akd` | Akademik | all Akademik tests | `=IFERROR(ROUND(AVERAGEIFS(Nilai!$F:$F,Nilai!$A:$A,$A2,Nilai!$C:$C,"Akademik")),"")` |
+| **K** `akh` | Akhlak | — | *type manually — it's a credit, not a test* |
+
+**H `tah` (Tahsin) — blend daily + test.** 40 % daily Tahsin setoran + 60 % the "Tahsin & Tajwid"
+exam (weights are yours). `LET` keeps it readable and handles either side being empty:
+
+```
+=LET(
+  d, IFERROR(AVERAGEIFS(Setoran!$F:$F, Setoran!$A:$A, $A2, Setoran!$C:$C, "Tahsin"), ""),
+  t, IFERROR(AVERAGEIFS(Nilai!$F:$F,   Nilai!$A:$A,   $A2, Nilai!$D:$D, "Tahsin & Tajwid"), ""),
+  IF(AND(d="",t=""), "", ROUND(IF(d="", t, IF(t="", d, 0.4*d + 0.6*t))))
+)
+```
+
+**J `ilm` and M `bhs` — average tests whose `mapel` matches keywords.** Use this reusable
+"average-where-mapel-matches" pattern (regex, so one formula covers several subjects):
+
+```
+J (ilm  → Mutun / Bahasa Arab / Ilmu):
+=IFERROR(ROUND(
+  SUMPRODUCT((Nilai!$A$2:$A=$A2)*REGEXMATCH(Nilai!$D$2:$D,"Mutun|Arab|Ilmu")*Nilai!$F$2:$F)
+  /SUMPRODUCT((Nilai!$A$2:$A=$A2)*REGEXMATCH(Nilai!$D$2:$D,"Mutun|Arab|Ilmu"))),"")
+
+M (bhs  → any subject containing "Bahasa"):
+=IFERROR(ROUND(
+  SUMPRODUCT((Nilai!$A$2:$A=$A2)*REGEXMATCH(Nilai!$D$2:$D,"Bahasa")*Nilai!$F$2:$F)
+  /SUMPRODUCT((Nilai!$A$2:$A=$A2)*REGEXMATCH(Nilai!$D$2:$D,"Bahasa"))),"")
+```
+
+> Tune the regex to your `Mapel` names (§2d). `REGEXMATCH` needs same-length ranges — use bounded
+> ranges (`$D$2:$D`, `$F$2:$F`), not whole columns, inside `SUMPRODUCT`.
+
+**Keeping the staff override.** A typed number and a formula can't share one cell. Two options:
+1. **Simple:** leave the formula in G–M; to override, just type over that cell (its formula is
+   replaced for that santri only). Re-paste the formula later if you want the auto value back.
+2. **Auto + override (advanced):** compute into a hidden block (e.g. `Master!AA:AG` with the formulas
+   above), then make each visible cell `=IF($<override>="", AA2, $<override>)` — a filled override
+   column always wins, otherwise the derived value shows.
+
+Nothing else changes: `Master!A1:P` still mirrors to the Public `Roster` (§3), and the app reads G–M
+as before — now they *reflect* the daily setoran and the exams instead of being hand-typed.
 
 ---
 
