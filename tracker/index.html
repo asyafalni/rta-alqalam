@@ -694,6 +694,8 @@ class Component extends DCLogic {
     const roleLabel = st.role==='admin'?'Admin':st.role==='mudir'?'Mudir':st.role==='musyrif'?'Musyrif':'Publik';
     const activeNilai = (st.nilai&&st.nilai.length)?st.nilai:NILAI;
     const selNilaiRows = sel ? activeNilai.filter(n=>n.id===sel.id).slice().sort((a,b)=>(b.tanggal||'').localeCompare(a.tanggal||'')).map(n=>{ const g=grade(n.nilai); return {...n, pred:g.name, pcolor:g.c}; }) : [];
+    // Rapor Akademik: break down by mata pelajaran from the Nilai records (avg per mapel), not the single aggregate score
+    const akademikRows = sel ? (()=>{ const by={}; activeNilai.filter(n=>n.id===sel.id && /akad/i.test(n.bidang||'')).forEach(n=>{ (by[n.mapel]=by[n.mapel]||[]).push(n.nilai); }); return Object.keys(by).sort((a,b)=>a.localeCompare(b)).map(m=>{ const arr=by[m], avg=Math.round(arr.reduce((x,y)=>x+y,0)/arr.length), g=grade(avg); return {label:m, score:avg, pname:g.name, color:g.c}; }); })() : [];
 
     return {
       view:v, role:st.role, roleLabel, userName:st.userName, greeting: st.userName?('Halo, '+st.userName):'',
@@ -712,7 +714,7 @@ class Component extends DCLogic {
       // report card (admin only)
       term:TERM, canRapor: st.role==='admin', raporOpen:st.raporOpen,
       raporDiniyah: sel ? sel.pillars.filter(p=>p.grp==='diniyah') : [],
-      raporAkademik: sel ? sel.pillars.filter(p=>p.grp==='akademik') : [],
+      raporAkademik: akademikRows.length ? akademikRows : (sel ? sel.pillars.filter(p=>p.grp==='akademik') : []),
       raporNote: sel ? ('Alhamdulillah, capaian '+sel.nick+' pada semester ini tergolong '+sel.gName+'. '+(sel.overall>=85?'Pertahankan dan tingkatkan terus, istiqamah dalam menghafal serta belajar.':'Teruslah bersemangat memperbaiki hafalan, muraja’ah, dan nilai akademik.')) : '',
       openRapor:()=>this.setState({raporOpen:true}),
       closeRapor:()=>this.setState({raporOpen:false}),
