@@ -203,6 +203,9 @@
 
       <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:22px">
         <input value="{{ search }}" onInput="{{ onSearch }}" placeholder="Cari nama atau kota…" style="flex:1;min-width:180px;padding:10px 13px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;outline:none;color:#16264d" />
+        <select value="{{ kelasFilter }}" onChange="{{ setKelas }}" style="flex:none;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;font-weight:600;color:#16264d;cursor:pointer;outline:none">
+          <sc-for list="{{ kelasOptions }}" as="k" hint-placeholder-count="4"><option value="{{ k.v }}">{{ k.label }}</option></sc-for>
+        </select>
       </div>
 
       <div class="book-grid">
@@ -353,6 +356,13 @@
         <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:16px 18px"><div style="font-size:12px;color:#6b7280;font-weight:600">Predikat Mumtaz</div><div style="font-size:28px;font-weight:800;margin-top:4px;color:#cfa02c">{{ mumtazCount }}</div></div>
       </div>
 
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <span style="font-size:12.5px;color:#6b7280;font-weight:600">Filter Kelas</span>
+        <select value="{{ kelasFilter }}" onChange="{{ setKelas }}" style="padding:9px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;font-size:13px;font-weight:600;color:#16264d;cursor:pointer;outline:none">
+          <sc-for list="{{ kelasOptions }}" as="k" hint-placeholder-count="4"><option value="{{ k.v }}">{{ k.label }}</option></sc-for>
+        </select>
+        <span style="font-size:12px;color:#9aa1ad">· {{ rosterCount }} santri</span>
+      </div>
       <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;overflow:hidden">
         <div class="roster-head" style="padding:13px 18px;background:#f7f6f2;border-bottom:1px solid #e6e1d5;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#9aa1ad">
           <span onClick="{{ sortName }}" style="cursor:pointer;user-select:none">Santri{{ arrowName }}</span><span onClick="{{ sortProg }}" style="cursor:pointer;user-select:none">Progres Hafalan{{ arrowProg }}</span><span onClick="{{ sortAsal }}" style="cursor:pointer;user-select:none">Asal{{ arrowAsal }}</span><span onClick="{{ sortNilai }}" style="text-align:center;cursor:pointer;user-select:none">Nilai{{ arrowNilai }}</span><span></span>
@@ -538,6 +548,9 @@ function normBidang(b){ b=String(b||'').toLowerCase(); if(/ekstra|ekskul/.test(b
 // Segmented-toggle button styles (active / inactive) for the Input sheet.
 const SEG_ON='flex:1;padding:9px 12px;border-radius:9px;border:none;background:#0a4631;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer';
 const SEG_OFF='flex:1;padding:9px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer';
+// Order Kelas naturally: digits by value, Roman numerals (VII/VIII/IX…) by their integer value.
+function romanToInt(s){ const m={i:1,v:5,x:10,l:50,c:100}; s=String(s||'').toLowerCase(); let n=0; for(let i=0;i<s.length;i++){ const c=m[s[i]]||0, nx=m[s[i+1]]||0; n+= c<nx?-c:c; } return n; }
+function kelasRank(k){ k=String(k||'').trim(); if(/^\d+$/.test(k)) return +k; return romanToInt(k)||999; }
 // Built-in demo subject definitions; overridden by the "Mapel" sheet when configured.
 const MAPEL = [
   {bidang:'Diniyah', mapel:'Tahfidz (Ziyadah)'},
@@ -571,7 +584,7 @@ class Component extends DCLogic {
     setoranFormId:'', nilaiFormId:'', entryKind:'setoran',
     sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
     clerkReady:false, userName:'', entryOpen:false, configOpen:false,
-    nilai:null, setoran:null, mapelDef:null, raporOpen:false, termId:'2026g',
+    nilai:null, setoran:null, mapelDef:null, raporOpen:false, termId:'2026g', kelasFilter:'all',
   };
 
   // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
@@ -795,10 +808,15 @@ class Component extends DCLogic {
       : st.loadState==='error'?'Gagal muat · memakai data contoh'
       : 'Data contoh (demo)';
     const q=st.search.trim().toLowerCase();
-    let gallery=all.filter(s=> !q || s.name.toLowerCase().includes(q) || s.kota.toLowerCase().includes(q));
+    // Kelas filter (shared by gallery + roster). 'all' = every kelas.
+    const kf=st.kelasFilter||'all';
+    const kelasMatch=s=> kf==='all' || String(s.kelas)===kf;
+    const kelasList=Array.from(new Set(all.map(s=>String(s.kelas||'').trim()).filter(k=>k&&k!=='—'))).sort((a,b)=>kelasRank(a)-kelasRank(b));
+    const kelasOptions=[{v:'all', label:'Semua Kelas'}].concat(kelasList.map(k=>({v:k, label:'Kelas '+k})));
+    let gallery=all.filter(s=> kelasMatch(s) && (!q || s.name.toLowerCase().includes(q) || s.kota.toLowerCase().includes(q)));
     gallery=gallery.slice().sort((a,b)=>b.overall-a.overall);
     // dashboard roster (for now all staff roles see every halaqah; musyrif scope TODO)
-    let roster=all.slice();
+    let roster=all.filter(kelasMatch);
     const sk=st.sortKey||'juz', sd=st.sortDir||'desc';
     const cmpBy={ nick:(a,b)=>a.nick.localeCompare(b.nick), juz:(a,b)=>a.juz-b.juz, kota:(a,b)=>(a.kota||'').localeCompare(b.kota||''), overall:(a,b)=>a.overall-b.overall };
     const cmp=cmpBy[sk]||cmpBy.juz;
@@ -847,7 +865,8 @@ class Component extends DCLogic {
       isPublic: st.role==='public',
       gallery, galleryCount:gallery.length, roster, rosterCount:roster.length,
       totalJuz, avgJuz:avgJuz.toFixed(1),
-      mumtazCount:all.filter(s=>s.gLetter==='A').length,
+      mumtazCount:roster.filter(s=>s.gLetter==='A').length,
+      kelasFilter:kf, kelasOptions, setKelas:(ev)=>this.setState({kelasFilter:ev.target.value}),
       sel, selRadar: sel?this.radar(sel):null, selJuz: sel?this.juzCells(sel):[],
       // per-subject test records (Islamic + secular)
       selNilai:selNilaiRows, hasNilai:selNilaiRows.length>0, noNilai:!selNilaiRows.length,
