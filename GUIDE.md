@@ -316,6 +316,11 @@ into a local helper tab with `IMPORTRANGE`, then reference that tab — don't ne
 app's Riwayat card ignores it — it's only for these formulas). If daily uses *taqdir* letters instead
 of a number, add a numeric column: `=IFS(G2="Mumtaz",95,G2="Jayyid Jiddan",85,G2="Jayyid",75,G2="Maqbul",65,TRUE,"")`.
 
+> ⚠️ **Using the linked form-response tabs?** They put `Timestamp` in column **A**, so every letter
+> above shifts by one: `Nilai` → id = **B**, bidang = **D**, mapel = **E**, nilai = **G**; `Setoran`
+> → id = **B**, jenis = **D**, nilai = **H**. Adjust the formula column letters to match your tab (or
+> copy just the needed columns into a clean helper tab first). `$A2` still refers to **Master** col A.
+
 **Put each formula in `Master` row 2 (first santri, id in `$A2`) and fill down.** Each returns blank
 (`""`) when a santri has no matching records yet, so empty stays empty.
 
