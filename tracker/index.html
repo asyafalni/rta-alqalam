@@ -143,6 +143,15 @@
               <tr><td style="padding:7px 10px;border:1px solid #e6e1d5">{{ p.label }}</td><td style="text-align:center;font-weight:700;padding:7px 10px;border:1px solid #e6e1d5">{{ p.score }}</td><td style="text-align:center;font-weight:700;color:{{ p.color }};padding:7px 10px;border:1px solid #e6e1d5">{{ p.pname }}</td></tr>
             </sc-for></tbody>
           </table>
+          <sc-if value="{{ hasEkskul }}" hint-placeholder-val="{{ true }}">
+          <div style="font-weight:800;font-size:13px;color:#0a4631;margin-bottom:6px">C. Bidang Ekstrakurikuler</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px">
+            <thead><tr style="background:#eef4ee"><th style="text-align:left;padding:7px 10px;border:1px solid #d8e3d8">Mata Pelajaran</th><th style="width:64px;padding:7px 10px;border:1px solid #d8e3d8">Nilai</th><th style="width:130px;padding:7px 10px;border:1px solid #d8e3d8">Predikat</th></tr></thead>
+            <tbody><sc-for list="{{ raporEkskul }}" as="p" hint-placeholder-count="2">
+              <tr><td style="padding:7px 10px;border:1px solid #e6e1d5">{{ p.label }}</td><td style="text-align:center;font-weight:700;padding:7px 10px;border:1px solid #e6e1d5">{{ p.score }}</td><td style="text-align:center;font-weight:700;color:{{ p.color }};padding:7px 10px;border:1px solid #e6e1d5">{{ p.pname }}</td></tr>
+            </sc-for></tbody>
+          </table>
+          </sc-if>
           <div style="background:#fbf7ea;border:1px solid #ecdfae;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12.5px;line-height:1.6"><span style="font-weight:800;color:#8a6d1e">Capaian Hafalan:</span> {{ sel.juz }} dari 15 juz ({{ sel.juzPct }}%) · sedang menghafal Juz {{ sel.curjuz }} · Predikat umum: <b>{{ sel.gName }}</b></div>
           <div style="font-weight:800;font-size:13px;color:#0a4631;margin-bottom:4px">Catatan Musyrif &amp; Mudir</div>
           <p style="font-size:12.5px;line-height:1.6;color:#333;border:1px solid #e6e1d5;border-radius:8px;padding:12px 14px;min-height:52px;margin:0 0 26px">{{ raporNote }}</p>
@@ -453,6 +462,11 @@ const NILAI = [
   {id:'s5', tanggal:'2026-09-22', bidang:'Akademik', mapel:'Bahasa Indonesia', jenis:'Ulangan Harian', nilai:83},
   {id:'s2', tanggal:'2026-09-11', bidang:'Diniyah', mapel:'Tahsin & Tajwid', jenis:'Ujian', nilai:84},
   {id:'s2', tanggal:'2026-09-21', bidang:'Akademik', mapel:'IPS', jenis:'Ujian', nilai:85},
+  {id:'s3', tanggal:'2026-09-16', bidang:'Diniyah', mapel:'Tahsin & Tajwid', jenis:'Ujian', nilai:93},
+  {id:'s3', tanggal:'2026-09-28', bidang:'Akademik', mapel:'Bahasa Inggris', jenis:'Ujian', nilai:87},
+  {id:'s3', tanggal:'2026-09-30', bidang:'Ekstrakurikuler', mapel:'Teknologi Informasi (IT)', jenis:'Proyek', nilai:90},
+  {id:'s3', tanggal:'2026-10-02', bidang:'Ekstrakurikuler', mapel:'Kewirausahaan', jenis:'Praktik', nilai:88},
+  {id:'s1', tanggal:'2026-09-30', bidang:'Ekstrakurikuler', mapel:'Teknologi Informasi (IT)', jenis:'Proyek', nilai:85},
 ];
 const PILLARS = [
   {key:'haf', abbr:'HAF', label:'Hafalan', grp:'diniyah'},
@@ -462,6 +476,29 @@ const PILLARS = [
   {key:'akh', abbr:'AKH', label:'Akhlak', grp:'diniyah'},
   {key:'akd', abbr:'AKD', label:'Akademik', grp:'akademik'},
   {key:'bhs', abbr:'BHS', label:'Bahasa', grp:'akademik'},
+];
+// ---- Rapor bidang: the three groups are FIXED; the subjects (mapel) inside each are
+//      DYNAMIC — the admin defines them in the "Mapel" sheet tab (bidang, mapel).
+const BIDANG = [
+  {key:'Diniyah', title:'Tahfidz & Diniyah', head:'Aspek Penilaian'},
+  {key:'Akademik', title:'Akademik', head:'Mata Pelajaran'},
+  {key:'Ekstrakurikuler', title:'Ekstrakurikuler', head:'Mata Pelajaran'},
+];
+function normBidang(b){ b=String(b||'').toLowerCase(); if(/ekstra|ekskul/.test(b)) return 'Ekstrakurikuler'; if(/akad/.test(b)) return 'Akademik'; if(/dini|tahfi|diniyah/.test(b)) return 'Diniyah'; return ''; }
+// Built-in demo subject definitions; overridden by the "Mapel" sheet when configured.
+const MAPEL = [
+  {bidang:'Diniyah', mapel:'Tahfidz (Ziyadah)'},
+  {bidang:'Diniyah', mapel:'Tahsin & Tajwid'},
+  {bidang:'Diniyah', mapel:'Muroja’ah'},
+  {bidang:'Diniyah', mapel:'Mutun Ilmiyah'},
+  {bidang:'Diniyah', mapel:'Akhlak'},
+  {bidang:'Akademik', mapel:'Matematika'},
+  {bidang:'Akademik', mapel:'IPA (Sains)'},
+  {bidang:'Akademik', mapel:'IPS'},
+  {bidang:'Akademik', mapel:'Bahasa Indonesia'},
+  {bidang:'Akademik', mapel:'Bahasa Inggris'},
+  {bidang:'Ekstrakurikuler', mapel:'Teknologi Informasi (IT)'},
+  {bidang:'Ekstrakurikuler', mapel:'Kewirausahaan'},
 ];
 
 function grade(n){
@@ -481,12 +518,12 @@ class Component extends DCLogic {
     formId:'1FAIpQLScSAMPLEFORMIDxxxxxxxxxxxxxxxxxxxxxxx',
     sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
     clerkReady:false, userName:'', entryOpen:false, configOpen:false,
-    nilai:null, raporOpen:false,
+    nilai:null, mapelDef:null, raporOpen:false,
   };
 
   // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
   //      the demo RAW until a viewable sheet + "Roster" tab are configured.
-  componentDidMount(){ if((this.state.sheetId||'').trim()){ this.loadRoster(); this.loadNilai(); } this.initClerk(); }
+  componentDidMount(){ if((this.state.sheetId||'').trim()){ this.loadRoster(); this.loadNilai(); this.loadMapel(); } this.initClerk(); }
 
   // ---- Auth: Clerk (client-side). Reads the signed-in user's role from
   //      publicMetadata.role (admin/mudir/musyrif); falls back to the demo
@@ -547,6 +584,19 @@ class Component extends DCLogic {
       const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); return {id:String(o.id!=null?o.id:''), tanggal:o.tanggal!=null?String(o.tanggal):'', bidang:o.bidang||'', mapel:o.mapel||'', jenis:o.jenis||'', nilai:num(o.nilai)}; }).filter(x=>x.id&&x.mapel);
       this.setState({nilai:rows.length?rows:null});
     }catch(e){ console.error('loadNilai failed', e); this.setState({nilai:null}); }
+  }
+
+  async loadMapel(){
+    const id=(this.state.sheetId||'').trim();
+    if(!id){ this.setState({mapelDef:null}); return; }
+    try{
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&sheet=Mapel';
+      const text=await (await fetch(url)).text();
+      const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
+      const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
+      const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); return {bidang:o.bidang||'', mapel:o.mapel||''}; }).filter(x=>x.bidang&&x.mapel);
+      this.setState({mapelDef:rows.length?rows:null});
+    }catch(e){ console.error('loadMapel failed', e); this.setState({mapelDef:null}); }
   }
 
   mapRow(o){
@@ -694,11 +744,26 @@ class Component extends DCLogic {
     const roleLabel = st.role==='admin'?'Admin':st.role==='mudir'?'Mudir':st.role==='musyrif'?'Musyrif':'Publik';
     const activeNilai = (st.nilai&&st.nilai.length)?st.nilai:NILAI;
     const selNilaiRows = sel ? activeNilai.filter(n=>n.id===sel.id).slice().sort((a,b)=>(b.tanggal||'').localeCompare(a.tanggal||'')).map(n=>{ const g=grade(n.nilai); return {...n, pred:g.name, pcolor:g.c}; }) : [];
-    // Rapor tables: break down by mata pelajaran from the Nilai records (avg per mapel), not the single aggregate score
-    const mapelRows = (bidangRe)=> { const by={}; activeNilai.filter(n=>n.id===sel.id && bidangRe.test(n.bidang||'')).forEach(n=>{ (by[n.mapel]=by[n.mapel]||[]).push(n.nilai); }); return Object.keys(by).sort((a,b)=>a.localeCompare(b)).map(m=>{ const arr=by[m], avg=Math.round(arr.reduce((x,y)=>x+y,0)/arr.length), g=grade(avg); return {label:m, score:avg, pname:g.name, color:g.c}; }); };
-    const akademikRows = sel ? mapelRows(/akad/i) : [];
-    // Diniyah: per-mapel test averages, plus Akhlak (an assessment/credit, not a test) from the roster
-    const diniyahRows = sel ? (()=>{ const rows=mapelRows(/dini/i); if(rows.length){ const akh=sel.pillars.find(p=>p.abbr==='AKH'); if(akh && !rows.some(r=>/akhlak/i.test(r.label))) rows.push({label:akh.label, score:akh.score, pname:akh.pname, color:akh.color}); } return rows; })() : [];
+    // Rapor tables: subjects are DYNAMIC (defined in the "Mapel" sheet, falling back to the demo MAPEL);
+    // the three bidang groups are FIXED. Each subject's score is the average of that santri's Nilai
+    // records for it; Akhlak (a credit, not a test) falls back to the roster aggregate.
+    const activeMapel = (st.mapelDef&&st.mapelDef.length)?st.mapelDef:MAPEL;
+    const raporRows = (bidangKey)=>{
+      if(!sel) return [];
+      const defs = activeMapel.filter(d=>normBidang(d.bidang)===bidangKey).map(d=>d.mapel);
+      const nil = activeNilai.filter(n=>n.id===sel.id && normBidang(n.bidang)===bidangKey);
+      const list = defs.length ? defs : Array.from(new Set(nil.map(n=>n.mapel)));
+      return list.map(mapel=>{
+        const arr = nil.filter(n=>n.mapel===mapel).map(n=>n.nilai);
+        let v = arr.length ? Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) : null;
+        if(v==null && bidangKey==='Diniyah' && /akhlak/i.test(mapel)){ const akh=sel.pillars.find(p=>p.abbr==='AKH'); if(akh) v=akh.score; }
+        if(v==null) return {label:mapel, score:'—', pname:'Belum dinilai', color:'#9aa1ad'};
+        const g=grade(v); return {label:mapel, score:v, pname:g.name, color:g.c};
+      });
+    };
+    const diniyahRows = raporRows('Diniyah');
+    const akademikRows = raporRows('Akademik');
+    const ekskulRows = raporRows('Ekstrakurikuler');
 
     return {
       view:v, role:st.role, roleLabel, userName:st.userName, greeting: st.userName?('Halo, '+st.userName):'',
@@ -716,8 +781,8 @@ class Component extends DCLogic {
       selNilai:selNilaiRows, hasNilai:selNilaiRows.length>0, noNilai:!selNilaiRows.length,
       // report card (admin only)
       term:TERM, canRapor: st.role==='admin', raporOpen:st.raporOpen,
-      raporDiniyah: diniyahRows.length ? diniyahRows : (sel ? sel.pillars.filter(p=>p.grp==='diniyah') : []),
-      raporAkademik: akademikRows.length ? akademikRows : (sel ? sel.pillars.filter(p=>p.grp==='akademik') : []),
+      raporDiniyah: diniyahRows, raporAkademik: akademikRows,
+      raporEkskul: ekskulRows, hasEkskul: ekskulRows.length>0,
       raporNote: sel ? ('Alhamdulillah, capaian '+sel.nick+' pada semester ini tergolong '+sel.gName+'. '+(sel.overall>=85?'Pertahankan dan tingkatkan terus, istiqamah dalam menghafal serta belajar.':'Teruslah bersemangat memperbaiki hafalan, muraja’ah, dan nilai akademik.')) : '',
       openRapor:()=>this.setState({raporOpen:true}),
       closeRapor:()=>this.setState({raporOpen:false}),
@@ -753,7 +818,7 @@ class Component extends DCLogic {
       setFormId:(ev)=>this.setState({formId:ev.target.value}),
       dataStatus, sheetId:st.sheetId,
       setSheetId:(ev)=>this.setState({sheetId:ev.target.value}),
-      reloadRoster:()=>{ this.loadRoster(); this.loadNilai(); },
+      reloadRoster:()=>{ this.loadRoster(); this.loadNilai(); this.loadMapel(); },
     };
   }
 }

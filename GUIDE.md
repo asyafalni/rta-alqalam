@@ -20,13 +20,17 @@ academics, reporting).
  ┌───────────────────────────────┐
  │  PRIVATE sheet  (source truth)│   restricted access — staff only
  │  ├─ tab: Setoran (Form resp.) │   raw per-event submissions
- │  └─ tab: Master               │   one row per santri (public cols A–P + private cols Q+)
+ │  ├─ tab: Master               │   one row per santri (public cols A–P + private cols Q+)
+ │  ├─ tab: Nilai                │   one row per test (Diniyah/Akademik/Ekstrakurikuler)
+ │  └─ tab: Mapel                │   subject definitions per group (bidang, mapel)
  └───────────────┬───────────────┘
                  │  IMPORTRANGE (one-way, authorized once)
                  ▼
  ┌───────────────────────────────┐
  │  PUBLIC sheet   (reference)   │   "Anyone with link → Viewer"
- │  └─ tab: Roster               │   ONLY the 16 public columns, mirrored live
+ │  ├─ tab: Roster               │   ONLY the 16 public columns, mirrored live
+ │  ├─ tab: Nilai                │   per-test scores, mirrored live
+ │  └─ tab: Mapel                │   subject definitions, mirrored live
  └───────────────┬───────────────┘
                  │  GViz JSON (no API key)
                  ▼
@@ -96,12 +100,42 @@ One row per test/exam, Islamic **or** secular. Headers in row 1:
 | s1 | 2026-09-19 | Akademik | Matematika | Ujian | 84 |
 | s1 | 2026-09-12 | Diniyah | Tahsin & Tajwid | Setoran | 88 |
 
-- `id` matches the santri id in `Master`. `bidang` = `Diniyah` or `Akademik`. `nilai` is 0–100.
+- `id` matches the santri id in `Master`. `bidang` = **`Diniyah`**, **`Akademik`**, or
+  **`Ekstrakurikuler`** (one of the three fixed groups — see §2d). `mapel` must match a subject you
+  defined in the `Mapel` tab. `nilai` is 0–100.
 - Mirror it to the **PUBLIC** sheet as a second tab named exactly `Nilai`:
   `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Nilai!A1:F"), "where Col1 is not null", 1)`
 - The tracker reads it automatically (same Sheet ID) → shown on each student’s detail as
   **Riwayat Nilai**, and used by the **Rapor** (report card, Admin only) together with the roster
   scores. Until the tab exists, the tracker uses built-in demo records.
+
+---
+
+### 2d. Tab `Mapel` (subject definitions) — **what subjects the Rapor tracks**
+The **three groups are fixed in the app** — `Tahfidz & Diniyah`, `Akademik`, `Ekstrakurikuler` — but
+**you decide which subjects live inside each group.** Define them here, one row per subject:
+
+| bidang | mapel |
+|--------|-------|
+| Diniyah | Tahfidz (Ziyadah) |
+| Diniyah | Tahsin & Tajwid |
+| Diniyah | Akhlak |
+| Akademik | Matematika |
+| Akademik | IPA (Sains) |
+| Ekstrakurikuler | Teknologi Informasi (IT) |
+| Ekstrakurikuler | Kewirausahaan |
+
+- `bidang` **must be one of** `Diniyah` / `Akademik` / `Ekstrakurikuler` (case-insensitive; `Tahfidz`,
+  `Ekskul` also accepted). Any other value is ignored.
+- `mapel` is the subject name shown on the Rapor — spell it **exactly** as you'll type it in the
+  `Nilai` tab (the tracker matches subject to score by this text).
+- The Rapor lists **every** defined subject per group; a subject with no `Nilai` record yet shows
+  `—` / *Belum dinilai*. **`Akhlak`** is special — define it under `Diniyah` and it takes its score
+  from the `akh` column in `Master` (it's a character credit, not a test).
+- `Ekstrakurikuler` is optional: if you define no ekskul subjects, section **C** is omitted from the Rapor.
+- Mirror to the **PUBLIC** sheet as a tab named exactly `Mapel`:
+  `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Mapel!A1:B"), "where Col1 is not null", 1)`
+- Until the tab exists, the tracker uses a built-in demo subject list.
 
 ---
 
