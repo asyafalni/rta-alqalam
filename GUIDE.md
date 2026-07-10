@@ -500,41 +500,46 @@ what lets a public viewer see data derived from a sheet they cannot open.
 
 ---
 
-## 5. Write path — **three** input forms
+## 5. Write path — **three custom input forms** (all POST via a pre-filled link)
 
-There are **three** input forms, wired in **Konfigurasi → 📝 Google Form**:
+All three inputs are **custom in-app forms** — the tracker draws its own beautiful UI and **POSTs** to a
+hidden Google Form. Nobody ever opens the Google Forms; they're just write-endpoints. So each is
+configured with a **pre-filled link** (which carries the field `entry.####` IDs the app needs):
 
-| Form | How the app uses it | Config field |
-|------|---------------------|--------------|
-| **A — Setoran Harian** | **Embedded** (+ Input toggle) — humans fill it | **Form ID** *(or any form link)* |
-| **B — Nilai Ujian/Tes** | **Embedded** (+ Input toggle) — humans fill it | **Form ID** *(or any form link)* |
-| **C — Absensi** | **Background write endpoint** — the app POSTs to it from the Absensi screen | **pre-filled link** |
+| In-app form | Where | Config value |
+|-------------|-------|--------------|
+| **A — Setoran Harian** | **+ Input** toggle | **pre-filled link** |
+| **B — Nilai Ujian/Tes** | **+ Input** toggle | **pre-filled link** |
+| **C — Absensi** | admin **Absensi** button | **pre-filled link** |
 
-Forms A & B **embed** the real Google Form in the tracker (mobile-friendly, native validation), so the
-app only needs the **Form ID** to build the embed URL — you can paste the bare ID *or* any form link
-(`/viewform` URL, even a pre-filled link) and the app extracts the ID. Form C is **never opened by a
-human** — the app POSTs to it with its own UI — so it needs the field **entry IDs**, which only a
-**pre-filled link** carries (that's why C is different, not just a preference). In the tracker,
-**+ Input** opens a slide-over with a **Setoran Harian / Nilai Ujian-Tes** toggle; **Absensi** is its
-own admin-only button.
+For **each** form: build a Google Form whose questions are titled exactly like the keys below (any
+question type works — nobody fills it by hand), link it to the Private sheet and rename its response
+tab, then paste its **pre-filled link** into the matching row of the **`Config`** tab (§6).
 
-> **Title each question exactly like the column key** (`id`, `tanggal`, `nilai`, …) and the form's
-> linked response tab is already app-ready — no reshaping (see the walkthrough's "one trick").
+> **Building the pre-fill (the app reads the entry IDs from it):** in the form, **⋮ → Get pre-filled
+> link**, and fill each field with the **`__KEY__` sentinel** matching its title — `id` → `__ID__`,
+> `tanggal` → `__TANGGAL__`, `juz` → `__JUZ__`, `nilai` → `__NILAI__`, etc. — then **Get link** and
+> copy the URL. (A `Date` question can't hold a sentinel — the app detects it by its `_year` part, so
+> just pick any date there. Same for `Time`/`_hour`.) The app maps `entry.### → field` automatically.
 
-**Form A — Setoran Harian** (daily / frequent; Musyrif & Mudir). Question titles **must be exactly** the key:
+**Form A — Setoran Harian** (daily; Musyrif & Mudir). Question titles = the keys:
 
-| Question title | Google Forms type | Required | Options / validation |
-|----------------|-------------------|----------|----------------------|
-| `id`      | **Dropdown**        | ✅ | options = the bare santri ids: `s1`, `s2`, … (see note below) |
-| `tanggal` | **Date**            | ✅ | date picker (leave *Include time* off) |
-| `jenis`   | **Multiple choice** | ✅ | `Ziyadah` · `Muroja'ah` · `Tahsin` |
-| `juz`     | **Short answer**    | ✅ | Response validation → **Number → Between 1 and 30** |
-| `halaman` | **Short answer**    | ✅ | e.g. `hal. 3–4` or `205` |
-| `surah`   | **Short answer**    | ⬜ | *optional* — surah no.; Response validation → **Number → Between 1 and 114** |
-| `ayat_dari` | **Short answer**  | ⬜ | *optional* — first ayat (**Number**) |
-| `ayat_ke` | **Short answer**    | ⬜ | *optional* — last ayat (**Number**); a single ayat → same value as `ayat_dari` |
-| `nilai`   | **Rating** (★ 1–5)  | ✅ | daily quality, 1–5 stars — shown as ★ on the Riwayat Setoran card (scale ×20 for §2e) |
-| `catatan` | **Paragraph**       | ⬜ | free note |
+| Question title | Type (any) | Pre-fill value |
+|----------------|------------|----------------|
+| `id`      | Short answer / Dropdown | `__ID__` |
+| `tanggal` | Short answer / Date | `__TANGGAL__` (or any date if Date type) |
+| `jenis`   | Short answer / Multiple choice | `__JENIS__` |
+| `juz`     | Short answer | `__JUZ__` |
+| `halaman` | Short answer | `__HALAMAN__` |
+| `surah`   | Short answer *(optional)* | `__SURAH__` |
+| `ayat_dari` | Short answer *(optional)* | `__AYAT_DARI__` |
+| `ayat_ke` | Short answer *(optional)* | `__AYAT_KE__` |
+| `nilai`   | Short answer *(the app sends the ★1–5 rating as a number)* | `__NILAI__` |
+| `catatan` | Short answer *(optional)* | `__CATATAN__` |
+
+The app's Setoran form has a **★1–5 rating picker** for `nilai`, a jenis selector, and the surah/ayat
+fields — shown on the Riwayat Setoran card as **`QS 11:6–24`** / **`QS 11:41`** / **`QS 11 · 1 surah
+penuh`** (see §2a). Only **`id`** and **`tanggal`** are required in the pre-fill for the app to accept it.
 
 The app shows surah + ayat on the Riwayat Setoran card as **`QS 11:6–24`** (range), **`QS 11:41`**
 (single ayat → set `ayat_dari` = `ayat_ke`), or **`QS 11 · 1 surah penuh`** when `surah` is filled but
@@ -543,59 +548,35 @@ both ayat fields are blank (whole surah). Question titles can be `ayat_dari`/`ay
 
 → Link to the **Private** spreadsheet → rename the response tab to **`Setoran`** (§2a).
 
-**Form B — Nilai Ujian/Tes** (periodic: weekly → 6-monthly; Mudir for Diniyah, guru for Akademik):
+**Form B — Nilai Ujian/Tes** (periodic; Mudir for Diniyah, guru for Akademik). Titles = keys:
 
-| Question title | Google Forms type | Required | Options / validation |
-|----------------|-------------------|----------|----------------------|
-| `id`      | **Dropdown**        | ✅ | the bare santri ids |
-| `tanggal` | **Date**            | ✅ | date picker |
-| `bidang`  | **Multiple choice** | ✅ | `Diniyah` · `Akademik` · `Ekstrakurikuler` |
-| `mapel`   | **Dropdown**        | ✅ | the subjects you listed in the `Mapel` tab (§2d) |
-| `jenis`   | **Multiple choice** | ✅ | `Tes / Kuis` · `UTS` · `UAS` · `Praktik` · … |
-| `nilai`   | **Short answer**    | ✅ | Response validation → **Number → Between 0 and 100** |
+| Question title | Type (any) | Pre-fill value |
+|----------------|------------|----------------|
+| `id`      | Short answer / Dropdown | `__ID__` |
+| `tanggal` | Short answer / Date | `__TANGGAL__` |
+| `bidang`  | Short answer / Multiple choice | `__BIDANG__` |
+| `mapel`   | Short answer / Dropdown | `__MAPEL__` |
+| `jenis`   | Short answer | `__JENIS__` |
+| `nilai`   | Short answer | `__NILAI__` |
 
-→ Link to the **Private** spreadsheet → rename the response tab to **`Nilai`** (§2c). No reshape
-needed — the app reads by header and ignores the `Timestamp` column.
+The app's Nilai form gives a **bidang selector** and a **mapel dropdown** filled from your `Mapel` tab
+(§2d). → Link to the Private sheet → rename its response tab to **`Nilai`** (§2c).
 
-**Form C — Absensi** *(optional; §2f)*. **Nobody ever opens this form** — the admin uses the app's own
-**Absensi** screen; the form is just the invisible **write endpoint** the app POSTs to. The app handles
-Date/Time correctly (splitting them the way Google expects), so use the **same input types as Forms
-A/B** — consistent, and the raw sheet gets clean typed data:
+**Form C — Absensi** *(§2f)*. Titles = keys: `id`, `tanggal`, `status`, `jam`, `reason`. → Link →
+rename response tab to **`Absensi`**. For the pre-fill, Absensi is extra-forgiving — you can use the
+`__KEY__` sentinels **or** a **real example** (`id`=`s1`, `tanggal`=`2026-07-10`, `status`=`Izin`,
+`jam`=`15:00`, `reason`=anything); the app detects fields by value pattern too.
 
-| Question title | Google Forms type | Required | Notes |
-|----------------|-------------------|----------|-------|
-| `id`      | **Dropdown**        | ✅ | the bare santri ids |
-| `tanggal` | **Date**            | ✅ | date picker |
-| `status`  | **Multiple choice** | ✅ | `Sakit` · `Izin` · `Alpa` (only absences are recorded) |
-| `jam`     | **Time**            | ⬜ | mid-day time |
-| `reason`  | **Paragraph**       | ⬜ | why absent |
+> **Pre-fill tips (all three forms)**
+> - **`id`** in the pre-fill must be a bare id like `s1` (or `__ID__`) — the app sends the santri id.
+> - A **`Date`** question can't hold `__TANGGAL__`; just pick any date — the app finds it by its
+>   `_year` part and posts the date correctly. Same for a **`Time`** `jam` (`_hour`).
+> - Only **`id`** + **`tanggal`** are required for the app to accept the link; the rest are optional.
+> - ⚠️ **Publish the form and set Responders → "Anyone"** (Settings) — an org-restricted form returns
+>   `401` and the POST silently fails. Email collection off, no "Limit to 1 response".
 
-→ Link to the **Private** spreadsheet → rename the response tab to **`Absensi`**.
-
-**Wire it to the app (one paste):** in the form, **⋮ → Get pre-filled link**, then fill it with a
-**real example** — `id` = a santri like `s1`, `tanggal` = `2026-07-10`, `status` = `Izin`, `jam` =
-`15:00`, `reason` = anything (e.g. `Dijemput orang tua`) — **Get link**, and paste that URL into
-**Konfigurasi → Absensi (pre-filled link)**. The app auto-detects each field by its **value pattern**
-(date `YYYY-MM-DD` → `tanggal`, `HH:MM` → `jam`, a status word → `status`, `s`+number → `id`, the
-leftover → `reason`) — **no per-field IDs to copy**. Konfigurasi shows **✓ Form absensi terhubung** when
-it parsed. *(Prefer Short answer everywhere with `__ID__`/`__TANGGAL__`/… sentinels? That still works too.
-Or just type the tab by hand — the quick-log logs in-session regardless.)*
-
-> **Field-type tips**
-> - **Dropdown vs Multiple choice:** use a **Dropdown** for long lists (`id`, `mapel`); **Multiple
->   choice** (radio buttons) for short fixed lists (`jenis`, `bidang`, `status`) — faster to tap on mobile.
-> - **`id` options must be the bare id** (`s3`), **not** `s3 — Zaid` — the value is matched against
->   `Master` exactly. Keep a printed id↔name cheat-sheet for staff, or add a separate (ignored) "nama" question.
-> - **Number validation** lives at the question's **⋮ menu → Response validation → Number → Between**.
-> - **Always use the `Date` type for `tanggal`** (not short answer) — it stores a real date the app parses.
-> - Turn on **Required** for `id`, `tanggal`, and the value field (`nilai`/`status`).
-> - Titles are matched case-insensitively, so `Tanggal` also works — but keep them lowercase for clarity.
-
-**Wire all three in Konfigurasi** — **Dashboard → ⚙️ Konfigurasi → 📝 Google Form:**
-1. **Form Setoran Harian** → paste Form A's **Form ID** *or* its form link (`.../forms/d/e/`**`ID`**`/viewform`) — the app extracts the ID.
-2. **Form Nilai Ujian/Tes** → paste Form B's **Form ID** or link.
-3. **Absensi — pre-filled link** → paste Form C's **pre-filled link** (built as described above). It
-   shows **✓ Form absensi terhubung** once parsed.
+**Wire all three in the `Config` tab** (§6) — paste each **pre-filled link** into its row: `setoran`,
+`nilai`, `absensi`. Konfigurasi then shows each as **✓ terhubung**.
 
 Each is independent — configure one now and the rest later. Until set, that input shows a "belum
 dikonfigurasi" prompt (Setoran/Nilai) or logs in-session only (Absensi).
@@ -613,9 +594,9 @@ what's active — to change anything, you edit the sheet and press **↻ Muat Ul
    | key | value |
    |-----|-------|
    | `sheet_id` | *(blank = use this same sheet for the data tabs, or paste another PUBLIC sheet ID)* |
-   | `setoran`  | Setoran form **ID or link** |
-   | `nilai`    | Nilai form **ID or link** |
-   | `absensi`  | Absensi **pre-filled link** (§5, Form C) |
+   | `setoran`  | Setoran form **pre-filled link** (§5) |
+   | `nilai`    | Nilai form **pre-filled link** (§5) |
+   | `absensi`  | Absensi **pre-filled link** (§5) |
 
 2. Put the **Config sheet's ID** into `CONFIG_ID` in the code (it can be the same public sheet that
    holds `Roster`/`Nilai`/… — then leave `sheet_id` blank).
