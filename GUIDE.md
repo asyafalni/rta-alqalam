@@ -506,14 +506,17 @@ There are **three** input forms, wired in **Konfigurasi → 📝 Google Form**:
 
 | Form | How the app uses it | Config field |
 |------|---------------------|--------------|
-| **A — Setoran Harian** | **Embedded** (+ Input toggle) — humans fill it | **Form ID** |
-| **B — Nilai Ujian/Tes** | **Embedded** (+ Input toggle) — humans fill it | **Form ID** |
+| **A — Setoran Harian** | **Embedded** (+ Input toggle) — humans fill it | **Form ID** *(or any form link)* |
+| **B — Nilai Ujian/Tes** | **Embedded** (+ Input toggle) — humans fill it | **Form ID** *(or any form link)* |
 | **C — Absensi** | **Background write endpoint** — the app POSTs to it from the Absensi screen | **pre-filled link** |
 
-Forms A & B embed in the tracker (mobile-friendly, native validation); you only need each **Form ID**.
-Form C is never opened by a human — the app writes to it — so instead of a Form ID you paste its
-**pre-filled link** (see Form C below). In the tracker, **+ Input** opens a slide-over with a
-**Setoran Harian / Nilai Ujian-Tes** toggle; **Absensi** is its own admin-only button.
+Forms A & B **embed** the real Google Form in the tracker (mobile-friendly, native validation), so the
+app only needs the **Form ID** to build the embed URL — you can paste the bare ID *or* any form link
+(`/viewform` URL, even a pre-filled link) and the app extracts the ID. Form C is **never opened by a
+human** — the app POSTs to it with its own UI — so it needs the field **entry IDs**, which only a
+**pre-filled link** carries (that's why C is different, not just a preference). In the tracker,
+**+ Input** opens a slide-over with a **Setoran Harian / Nilai Ujian-Tes** toggle; **Absensi** is its
+own admin-only button.
 
 > **Title each question exactly like the column key** (`id`, `tanggal`, `nilai`, …) and the form's
 > linked response tab is already app-ready — no reshaping (see the walkthrough's "one trick").
@@ -589,8 +592,8 @@ Or just type the tab by hand — the quick-log logs in-session regardless.)*
 > - Titles are matched case-insensitively, so `Tanggal` also works — but keep them lowercase for clarity.
 
 **Wire all three in Konfigurasi** — **Dashboard → ⚙️ Konfigurasi → 📝 Google Form:**
-1. **Form Setoran Harian** → paste Form A's **Form ID** (`.../forms/d/e/`**`ID`**`/viewform`).
-2. **Form Nilai Ujian/Tes** → paste Form B's **Form ID**.
+1. **Form Setoran Harian** → paste Form A's **Form ID** *or* its form link (`.../forms/d/e/`**`ID`**`/viewform`) — the app extracts the ID.
+2. **Form Nilai Ujian/Tes** → paste Form B's **Form ID** or link.
 3. **Absensi — pre-filled link** → paste Form C's **pre-filled link** (built as described above). It
    shows **✓ Form absensi terhubung** once parsed.
 

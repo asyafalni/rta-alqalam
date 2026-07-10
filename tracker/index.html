@@ -523,12 +523,12 @@
         <p style="font-size:12.5px;color:#6b7280;margin:0 0 16px;line-height:1.5">Hubungkan tracker ke Google Form (jalur input) dan Google Sheet publik (jalur baca).</p>
         <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:18px;margin-bottom:14px">
           <div style="font-weight:800;font-size:13.5px;margin-bottom:4px">📝 Google Form — jalur input</div>
-          <p style="font-size:11.5px;color:#9aa1ad;margin:0 0 12px;line-height:1.5">Tiga jalur input. Isi <b>Form ID</b> (bagian .../forms/d/e/<b>ID</b>/viewform) untuk <b>Setoran Harian</b> → tab <code>Setoran</code> dan <b>Nilai Ujian/Tes</b> → tab <code>Nilai</code>. Untuk <b>Absensi</b> → tab <code>Absensi</code>, isi <b>pre-filled link</b> (lihat GUIDE §5).</p>
+          <p style="font-size:11.5px;color:#9aa1ad;margin:0 0 12px;line-height:1.5">Tiga jalur input. Untuk <b>Setoran Harian</b> → tab <code>Setoran</code> dan <b>Nilai Ujian/Tes</b> → tab <code>Nilai</code>, tempel <b>Form ID atau link form</b> (form ditampilkan langsung di app). Untuk <b>Absensi</b> → tab <code>Absensi</code>, tempel <b>pre-filled link</b> (app menulis di balik layar; lihat GUIDE §5).</p>
           <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Form Setoran Harian
-            <input value="{{ setoranFormId }}" onInput="{{ setSetoranFormId }}" placeholder="ID form setoran harian" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
+            <input value="{{ setoranFormId }}" onInput="{{ setSetoranFormId }}" placeholder="Form ID atau link — setoran harian" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
           </label>
           <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Form Nilai Ujian/Tes
-            <input value="{{ nilaiFormId }}" onInput="{{ setNilaiFormId }}" placeholder="ID form nilai ujian/tes" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
+            <input value="{{ nilaiFormId }}" onInput="{{ setNilaiFormId }}" placeholder="Form ID atau link — nilai ujian/tes" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
           </label>
           <label style="font-size:11.5px;color:#6b7280;display:block">Absensi — <b>pre-filled link</b> <span style="color:#9aa1ad">(dipakai tombol Absensi; lihat GUIDE §2f)</span>
             <input value="{{ kehLink }}" onInput="{{ setKehLink }}" placeholder="https://docs.google.com/forms/d/e/.../viewform?entry.123=__ID__&entry.456=__TANGGAL__&..." style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12px;font-family:ui-monospace,monospace;color:#16264d" />
@@ -705,6 +705,9 @@ const KEHADIRAN = [
 function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function nowHM(){ const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 // Parse a Kehadiran Google Form "pre-filled link" → POST action + field map. Works whether the
+// Pull a Google Form ID from anything the user pastes: a bare ID, a /viewform URL, or a
+// pre-filled link. So all three form fields accept the same kinds of input.
+function extractFormId(s){ s=String(s||'').trim(); const m=s.match(/forms\/d\/e\/([^\/?#]+)/)||s.match(/forms\/d\/([^\/?#]+)/); return m?m[1]:s; }
 // questions are Dropdown/Date/Time or plain Short answer: Date fields are detected by the
 // entry.N_year part, Time by entry.N_hour; status/reason by value or sentinel; whatever single
 // value is left over = id (so any id format works).
@@ -1128,7 +1131,7 @@ class Component extends DCLogic {
     const activeMapel = (st.mapelDef&&st.mapelDef.length)?st.mapelDef:MAPEL;
     const raporHafalanNote = sel ? (sel.juz+' dari 15 juz ('+sel.juzPct+'%) · sedang menghafal Juz '+sel.curJuz + (sel.hasPage?(' · halaman '+sel.curpg+'/'+MUSHAF_PAGES+', ± '+sel.pgLeft+' hlm lagi menuju Juz '+sel.pgNextJuz):'') + (sel.overTarget?' · melampaui target':'')) : '';
     const entryKind = st.entryKind||'setoran';
-    const activeFormId = entryKind==='nilai' ? (st.nilaiFormId||'') : (st.setoranFormId||'');
+    const activeFormId = extractFormId(entryKind==='nilai' ? (st.nilaiFormId||'') : (st.setoranFormId||''));
     const formConfigured = !!activeFormId && activeFormId.indexOf('SAMPLE')<0;
     const raporRows = (bidangKey)=>{
       if(!sel) return [];
