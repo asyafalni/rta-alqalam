@@ -453,18 +453,55 @@ slide-over with a **Setoran Harian / Nilai Ujian-Tes** toggle, each showing its 
 > **Title each question exactly like the column key** (`id`, `tanggal`, `nilai`, …) and the form's
 > linked response tab is already app-ready — no reshaping (see the walkthrough's "one trick").
 
-**Form A — Setoran Harian** (daily / frequent; Musyrif & Mudir)
-1. Questions, titled exactly: `id` (Dropdown of santri ids), `tanggal` (Date), `jenis`
-   (Ziyadah / Muroja'ah / Tahsin), `juz`, `halaman`, `catatan`, optional `nilai` (daily quality).
-2. Link to the **Private** spreadsheet → rename the response tab to **`Setoran`** (§2a). Use it to
-   keep the `Master` hafalan/juz columns current (manual or §2e formula).
+**Form A — Setoran Harian** (daily / frequent; Musyrif & Mudir). Question titles **must be exactly** the key:
 
-**Form B — Nilai Ujian/Tes** (periodic: weekly → 6-monthly; Mudir for Diniyah, guru for Akademik)
-1. Questions, titled exactly: `id` (Dropdown), `tanggal` (Date), `bidang`
-   (Diniyah / Akademik / Ekstrakurikuler), `mapel` (match §2d), `jenis` (Ulangan Harian / UTS / UAS …),
-   `nilai` (0–100).
-2. Link to the **Private** spreadsheet → rename the response tab to **`Nilai`** (§2c). No reshape
-   needed — the app reads `id, tanggal, bidang, mapel, jenis, nilai` by header and ignores `Timestamp`.
+| Question title | Google Forms type | Required | Options / validation |
+|----------------|-------------------|----------|----------------------|
+| `id`      | **Dropdown**        | ✅ | options = the bare santri ids: `s1`, `s2`, … (see note below) |
+| `tanggal` | **Date**            | ✅ | date picker (leave *Include time* off) |
+| `jenis`   | **Multiple choice** | ✅ | `Ziyadah` · `Muroja'ah` · `Tahsin` |
+| `juz`     | **Short answer**    | ✅ | Response validation → **Number → Between 1 and 30** |
+| `halaman` | **Short answer**    | ⬜ | free text, e.g. `hal. 3–4` or `205` |
+| `nilai`   | **Short answer**    | ⬜ | Response validation → **Number → Between 0 and 100** (daily quality; used by §2e) |
+| `catatan` | **Paragraph**       | ⬜ | free note |
+
+→ Link to the **Private** spreadsheet → rename the response tab to **`Setoran`** (§2a).
+
+**Form B — Nilai Ujian/Tes** (periodic: weekly → 6-monthly; Mudir for Diniyah, guru for Akademik):
+
+| Question title | Google Forms type | Required | Options / validation |
+|----------------|-------------------|----------|----------------------|
+| `id`      | **Dropdown**        | ✅ | the bare santri ids |
+| `tanggal` | **Date**            | ✅ | date picker |
+| `bidang`  | **Multiple choice** | ✅ | `Diniyah` · `Akademik` · `Ekstrakurikuler` |
+| `mapel`   | **Dropdown**        | ✅ | the subjects you listed in the `Mapel` tab (§2d) |
+| `jenis`   | **Multiple choice** | ✅ | `Ulangan Harian` · `UTS` · `UAS` · `Praktik` · … |
+| `nilai`   | **Short answer**    | ✅ | Response validation → **Number → Between 0 and 100** |
+
+→ Link to the **Private** spreadsheet → rename the response tab to **`Nilai`** (§2c). No reshape
+needed — the app reads by header and ignores the `Timestamp` column.
+
+**Form C — Kehadiran** *(optional, attendance; §2f)*. Not embedded in the app — staff fill it via its
+own Google Forms link, or you type the `Kehadiran` tab by hand:
+
+| Question title | Google Forms type | Required | Options / validation |
+|----------------|-------------------|----------|----------------------|
+| `id`      | **Dropdown**        | ✅ | the bare santri ids |
+| `tanggal` | **Date**            | ✅ | date picker |
+| `status`  | **Multiple choice** | ✅ | `Hadir` · `Sakit` · `Izin` · `Alpa` |
+| `reason`  | **Paragraph**       | ⬜ | why absent — fill for Sakit/Izin/Alpa |
+
+→ Link to the **Private** spreadsheet → rename the response tab to **`Kehadiran`**.
+
+> **Field-type tips**
+> - **Dropdown vs Multiple choice:** use a **Dropdown** for long lists (`id`, `mapel`); **Multiple
+>   choice** (radio buttons) for short fixed lists (`jenis`, `bidang`, `status`) — faster to tap on mobile.
+> - **`id` options must be the bare id** (`s3`), **not** `s3 — Zaid` — the value is matched against
+>   `Master` exactly. Keep a printed id↔name cheat-sheet for staff, or add a separate (ignored) "nama" question.
+> - **Number validation** lives at the question's **⋮ menu → Response validation → Number → Between**.
+> - **Always use the `Date` type for `tanggal`** (not short answer) — it stores a real date the app parses.
+> - Turn on **Required** for `id`, `tanggal`, and the value field (`nilai`/`status`).
+> - Titles are matched case-insensitively, so `Tanggal` also works — but keep them lowercase for clarity.
 
 3. Copy each **Form ID** — the `.../forms/d/e/`**`ID`**`/viewform` part of the URL.
 4. In the tracker: **Dashboard → ⚙️ Konfigurasi → Google Form** → paste both IDs
