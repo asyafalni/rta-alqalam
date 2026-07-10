@@ -75,15 +75,14 @@ New to Google Sheets/Forms? Follow these steps top to bottom. Sections §2–§7
    how every other tab links to the student, so keep it stable. Put private data (wali, phone, …)
    **from column R onward** (see the ⚠️ in §2b).
 
-### Step 3 — Add the `Nilai` and `Mapel` tabs
+### Step 3 — Add the `Mapel` tab
 1. Bottom-left **＋** to add a tab → name it **`Mapel`**. Row 1: `bidang` , `mapel`. List your
    subjects, one per row (which `bidang` values are allowed → **§2d**).
-2. Add another tab → **`Nilai`**. Row 1: `id  tanggal  bidang  mapel  jenis  nilai` (**§2c**). You can
-   leave it empty — **Form B** (Step 4) will fill it.
-   *(The `Setoran` tab is created automatically when you link Form A — don't add it by hand.)*
-3. *(Optional)* For attendance, add a **`Kehadiran`** tab. Row 1: `id  tanggal  status  reason` — one
-   row per santri per day, `status` = `Hadir`/`Sakit`/`Izin`/`Alpa` (default `Hadir`), `reason` = why
-   they were absent. Fill it by hand or from a small third form (**§2f**).
+
+> **That's the only tab you create by hand.** The `Setoran`, `Nilai`, and (optional) `Kehadiran` tabs
+> are **created automatically** when you link their forms in Step 4 — do **not** pre-create empty
+> versions, or you'll end up with duplicates. (Prefer to hand-build `Kehadiran` instead of a form?
+> Then add it here with row 1 `id  tanggal  status  reason` — §2f.)
 
 ### Step 4 — Build the two input Forms (why two → §5)
 For **each** form: **New → Google Forms** inside the folder.
@@ -102,11 +101,14 @@ used by the §2e formulas).
   answer (0–100).
 
 **Link each form to the PRIVATE sheet:** in the form, **Responses** tab → the green **Sheets** icon
-→ **Select existing spreadsheet** → pick `RTA Tracker — PRIVATE`.
-- Form A creates a response tab — rename that tab to **`Setoran`**.
-- Form B creates a response tab — rename it to **`Nilai`** (delete the empty `Nilai` you made in
-  Step 3 first, or just name Step 3's tab something else and rename this one to `Nilai`). The extra
-  `Timestamp` column it adds is harmless — the app ignores it.
+→ **Select existing spreadsheet** → pick `RTA Tracker — PRIVATE`. Each link creates **one** new tab —
+rename it to the app's name:
+- Form A's response tab → rename to **`Setoran`**.
+- Form B's response tab → rename to **`Nilai`**.
+- (Optional Form C's response tab → rename to **`Kehadiran`**.)
+
+The extra `Timestamp` column each form adds is harmless — the app ignores unrecognised columns. **One
+tab per form; no duplicates to maintain.**
 
 Send yourself one test submission through each form and confirm a row lands in the right tab.
 
