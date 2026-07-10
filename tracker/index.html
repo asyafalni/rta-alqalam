@@ -176,7 +176,7 @@
             <div style="font-weight:700;font-size:12px;color:#0a4631;margin:-8px 0 5px">Keterangan Ketidakhadiran</div>
             <div style="border:1px solid #e6e1d5;border-radius:8px;padding:8px 12px;margin-bottom:18px;font-size:11.5px">
               <sc-for list="{{ attNotes }}" as="a" hint-placeholder-count="2">
-                <div style="display:flex;flex-wrap:wrap;gap:4px 10px;padding:3px 0"><span style="flex:none;font-weight:800;color:{{ a.color }};min-width:44px">{{ a.label }}</span><span style="flex:none;color:#9aa1ad;min-width:82px">{{ a.tgl }}</span><span style="color:#333">{{ a.reason }}</span></div>
+                <div style="display:flex;flex-wrap:wrap;gap:4px 10px;padding:3px 0"><span style="flex:none;font-weight:800;color:{{ a.color }};min-width:44px">{{ a.label }}</span><span style="flex:none;color:#9aa1ad;min-width:110px">{{ a.tgl }}{{ a.waktu }}</span><span style="color:#333">{{ a.reason }}</span></div>
               </sc-for>
             </div>
           </sc-if>
@@ -402,6 +402,9 @@
         <span style="font-size:12.5px;color:#6b7280;font-weight:600;white-space:nowrap;margin-right:2px">{{ greeting }}</span>
         <button onClick="{{ goGallery }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Progres Santri</button>
         <button onClick="{{ goEntry }}" style="padding:8px 14px;border-radius:9px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer">+ Input</button>
+        <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ openKeh }}" style="padding:8px 14px;border-radius:9px;border:1px solid #0a4631;background:#eef4ee;color:#0a4631;font-weight:700;font-size:12.5px;cursor:pointer">Kehadiran</button>
+        </sc-if>
         <button onClick="{{ goConfig }}" title="Konfigurasi" style="width:36px;height:34px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#0a4631;cursor:pointer;display:grid;place-items:center;padding:0">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
         </button>
@@ -521,8 +524,12 @@
           <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Form Setoran Harian
             <input value="{{ setoranFormId }}" onInput="{{ setSetoranFormId }}" placeholder="ID form setoran harian" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
           </label>
-          <label style="font-size:11.5px;color:#6b7280;display:block">Form Nilai Ujian/Tes
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Form Nilai Ujian/Tes
             <input value="{{ nilaiFormId }}" onInput="{{ setNilaiFormId }}" placeholder="ID form nilai ujian/tes" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
+          </label>
+          <label style="font-size:11.5px;color:#6b7280;display:block">Kehadiran — <b>pre-filled link</b> <span style="color:#9aa1ad">(dipakai tombol Kehadiran; lihat GUIDE §2f)</span>
+            <input value="{{ kehLink }}" onInput="{{ setKehLink }}" placeholder="https://docs.google.com/forms/d/e/.../viewform?entry.123=__ID__&entry.456=__TANGGAL__&..." style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12px;font-family:ui-monospace,monospace;color:#16264d" />
+            <div style="margin-top:6px;font-size:11px;font-weight:700"><sc-if value="{{ kehConfigured }}" hint-placeholder-val="{{ true }}"><span style="color:#1f7a34">✓ Form kehadiran terhubung</span></sc-if><sc-if value="{{ kehNotConfigured }}" hint-placeholder-val="{{ false }}"><span style="color:#9aa1ad">Belum terhubung — input kehadiran hanya tersimpan di sesi ini.</span></sc-if></div>
           </label>
         </div>
         <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:18px">
@@ -535,6 +542,63 @@
           </label>
           <div style="margin-top:12px;font-size:12px;color:#6b7280">Status data: <span style="font-weight:800;color:#0a4631">{{ dataStatus }}</span></div>
         </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ KEHADIRAN (admin quick-log, slide-over sheet) ============ -->
+  <sc-if value="{{ kehOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeKeh }}" class="sheet-backdrop"></div>
+    <div class="sheet">
+      <div style="display:flex;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid #e6ddc8;background:#fff">
+        <div style="flex:1"><h1 style="font-size:17px;font-weight:800;margin:0;color:#0a4631">Kehadiran</h1><div style="font-size:11.5px;color:#9aa1ad">Semua Hadir — catat yang izin/sakit/alpa saja</div></div>
+        <button onClick="{{ closeKeh }}" title="Tutup" style="width:32px;height:32px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;cursor:pointer;display:grid;place-items:center;padding:0">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div style="flex:1;overflow:auto;padding:18px">
+        <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:14px">Tanggal
+          <input type="date" value="{{ kehDate }}" onInput="{{ setKehDate }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" />
+        </label>
+        <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:16px;margin-bottom:16px">
+          <div style="font-weight:800;font-size:13px;margin-bottom:12px;color:#0a4631">Catat Ketidakhadiran</div>
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Santri
+            <select value="{{ kehSantri }}" onChange="{{ setKehSantri }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d">
+              <option value="">— pilih santri —</option>
+              <sc-for list="{{ kehSantriOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o.v }}">{{ o.label }}</option></sc-for>
+            </select>
+          </label>
+          <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">Status</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <sc-for list="{{ kehStatusChips }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.onPick }}" style="{{ c.style }}">{{ c.v }}</button></sc-for>
+          </div>
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Jam <span style="color:#9aa1ad">(opsional — kosongkan bila sehari penuh)</span>
+            <div style="display:flex;gap:8px;margin-top:6px">
+              <input value="{{ kehJam }}" onInput="{{ setKehJam }}" placeholder="mis. 10:30" style="flex:1;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" />
+              <button onClick="{{ kehNow }}" style="padding:10px 14px;border-radius:9px;border:1px solid #cfe3d0;background:#eef4ee;color:#0a4631;font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap">Sekarang</button>
+            </div>
+          </label>
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:14px">Alasan
+            <input value="{{ kehReason }}" onInput="{{ setKehReason }}" placeholder="mis. Sakit demam / izin acara keluarga" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" />
+          </label>
+          <button onClick="{{ saveKeh }}" style="width:100%;padding:12px;border-radius:10px;border:none;background:#0a4631;color:#fff;font-weight:800;font-size:13.5px;cursor:pointer">Simpan</button>
+          <div style="min-height:16px;margin-top:8px;font-size:11.5px;font-weight:700;color:#0a4631;text-align:center">{{ kehMsg }}</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><span style="font-weight:800;font-size:13px;color:#0a4631">Ketidakhadiran tanggal ini</span><span style="font-size:11.5px;color:#9aa1ad">{{ kehCount }} santri · sisanya Hadir</span></div>
+        <sc-if value="{{ hasKehList }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#fff;border:1px solid #e6e1d5;border-radius:12px;padding:6px 14px">
+            <sc-for list="{{ kehList }}" as="a" hint-placeholder-count="2">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 0;border-bottom:1px solid #f0ede4">
+                <span style="flex:none;font-size:9.5px;font-weight:800;color:#fff;background:{{ a.statusColor }};padding:2px 8px;border-radius:6px">{{ a.status }}</span>
+                <div style="flex:1;min-width:120px"><div style="font-weight:700;font-size:13px;color:#16264d">{{ a.who }}<span style="color:#9aa1ad;font-weight:600">{{ a.waktu }}</span></div><div style="font-size:11px;color:#9aa1ad">{{ a.reason }}</div></div>
+                <sc-if value="{{ a.pending }}" hint-placeholder-val="{{ true }}"><button onClick="{{ a.onUndo }}" title="Batalkan" style="flex:none;font-size:11px;color:#b4483a;background:none;border:none;cursor:pointer;font-weight:700">Batal</button></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ kehNotConfigured }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size:11px;color:#b58a3a;background:#fbf5e4;border:1px solid #ecdcae;border-radius:8px;padding:8px 11px;margin-top:12px;line-height:1.5">Form kehadiran belum dikonfigurasi (Konfigurasi → pre-filled link). Entri di sini hanya tersimpan sesi ini dan belum tertulis ke sheet.</p>
+        </sc-if>
       </div>
     </div>
   </sc-if>
@@ -623,13 +687,27 @@ function attStatus(s){ s=String(s||'').trim().toLowerCase(); if(/sakit|^s$/.test
 // Daily attendance log (one row per santri per day). Same shape as the 'Kehadiran' sheet tab.
 const KEHADIRAN = [
   {id:'s3', tanggal:'2026-10-01', status:'Hadir', reason:''}, {id:'s3', tanggal:'2026-10-02', status:'Hadir', reason:''},
-  {id:'s3', tanggal:'2026-10-03', status:'Sakit', reason:'Demam, ada surat dokter'}, {id:'s3', tanggal:'2026-10-04', status:'Hadir', reason:''},
-  {id:'s3', tanggal:'2026-10-05', status:'Izin', reason:'Izin acara keluarga'}, {id:'s3', tanggal:'2026-10-06', status:'Hadir', reason:''},
+  {id:'s3', tanggal:'2026-10-03', status:'Sakit', jam:'', reason:'Demam, ada surat dokter'}, {id:'s3', tanggal:'2026-10-04', status:'Hadir', reason:''},
+  {id:'s3', tanggal:'2026-10-05', status:'Izin', jam:'10:30', reason:'Pulang, acara keluarga'}, {id:'s3', tanggal:'2026-10-06', status:'Hadir', reason:''},
   {id:'s1', tanggal:'2026-10-01', status:'Hadir', reason:''}, {id:'s1', tanggal:'2026-10-02', status:'Alpa', reason:'Tanpa keterangan'},
   {id:'s1', tanggal:'2026-10-03', status:'Hadir', reason:''},
   {id:'s11', tanggal:'2026-10-01', status:'Hadir', reason:''}, {id:'s11', tanggal:'2026-10-02', status:'Hadir', reason:''},
   {id:'s11', tanggal:'2026-10-03', status:'Izin', reason:'Lomba tahfidz antar pesantren'}, {id:'s11', tanggal:'2026-10-04', status:'Hadir', reason:''},
 ];
+// Local date/time (browser) for the attendance quick-log.
+function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function nowHM(){ const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+// Parse a Kehadiran Google Form "pre-filled link" (built with sentinel values) → POST action + entry map.
+function parseKehLink(link){
+  link=String(link||'').trim(); if(!link) return null;
+  const fm=link.match(/forms\/d\/e\/([^\/?#]+)/); if(!fm) return null;
+  const action='https://docs.google.com/forms/d/e/'+fm[1]+'/formResponse';
+  const sent={'__ID__':'id','__TANGGAL__':'tanggal','__STATUS__':'status','__JAM__':'jam','__REASON__':'reason'};
+  const map={}; const re=/entry\.(\d+)=([^&#]+)/g; let m;
+  while((m=re.exec(link))){ const val=decodeURIComponent(m[2].replace(/\+/g,' ')); if(sent[val]) map[sent[val]]='entry.'+m[1]; }
+  if(!map.id||!map.tanggal||!map.status) return null;
+  return Object.assign({action}, map);
+}
 const PILLARS = [
   {key:'haf', abbr:'HAF', label:'Hafalan', grp:'diniyah'},
   {key:'tah', abbr:'TAH', label:'Tahsin', grp:'diniyah'},
@@ -700,6 +778,8 @@ class Component extends DCLogic {
     sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
     clerkReady:false, userName:'', entryOpen:false, configOpen:false,
     nilai:null, setoran:null, kehadiran:null, mapelDef:null, raporOpen:false, termId:'2026g', groupFilter:'all', filterOpen:false,
+    // Admin attendance quick-log
+    kehOpen:false, kehDate:'', kehSantri:'', kehStatus:'Izin', kehJam:'', kehReason:'', kehPending:[], kehLink:'', kehMsg:'',
   };
 
   // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
@@ -792,7 +872,7 @@ class Component extends DCLogic {
       const text=await (await fetch(url)).text();
       const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
       const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
-      const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); return {id:String(o.id!=null?o.id:''), tanggal:o.tanggal!=null?String(o.tanggal):'', status:o.status||'', reason:o.reason||o.alasan||o.keterangan||o.catatan||''}; }).filter(x=>x.id);
+      const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); return {id:String(o.id!=null?o.id:''), tanggal:o.tanggal!=null?String(o.tanggal):'', status:o.status||'', jam:o.jam!=null?String(o.jam):'', reason:o.reason||o.alasan||o.keterangan||o.catatan||''}; }).filter(x=>x.id);
       this.setState({kehadiran:rows.length?rows:null});
     }catch(e){ console.error('loadKehadiran failed', e); this.setState({kehadiran:null}); }
   }
@@ -984,7 +1064,7 @@ class Component extends DCLogic {
     const hasAttendance = attTotal>0;
     // Absence notes: non-Hadir days with the reason the mudir/musyrif recorded.
     const ATT_LABEL={sakit:'Sakit', izin:'Izin', alpa:'Alpa'}, ATT_COLOR={sakit:'#3f6fa8', izin:'#8a6d1e', alpa:'#b4483a'};
-    const attNotes = selAtt.filter(r=>attStatus(r.status)!=='hadir').map(r=>{ const k=attStatus(r.status); return {tgl:ymd(r.tanggal), label:ATT_LABEL[k], color:ATT_COLOR[k], reason:String(r.reason||'').trim()||'—'}; }).sort((a,b)=>(a.tgl||'').localeCompare(b.tgl||''));
+    const attNotes = selAtt.filter(r=>attStatus(r.status)!=='hadir').map(r=>{ const k=attStatus(r.status); const jam=String(r.jam||'').trim(); return {tgl:ymd(r.tanggal), waktu: jam?(' · '+jam):'', label:ATT_LABEL[k], color:ATT_COLOR[k], reason:String(r.reason||'').trim()||'—'}; }).sort((a,b)=>(a.tgl||'').localeCompare(b.tgl||''));
     const hasAttNotes = attNotes.length>0;
 
     const roleLabel = st.role==='admin'?'Admin':st.role==='mudir'?'Mudir':st.role==='musyrif'?'Musyrif':'Publik';
@@ -1020,12 +1100,26 @@ class Component extends DCLogic {
     const akademikRows = raporRows('Akademik');
     const ekskulRows = raporRows('Ekstrakurikuler');
 
+    // ---- Attendance quick-log (admin) ----
+    const nameById={}; all.forEach(s=>{ nameById[s.id]=s.nick||s.name; });
+    const kehDate = st.kehDate||todayStr();
+    const kss = st.kehStatus||'Izin';
+    const kehStatusChips = ['Sakit','Izin','Alpa'].map(v=>{ const active=kss===v, c=ATT_COLOR[v.toLowerCase()]; return {v, style:'flex:1;padding:9px 8px;border-radius:9px;border:1px solid '+(active?c:'#e6e1d5')+';background:'+(active?c:'#fff')+';color:'+(active?'#fff':'#16264d')+';font-weight:700;font-size:12.5px;cursor:pointer', onPick:()=>this.setState({kehStatus:v})}; });
+    const kehSantriOpts = all.slice().sort((a,b)=>(a.nick||a.name).localeCompare(b.nick||b.name)).map(s=>({v:s.id, label:(s.nick||s.name)+' · '+(s.kelas||'')}));
+    const kehCfg = parseKehLink(st.kehLink), kehConfigured=!!kehCfg;
+    const kehList = (st.kehPending||[]).map((r,i)=>({r,i})).filter(x=>x.r.tanggal===kehDate)
+        .map(({r,i})=>({who:nameById[r.id]||r.id, status:r.status, statusColor:ATT_COLOR[attStatus(r.status)]||'#8a6d1e', waktu:r.jam?(' · '+r.jam):'', reason:r.reason||'—', pending:true, onUndo:(idx=>()=>{ const p=(this.state.kehPending||[]).slice(); p.splice(idx,1); this.setState({kehPending:p}); })(i)}))
+      .concat(activeKehadiran.filter(r=>ymd(r.tanggal)===kehDate && attStatus(r.status)!=='hadir')
+        .map(r=>({who:nameById[r.id]||r.id, status:r.status, statusColor:ATT_COLOR[attStatus(r.status)]||'#8a6d1e', waktu:(String(r.jam||'').trim())?(' · '+String(r.jam).trim()):'', reason:String(r.reason||'').trim()||'—', pending:false, onUndo:null})));
+
     return {
       view:v, role:st.role, roleLabel, userName:st.userName, greeting: st.userName?('Halo, '+st.userName):'',
       isLogin:v==='login', isGallery:v==='gallery', isDetail:v==='detail', isDashboard:v==='dashboard',
       loginOpen:st.loginOpen, entryOpen:st.entryOpen, configOpen:st.configOpen,
       canManage: st.role==='admin'||st.role==='mudir'||st.role==='musyrif',
-      canManageSecular: st.role==='admin',
+      canManageSecular: st.role==='admin', isAdmin: st.role==='admin',
+      kehOpen:st.kehOpen, kehDate, kehSantri:st.kehSantri, kehStatus:kss, kehJam:st.kehJam, kehReason:st.kehReason, kehLink:st.kehLink, kehMsg:st.kehMsg,
+      kehStatusChips, kehSantriOpts, kehList, kehCount:kehList.length, hasKehList:kehList.length>0, kehConfigured, kehNotConfigured:!kehConfigured,
       isStaff: st.role==='admin'||st.role==='mudir'||st.role==='musyrif',
       isPublic: st.role==='public',
       gallery, galleryCount:gallery.length, roster, rosterCount:roster.length,
@@ -1069,6 +1163,25 @@ class Component extends DCLogic {
       closeEntry:()=>this.setState({entryOpen:false}),
       goConfig:()=>this.setState({configOpen:true, entryOpen:false}),
       closeConfig:()=>this.setState({configOpen:false}),
+      // ---- Attendance quick-log (admin) ----
+      openKeh:()=>this.setState({kehOpen:true, kehDate:this.state.kehDate||todayStr(), kehMsg:''}),
+      closeKeh:()=>this.setState({kehOpen:false}),
+      setKehDate:(ev)=>this.setState({kehDate:ev.target.value}),
+      setKehSantri:(ev)=>this.setState({kehSantri:ev.target.value}),
+      setKehStatus:(v)=>()=>this.setState({kehStatus:v}),
+      setKehJam:(ev)=>this.setState({kehJam:ev.target.value}),
+      kehNow:()=>this.setState({kehJam:nowHM()}),
+      setKehReason:(ev)=>this.setState({kehReason:ev.target.value}),
+      setKehLink:(ev)=>this.setState({kehLink:ev.target.value}),
+      saveKeh:()=>{
+        const s=this.state; const id=(s.kehSantri||'').trim(), tgl=(s.kehDate||todayStr()).trim();
+        if(!id){ this.setState({kehMsg:'Pilih santri dahulu.'}); return; }
+        const rec={id, tanggal:tgl, status:s.kehStatus||'Izin', jam:(s.kehJam||'').trim(), reason:(s.kehReason||'').trim()};
+        const cfg=parseKehLink(s.kehLink);
+        if(cfg){ try{ const body=new URLSearchParams(); body.append(cfg.id,rec.id); body.append(cfg.tanggal,rec.tanggal); body.append(cfg.status,rec.status); if(cfg.jam&&rec.jam) body.append(cfg.jam,rec.jam); if(cfg.reason) body.append(cfg.reason,rec.reason); fetch(cfg.action,{method:'POST',mode:'no-cors',body}); }catch(e){ console.error('keh POST failed',e); } }
+        this.setState({kehPending:[rec].concat(s.kehPending||[]), kehSantri:'', kehJam:'', kehReason:'', kehMsg: cfg?'Tersimpan ✓':'Tercatat sesi ini (form belum dikonfigurasi — belum tersimpan ke sheet).'});
+      },
+      undoKeh:(i)=>()=>{ const p=(this.state.kehPending||[]).slice(); p.splice(i,1); this.setState({kehPending:p}); },
       goLogin:()=>{ const C=window.Clerk; if(C){ this._afterSignIn=true; const here=window.location.href, o={afterSignInUrl:here, afterSignUpUrl:here, signInForceRedirectUrl:here, signUpForceRedirectUrl:here}; if(C.loaded){ C.openSignIn(o); } else { C.load().then(()=>C.openSignIn(o)).catch(()=>this.setState({loginOpen:true})); } } else { this.setState({loginOpen:true}); } },
       closeLogin:()=>this.setState({loginOpen:false}),
       stopLogin:(ev)=>{ ev && ev.stopPropagation && ev.stopPropagation(); },

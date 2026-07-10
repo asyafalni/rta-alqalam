@@ -378,26 +378,34 @@ as before — now they *reflect* the daily setoran and the exams instead of bein
 ---
 
 ### 2f. Tab `Kehadiran` (daily attendance) — powers the Rapor Kehadiran table
-One row per santri per day, with a **single `status` column** (default **Hadir**) instead of four
-count columns, plus an optional **`reason`** note. Headers in row 1:
+One row per santri per day, with a **single `status` column** (default **Hadir**), an optional
+**`jam`** (for a mid-day case), and an optional **`reason`**. Headers in row 1:
 
-| id | tanggal | status | reason |
-|----|---------|--------|--------|
-| s3 | 2026-10-03 | Sakit | Demam, ada surat dokter |
-| s3 | 2026-10-05 | Izin | Izin acara keluarga |
-| s3 | 2026-10-04 | Hadir | |
+| id | tanggal | status | jam | reason |
+|----|---------|--------|-----|--------|
+| s3 | 2026-10-03 | Sakit | | Demam, ada surat dokter |
+| s3 | 2026-10-05 | Izin | 10:30 | Pulang, acara keluarga |
+| s3 | 2026-10-04 | Hadir | | |
 
 - `status` is one of **`Hadir` / `Sakit` / `Izin` / `Alpa`** — blank or unrecognised counts as
   **`Hadir`** (also understood: `S`/`I`/`A`, `ijin`, `alfa`, `bolos`).
-- **`reason`** (optional) — why the santri was absent, written by the mudir/musyrif/admin. Shown on
-  the Rapor under **"Keterangan Ketidakhadiran"** for each non-Hadir day (ignored for `Hadir` rows).
-  Also accepted under the headers `alasan` / `keterangan` / `catatan`.
+- **`jam`** (optional) — the time the santri left / fell ill, for a **mid-day** case. Blank = whole day.
+  Shown next to the date on the Rapor (e.g. `2026-10-05 · 10:30`).
+- **`reason`** (optional) — why the santri was absent (also accepted as `alasan`/`keterangan`/`catatan`).
+  Shown on the Rapor under **"Keterangan Ketidakhadiran"** for each non-Hadir day.
 - The app tallies statuses **per status, within the selected Rapor term** → the **Kehadiran** table on
   the report card (Hadir / Sakit / Izin / Alpa + Total Hari). If a santri has no rows in the term,
   the table is hidden.
-- Record it however suits you: a **third Google Form** (question titled `status`, default `Hadir`),
-  or a quick manual/scanned entry. You can log every day, or log only exceptions (S/I/A) and treat the
-  rest as Hadir — then *Total Hari* reflects the days you actually recorded.
+
+**Fastest way to fill it — the in-app quick-log (admin only).** One admin owns attendance; students
+report to them. On the dashboard the admin taps **Kehadiran** → a slide-over where **everyone is Hadir
+by default** and you only **log the exceptions**: pick santri → Sakit/Izin/Alpa → optional `jam`
+(**Sekarang** button stamps the current time) → reason → **Simpan**. Today's exceptions list below;
+everyone else stays Hadir. No per-mapel, no per-student marking.
+- **To make Simpan write to the sheet**, the app POSTs to a **Kehadiran Google Form** — make that
+  form's questions **Short answer** (titles `id`, `tanggal`, `status`, `jam`, `reason`), then paste its
+  **pre-filled link** into **Konfigurasi** (see §5, Form C). Until then, entries stay in the session
+  only (a banner tells you). You can always fill the tab by hand / a normal form instead.
 - Mirror to the **PUBLIC** sheet as a tab named exactly `Kehadiran`:
   `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Kehadiran!A1:Z"), "where Col2 is not null", 1)`
   (`Col2` = `id` if it's a form response tab with `Timestamp` in A; use `Col1` for a hand-built tab
@@ -494,17 +502,26 @@ both ayat fields are blank (whole surah). Question titles can be `ayat_dari`/`ay
 → Link to the **Private** spreadsheet → rename the response tab to **`Nilai`** (§2c). No reshape
 needed — the app reads by header and ignores the `Timestamp` column.
 
-**Form C — Kehadiran** *(optional, attendance; §2f)*. Not embedded in the app — staff fill it via its
-own Google Forms link, or you type the `Kehadiran` tab by hand:
+**Form C — Kehadiran** *(optional, attendance; §2f)*. This form is the **write endpoint for the
+in-app admin quick-log** (the app POSTs to it). So make every question **Short answer** (single value
+→ simple POST), **not** Date/Dropdown/Multiple-choice:
 
-| Question title | Google Forms type | Required | Options / validation |
-|----------------|-------------------|----------|----------------------|
-| `id`      | **Dropdown**        | ✅ | the bare santri ids |
-| `tanggal` | **Date**            | ✅ | date picker |
-| `status`  | **Multiple choice** | ✅ | `Hadir` · `Sakit` · `Izin` · `Alpa` |
-| `reason`  | **Paragraph**       | ⬜ | why absent — fill for Sakit/Izin/Alpa |
+| Question title | Google Forms type | Required | Notes |
+|----------------|-------------------|----------|-------|
+| `id`      | **Short answer** | ✅ | santri id (the app sends `s3`) |
+| `tanggal` | **Short answer** | ✅ | date text `YYYY-MM-DD` |
+| `status`  | **Short answer** | ✅ | `Sakit` / `Izin` / `Alpa` |
+| `jam`     | **Short answer** | ⬜ | time `HH:MM` for a mid-day case |
+| `reason`  | **Short answer** | ⬜ | why absent |
 
 → Link to the **Private** spreadsheet → rename the response tab to **`Kehadiran`**.
+
+**Wire it to the app (one paste):** in the form, **⋮ → Get pre-filled link**, fill each field with the
+exact sentinel — `id` = `__ID__`, `tanggal` = `__TANGGAL__`, `status` = `__STATUS__`, `jam` = `__JAM__`,
+`reason` = `__REASON__` — **Get link**, and paste that URL into **Konfigurasi → Kehadiran (pre-filled
+link)**. The app reads each `entry.####` from it automatically (no per-field IDs to copy). Konfigurasi
+shows **✓ Form kehadiran terhubung** when it parsed. *(You can also just fill/​type the tab by hand;
+the quick-log still works in-session without this.)*
 
 > **Field-type tips**
 > - **Dropdown vs Multiple choice:** use a **Dropdown** for long lists (`id`, `mapel`); **Multiple
