@@ -146,12 +146,12 @@ Send yourself one test submission through each form and confirm a row lands in t
 - **PUBLIC** sheet: **Share** → **General access → Anyone with the link → Viewer**. ⚠️ Never give
   the public **Editor** (§4 explains why that would leak the whole private sheet).
 
-### Step 7 — Connect the tracker (→ §6)
-1. Open `/tracker/` → **Masuk Staff** (log in via Clerk) → on the dashboard, **⚙️ Konfigurasi**.
-2. Paste the **PUBLIC** Sheet ID into **Google Sheet ID** → **Muat Data**. Status flips to
-   **Live · Google Sheet**.
-3. Paste the two **Form IDs** into **Form Setoran Harian** and **Form Nilai Ujian/Tes**, and the
-   **Absensi pre-filled link** into **Absensi** (§5, Form C).
+### Step 7 — Connect via the Config sheet (→ §6)
+1. In your **PUBLIC** sheet, add a **`Config`** tab (`key` | `value`) with `sheet_id` (blank = this
+   sheet), `setoran`, `nilai`, `absensi` — see §6.
+2. Put that sheet's ID into **`CONFIG_ID`** near the top of `tracker/index.html`'s `<script>` (once).
+3. Open `/tracker/` → **Masuk Staff** → **⚙️ Konfigurasi** shows each connection ✓/– and the data
+   status. The panel is **read-only** — edit the `Config` tab and press **↻ Muat Ulang** to apply.
 
 ### Step 8 — Verify
 - Gallery/dashboard show your real santri (not the demo names).
@@ -600,20 +600,33 @@ Or just type the tab by hand — the quick-log logs in-session regardless.)*
 Each is independent — configure one now and the rest later. Until set, that input shows a "belum
 dikonfigurasi" prompt (Setoran/Nilai) or logs in-session only (Absensi).
 
-## 6. Connect the tracker
+## 6. Connect the tracker — the **Config sheet**
 
-1. Open `/tracker/` → **Masuk Staff** (Clerk) → on the dashboard click **⚙️ Konfigurasi**.
-2. Paste the **PUBLIC** Sheet ID into **Google Sheet ID** and click **Muat Data**.
-3. Status flips from *"Data contoh (demo)"* → *"Live · Google Sheet"*.
+Connections are **not typed into the app** (that resets on reload/logout). Instead they live in a
+**public Config sheet**, and its ID is **hard-coded once** in `tracker/index.html`
+(`const CONFIG_ID = '…'`, near the top of the `<script>`). Konfigurasi in the app just **displays**
+what's active — to change anything, you edit the sheet and press **↻ Muat Ulang**.
 
-From that **one** Public Sheet ID the tracker reads six tabs via GViz — **`Roster`** (santri),
+**Set it up (once):**
+1. In your **PUBLIC** sheet, add a tab named exactly **`Config`** with two columns, `key` and `value`:
+
+   | key | value |
+   |-----|-------|
+   | `sheet_id` | *(blank = use this same sheet for the data tabs, or paste another PUBLIC sheet ID)* |
+   | `setoran`  | Setoran form **ID or link** |
+   | `nilai`    | Nilai form **ID or link** |
+   | `absensi`  | Absensi **pre-filled link** (§5, Form C) |
+
+2. Put the **Config sheet's ID** into `CONFIG_ID` in the code (it can be the same public sheet that
+   holds `Roster`/`Nilai`/… — then leave `sheet_id` blank).
+3. Open `/tracker/` → **Masuk Staff** → **⚙️ Konfigurasi** shows each connection with a ✓/–. Data
+   status flips to **Live · Google Sheet**.
+
+From the resolved **data** Sheet ID the tracker reads six tabs via GViz — **`Roster`** (santri),
 **`Nilai`** (tests), **`Mapel`** (subjects), **`Halaqah`** (circles), **`Setoran`** (daily log),
-**`Absensi`** (absences) — e.g.
-`https://docs.google.com/spreadsheets/d/<PUBLIC_ID>/gviz/tq?tqx=out:json&sheet=Roster`
-Each tab is optional: any that's missing or unreachable falls back to built-in demo data automatically.
-
-4. In the same **Konfigurasi → 📝 Google Form** card, wire the **three input forms** — two **Form IDs**
-   (Setoran, Nilai) + the **Absensi pre-filled link** (§5).
+**`Absensi`** (absences) — e.g. `…/gviz/tq?tqx=out:json&headers=1&sheet=Roster`. Each tab is optional;
+any missing/unreachable one falls back to demo data. If the **`Config` tab** itself is missing, the app
+still reads the data tabs straight from `CONFIG_ID` (forms just show "belum diisi").
 
 ---
 

@@ -520,31 +520,19 @@
         </button>
       </div>
       <div style="flex:1;overflow:auto;padding:18px">
-        <p style="font-size:12.5px;color:#6b7280;margin:0 0 16px;line-height:1.5">Hubungkan tracker ke Google Form (jalur input) dan Google Sheet publik (jalur baca).</p>
-        <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:18px;margin-bottom:14px">
-          <div style="font-weight:800;font-size:13.5px;margin-bottom:4px">📝 Google Form — jalur input</div>
-          <p style="font-size:11.5px;color:#9aa1ad;margin:0 0 12px;line-height:1.5">Tiga jalur input. Untuk <b>Setoran Harian</b> → tab <code>Setoran</code> dan <b>Nilai Ujian/Tes</b> → tab <code>Nilai</code>, tempel <b>Form ID atau link form</b> (form ditampilkan langsung di app). Untuk <b>Absensi</b> → tab <code>Absensi</code>, tempel <b>pre-filled link</b> (app menulis di balik layar; lihat GUIDE §5).</p>
-          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Form Setoran Harian
-            <input value="{{ setoranFormId }}" onInput="{{ setSetoranFormId }}" placeholder="Form ID atau link — setoran harian" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
-          </label>
-          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Form Nilai Ujian/Tes
-            <input value="{{ nilaiFormId }}" onInput="{{ setNilaiFormId }}" placeholder="Form ID atau link — nilai ujian/tes" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
-          </label>
-          <label style="font-size:11.5px;color:#6b7280;display:block">Absensi — <b>pre-filled link</b> <span style="color:#9aa1ad">(dipakai tombol Absensi; lihat GUIDE §2f)</span>
-            <input value="{{ kehLink }}" onInput="{{ setKehLink }}" placeholder="https://docs.google.com/forms/d/e/.../viewform?entry.123=__ID__&entry.456=__TANGGAL__&..." style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12px;font-family:ui-monospace,monospace;color:#16264d" />
-            <div style="margin-top:6px;font-size:11px;font-weight:700"><sc-if value="{{ kehConfigured }}" hint-placeholder-val="{{ true }}"><span style="color:#1f7a34">✓ Form absensi terhubung</span></sc-if><sc-if value="{{ kehNotConfigured }}" hint-placeholder-val="{{ false }}"><span style="color:#9aa1ad">Belum terhubung — input absensi hanya tersimpan di sesi ini.</span></sc-if></div>
-          </label>
-        </div>
-        <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:18px">
-          <div style="font-weight:800;font-size:13.5px;margin-bottom:10px">📊 Google Sheet — baca data santri</div>
-          <label style="font-size:11.5px;color:#6b7280;display:block">Google Sheet ID <span style="color:#9aa1ad">— sheet publik (Viewer), tab bernama "Roster"</span>
-            <div style="display:flex;gap:8px;margin-top:6px">
-              <input value="{{ sheetId }}" onInput="{{ setSheetId }}" placeholder="1AbC...xyz — kosongkan untuk data contoh" style="flex:1;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
-              <button onClick="{{ reloadRoster }}" style="padding:10px 16px;border-radius:9px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap">Muat Data</button>
+        <p style="font-size:12.5px;color:#6b7280;margin:0 0 12px;line-height:1.5">Semua koneksi dibaca dari <b>Config Sheet</b> (tab <code>Config</code>). Panel ini hanya <b>menampilkan</b> yang sedang aktif — untuk mengubah, edit di Google Sheet lalu tekan <b>Muat Ulang</b>.</p>
+        <a href="{{ cfgSheetUrl }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#0c6240;margin-bottom:14px">Buka Config Sheet ↗</a>
+        <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:8px 16px;margin-bottom:14px">
+          <sc-for list="{{ cfgRows }}" as="c" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #f0ede4">
+              <span style="flex:none;width:9px;height:9px;border-radius:50%;background:{{ c.dot }}"></span>
+              <span style="flex:1;font-size:12.5px;font-weight:600;color:#16264d">{{ c.label }}</span>
+              <span style="flex:none;font-size:11.5px;font-family:ui-monospace,monospace;color:#6b7280">{{ c.val }}</span>
             </div>
-          </label>
-          <div style="margin-top:12px;font-size:12px;color:#6b7280">Status data: <span style="font-weight:800;color:#0a4631">{{ dataStatus }}</span></div>
+          </sc-for>
         </div>
+        <div style="font-size:12px;color:#6b7280;margin-bottom:14px">Status data: <span style="font-weight:800;color:#0a4631">{{ dataStatus }}</span></div>
+        <button onClick="{{ reloadConfig }}" style="width:100%;padding:11px;border-radius:10px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:13px;cursor:pointer">↻ Muat Ulang dari Config Sheet</button>
       </div>
     </div>
   </sc-if>
@@ -610,6 +598,18 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 const NAVY='#16264d', NAVY2='#0f1c3a', GREEN='#2f8f3a', GOLD='#cfa02c', CREAM='#f5f3ec', PAPER='#ffffff', LINE='#e6e1d5', INK='#16264d', MUT='#6b7280';
+
+// ============================================================================
+// CONFIG SHEET — the single source of truth for connections. Set this to the ID
+// of a PUBLIC Google Sheet that has a tab named "Config" with two columns:
+//   key        | value
+//   sheet_id   | <PUBLIC data sheet ID>  (blank = use this same sheet)
+//   setoran    | <Setoran form ID or link>
+//   nilai      | <Nilai form ID or link>
+//   absensi    | <Absensi pre-filled link>
+// The app reads it on load; Konfigurasi just DISPLAYS it (edit in the sheet).
+// Leave '' to always run on demo data.
+const CONFIG_ID = '1SnffTFvWwICjyskkoW2L66puVSpcuwNF2RplRqUQt44';
 
 // Score keys: haf/tah/mur/ilm/akh = diniyah (musyrif/mudir) · akd/bhs = akademik (admin)
 // juzdone = which specific juz are memorized (list, any order) → juz count &
@@ -798,7 +798,7 @@ class Component extends DCLogic {
     view:'gallery', role:'public', loginOpen:false, selectedId:null, theme:'minimal', search:'',
     sortKey:'juz', sortDir:'desc',
     setoranFormId:'', nilaiFormId:'', entryKind:'setoran',
-    sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
+    sheetId:'', sheetTab:'Roster', students:null, loadState:'demo', cfgFound:false,
     clerkReady:false, userName:'', entryOpen:false, configOpen:false,
     nilai:null, setoran:null, kehadiran:null, mapelDef:null, halaqahDef:null, raporOpen:false, termId:'2026g', groupFilter:'all', filterOpen:false,
     // Admin attendance quick-log
@@ -807,7 +807,33 @@ class Component extends DCLogic {
 
   // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
   //      the demo RAW until a viewable sheet + "Roster" tab are configured.
-  componentDidMount(){ if((this.state.sheetId||'').trim()){ this.loadRoster(); this.loadNilai(); this.loadSetoran(); this.loadKehadiran(); this.loadMapel(); this.loadHalaqah(); } this.initClerk(); }
+  componentDidMount(){ this.loadConfig(); this.initClerk(); }
+
+  // ---- Config: read a public "Config" tab (key | value) from the hardcoded CONFIG_ID sheet, then
+  //      load the data tabs from the sheet it points to. Falls back to demo if unreachable/empty.
+  async loadConfig(){
+    if(!CONFIG_ID){ this.setState({loadState:'demo'}); return; }
+    this.setState({loadState:'loading'});
+    try{
+      const url='https://docs.google.com/spreadsheets/d/'+CONFIG_ID+'/gviz/tq?tqx=out:json&headers=1&sheet=Config';
+      const text=await (await fetch(url)).text();
+      const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
+      const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
+      // GViz returns the FIRST sheet when "Config" is missing → only trust it if it has a `key` column.
+      const hasKey=cols.indexOf('key')>=0;
+      const map={}; if(hasKey){ (json.table.rows||[]).forEach(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); const k=String(o.key!=null?o.key:'').trim().toLowerCase(); if(k) map[k]=(o.value!=null?String(o.value):'').trim(); }); }
+      const sheetId=(map.sheet_id||map.sheetid||'').trim()||CONFIG_ID;
+      this.setState({ sheetId, setoranFormId:map.setoran||map.setoran_link||'', nilaiFormId:map.nilai||map.nilai_link||'', kehLink:map.absensi||map.absensi_link||'', cfgFound: hasKey && Object.keys(map).length>0 });
+      // give setState a tick to flush, then load the data tabs from sheetId
+      setTimeout(()=>{ this.loadRoster(); this.loadNilai(); this.loadSetoran(); this.loadKehadiran(); this.loadMapel(); this.loadHalaqah(); }, 0);
+    }catch(e){
+      // No "Config" tab (or unreachable) → still read the data tabs straight from CONFIG_ID.
+      console.error('loadConfig failed', e);
+      this.setState({cfgFound:false, sheetId:CONFIG_ID});
+      if(CONFIG_ID){ setTimeout(()=>{ this.loadRoster(); this.loadNilai(); this.loadSetoran(); this.loadKehadiran(); this.loadMapel(); this.loadHalaqah(); }, 0); }
+      else this.setState({loadState:'demo'});
+    }
+  }
 
   // ---- Auth: Clerk (client-side). Reads the signed-in user's role from
   //      publicMetadata.role (admin/mudir/musyrif); falls back to the demo
@@ -1069,8 +1095,9 @@ class Component extends DCLogic {
     const dataStatus = st.loadState==='live'?'Live · Google Sheet'
       : st.loadState==='loading'?'Memuat data…'
       : st.loadState==='empty'?'Terhubung · tab Roster masih kosong (belum ada baris santri)'
-      : st.loadState==='error'?'Gagal muat · cek Sheet ID / sharing (Anyone with link → Viewer) & tab "Roster"'
-      : 'Data contoh (demo)';
+      : st.loadState==='error'?'Gagal muat · cek sharing (Anyone with link → Viewer) & tab "Roster"'
+      : st.cfgFound?'Config terbaca · data contoh (demo)'
+      : 'Config Sheet tidak ditemukan · data contoh (demo)';
     const q=st.search.trim().toLowerCase();
     // One combined filter (shared by gallery + roster): 'all' | 'kelas:VII' | 'hal:1'.
     const gf=st.groupFilter||'all';
@@ -1260,6 +1287,15 @@ class Component extends DCLogic {
       setNilaiFormId:(ev)=>this.setState({nilaiFormId:ev.target.value}),
       dataStatus, sheetId:st.sheetId,
       setSheetId:(ev)=>this.setState({sheetId:ev.target.value}),
+      // Config sheet (read-only display)
+      cfgSheetUrl:'https://docs.google.com/spreadsheets/d/'+CONFIG_ID+'/edit',
+      reloadConfig:()=>this.loadConfig(),
+      cfgRows:[
+        { label:'Sumber data (Sheet)', ok:!!(st.sheetId&&st.sheetId!==CONFIG_ID), dot:(st.sheetId?'#1f7a34':'#c9cdd4'), val: st.sheetId?(String(st.sheetId).slice(0,8)+'…'):'— config sheet' },
+        { label:'Form Setoran Harian', ok:!!st.setoranFormId, dot:(st.setoranFormId?'#1f7a34':'#c9cdd4'), val: st.setoranFormId?'terhubung':'belum diisi' },
+        { label:'Form Nilai Ujian/Tes', ok:!!st.nilaiFormId, dot:(st.nilaiFormId?'#1f7a34':'#c9cdd4'), val: st.nilaiFormId?'terhubung':'belum diisi' },
+        { label:'Absensi (pre-filled link)', ok:kehConfigured, dot:(kehConfigured?'#1f7a34':'#c9cdd4'), val: kehConfigured?'terhubung':'belum diisi' },
+      ],
       reloadRoster:()=>{ this.loadRoster(); this.loadNilai(); this.loadSetoran(); this.loadKehadiran(); this.loadMapel(); this.loadHalaqah(); },
     };
   }
