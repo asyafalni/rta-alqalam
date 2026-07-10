@@ -485,7 +485,6 @@
     <div class="sheet">
       <div style="display:flex;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid #e6ddc8;background:#fff">
         <h1 style="font-size:17px;font-weight:800;margin:0;flex:1;color:#0a4631">{{ entryTitle }}</h1>
-        <a href="{{ formOpenUrl }}" target="_blank" rel="noopener" title="Buka di tab baru" style="font-size:15px;font-weight:700;color:#0c6240;padding:4px 6px">↗</a>
         <button onClick="{{ closeEntry }}" title="Tutup" style="width:32px;height:32px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;cursor:pointer;display:grid;place-items:center;padding:0">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </button>
@@ -494,16 +493,55 @@
         <button onClick="{{ showSetoran }}" style="{{ segSetoranStyle }}">Setoran Harian</button>
         <button onClick="{{ showNilai }}" style="{{ segNilaiStyle }}">Nilai Ujian/Tes</button>
       </div>
-      <sc-if value="{{ formConfigured }}" hint-placeholder-val="{{ true }}">
-        <iframe src="{{ formEmbedUrl }}" title="{{ entryTitle }}" style="flex:1;width:100%;border:none;display:block;background:#fff"></iframe>
-      </sc-if>
-      <sc-if value="{{ formNotConfigured }}" hint-placeholder-val="{{ false }}">
-        <div style="flex:1;display:grid;place-items:center;padding:26px;text-align:center">
-          <div style="max-width:340px">
-            <div style="font-size:14px;font-weight:800;color:#8a6d1e">Google Form belum dikonfigurasi</div>
-            <p style="font-size:12.5px;color:#6b7280;margin:8px 0 16px;line-height:1.5">Masukkan ID Google Form pada halaman Konfigurasi agar form input muncul di sini.</p>
-            <button onClick="{{ goConfig }}" style="padding:11px 20px;border-radius:10px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Buka Konfigurasi</button>
+      <!-- SETORAN -->
+      <sc-if value="{{ isSetoran }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;overflow:auto;padding:18px">
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Santri
+            <select value="{{ sSantri }}" onChange="{{ setSSantri }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d"><option value="">— pilih santri —</option><sc-for list="{{ santriOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
+          </label>
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Tanggal
+            <input type="date" value="{{ sDate }}" onInput="{{ setSDate }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" />
+          </label>
+          <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">Jenis setoran</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px"><sc-for list="{{ sJenisChips }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.onPick }}" style="{{ c.style }}">{{ c.v }}</button></sc-for></div>
+          <div style="display:flex;gap:10px;margin-bottom:12px">
+            <label style="flex:1;font-size:11.5px;color:#6b7280">Juz<input value="{{ sJuz }}" onInput="{{ setSJuz }}" placeholder="11" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+            <label style="flex:2;font-size:11.5px;color:#6b7280">Halaman<input value="{{ sHalaman }}" onInput="{{ setSHalaman }}" placeholder="hal. 3–4" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
           </div>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <label style="flex:1;font-size:11.5px;color:#6b7280">No. Surah<input value="{{ sSurah }}" onInput="{{ setSSurah }}" placeholder="opsional" style="width:100%;margin-top:6px;padding:10px 10px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+            <label style="flex:1;font-size:11.5px;color:#6b7280">Ayat dari<input value="{{ sAyatDari }}" onInput="{{ setSAyatDari }}" placeholder="—" style="width:100%;margin-top:6px;padding:10px 10px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+            <label style="flex:1;font-size:11.5px;color:#6b7280">Ayat ke<input value="{{ sAyatKe }}" onInput="{{ setSAyatKe }}" placeholder="—" style="width:100%;margin-top:6px;padding:10px 10px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+          </div>
+          <div style="font-size:11.5px;color:#6b7280;margin-bottom:4px">Kualitas setoran</div>
+          <div style="display:flex;gap:4px;margin-bottom:12px"><sc-for list="{{ sStars }}" as="s" hint-placeholder-count="5"><span onClick="{{ s.onPick }}" style="cursor:pointer;font-size:28px;line-height:1;color:{{ s.col }}">{{ s.star }}</span></sc-for></div>
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:14px">Catatan<input value="{{ sCatatan }}" onInput="{{ setSCatatan }}" placeholder="opsional" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+          <button onClick="{{ saveSetoran }}" style="width:100%;padding:12px;border-radius:10px;border:none;background:#0a4631;color:#fff;font-weight:800;font-size:13.5px;cursor:pointer">Simpan Setoran</button>
+          <div style="min-height:16px;margin-top:8px;font-size:11.5px;font-weight:700;color:#0a4631;text-align:center">{{ sMsg }}</div>
+          <sc-if value="{{ setoranNotReady }}" hint-placeholder-val="{{ false }}"><p style="font-size:11px;color:#b58a3a;background:#fbf5e4;border:1px solid #ecdcae;border-radius:8px;padding:8px 11px;margin-top:10px;line-height:1.5">Form Setoran belum berupa <b>pre-filled link</b> — isi di Config sheet agar tersimpan ke Google (lihat GUIDE §5). Sekarang tombol Simpan belum menulis ke sheet.</p></sc-if>
+        </div>
+      </sc-if>
+      <!-- NILAI -->
+      <sc-if value="{{ isNilai }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;overflow:auto;padding:18px">
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Santri
+            <select value="{{ nSantri }}" onChange="{{ setNSantri }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d"><option value="">— pilih santri —</option><sc-for list="{{ santriOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
+          </label>
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Tanggal
+            <input type="date" value="{{ nDate }}" onInput="{{ setNDate }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" />
+          </label>
+          <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">Bidang</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px"><sc-for list="{{ nBidangChips }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.onPick }}" style="{{ c.style }}">{{ c.v }}</button></sc-for></div>
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Mata Pelajaran
+            <select value="{{ nMapel }}" onChange="{{ setNMapel }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d"><option value="">— pilih mapel —</option><sc-for list="{{ nMapelOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
+          </label>
+          <div style="display:flex;gap:10px;margin-bottom:14px">
+            <label style="flex:1;font-size:11.5px;color:#6b7280">Jenis<input value="{{ nJenis }}" onInput="{{ setNJenis }}" placeholder="Tes / Kuis" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+            <label style="flex:1;font-size:11.5px;color:#6b7280">Nilai (0–100)<input value="{{ nNilai }}" onInput="{{ setNNilai }}" placeholder="88" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+          </div>
+          <button onClick="{{ saveNilai }}" style="width:100%;padding:12px;border-radius:10px;border:none;background:#0a4631;color:#fff;font-weight:800;font-size:13.5px;cursor:pointer">Simpan Nilai</button>
+          <div style="min-height:16px;margin-top:8px;font-size:11.5px;font-weight:700;color:#0a4631;text-align:center">{{ nMsg }}</div>
+          <sc-if value="{{ nilaiNotReady }}" hint-placeholder-val="{{ false }}"><p style="font-size:11px;color:#b58a3a;background:#fbf5e4;border:1px solid #ecdcae;border-radius:8px;padding:8px 11px;margin-top:10px;line-height:1.5">Form Nilai belum berupa <b>pre-filled link</b> — isi di Config sheet agar tersimpan ke Google (GUIDE §5).</p></sc-if>
         </div>
       </sc-if>
     </div>
@@ -733,6 +771,31 @@ function parseKehLink(link){
   if(!cfg.id||!cfg.tanggal||!cfg.status) return null;
   return cfg;
 }
+// Generic pre-filled-link parser for the Setoran/Nilai custom forms. Each field is identified by a
+// __KEY__ sentinel in the pre-fill (Date fields by their _year part, Time by _hour). → {action, map}.
+function parseFormLink(link){
+  link=String(link||'').trim(); if(!link) return null;
+  const fm=link.match(/forms\/d\/e\/([^\/?#]+)/); if(!fm) return null;
+  const action='https://docs.google.com/forms/d/e/'+fm[1]+'/formResponse';
+  const map={}; const re=/entry\.(\d+)(_year|_month|_day|_hour|_minute)?=([^&#]*)/g; let m;
+  while((m=re.exec(link))){ const num=m[1], suf=m[2]||'', val=decodeURIComponent((m[3]||'').replace(/\+/g,' '));
+    if(suf==='_year'){ map.tanggal={dateBase:num}; continue; }
+    if(suf==='_hour'){ map.jam={timeBase:num}; continue; }
+    if(suf) continue;
+    const mm=val.match(/^__([A-Z_]+)__$/); if(mm) map[mm[1].toLowerCase()]={simple:'entry.'+num}; }
+  return (map.id && map.tanggal) ? {action, map} : null;
+}
+// Build a no-cors POST body from a parsed config + a record. Splits date (YYYY-MM-DD) / time (HH:MM).
+function buildFormBody(cfg, rec){
+  const b=new URLSearchParams();
+  for(const k in cfg.map){ const e=cfg.map[k], v=rec[k]; if(v==null||v==='') continue;
+    if(e.dateBase){ const p=String(v).split('-'); b.append('entry.'+e.dateBase+'_year',p[0]); b.append('entry.'+e.dateBase+'_month',String(+p[1])); b.append('entry.'+e.dateBase+'_day',String(+p[2])); }
+    else if(e.timeBase){ const p=String(v).split(':'); b.append('entry.'+e.timeBase+'_hour',String(+p[0])); b.append('entry.'+e.timeBase+'_minute',String(+p[1])); }
+    else b.append(e.simple, v); }
+  return b;
+}
+// Post a record to a form via its parsed config (no-cors); returns whether it was configured.
+function postForm(cfg, rec){ if(!cfg) return false; try{ fetch(cfg.action,{method:'POST',mode:'no-cors',body:buildFormBody(cfg,rec)}); }catch(e){ console.error('postForm failed',e); } return true; }
 const PILLARS = [
   {key:'haf', abbr:'HAF', label:'Hafalan', grp:'diniyah'},
   {key:'tah', abbr:'TAH', label:'Tahsin', grp:'diniyah'},
@@ -805,6 +868,9 @@ class Component extends DCLogic {
     nilai:null, setoran:null, kehadiran:null, mapelDef:null, halaqahDef:null, raporOpen:false, termId:'2026g', groupFilter:'all', filterOpen:false,
     // Admin attendance quick-log
     kehOpen:false, kehDate:'', kehSantri:'', kehStatus:'Izin', kehJam:'', kehReason:'', kehPending:[], kehLink:'', kehMsg:'',
+    // Custom Setoran / Nilai input forms
+    sSantri:'', sDate:'', sJenis:'Ziyadah', sJuz:'', sHalaman:'', sSurah:'', sAyatDari:'', sAyatKe:'', sRating:0, sCatatan:'', sMsg:'',
+    nSantri:'', nDate:'', nBidang:'Diniyah', nMapel:'', nJenis:'Tes / Kuis', nNilai:'', nMsg:'',
   };
 
   // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
@@ -1191,6 +1257,16 @@ class Component extends DCLogic {
       .concat(activeKehadiran.filter(r=>ymd(r.tanggal)===kehDate && attStatus(r.status)!=='hadir')
         .map(r=>({who:nameById[r.id]||r.id, status:r.status, statusColor:ATT_COLOR[attStatus(r.status)]||'#8a6d1e', waktu:(String(r.jam||'').trim())?(' · '+String(r.jam).trim()):'', reason:String(r.reason||'').trim()||'—', pending:false, onUndo:null})));
 
+    // ---- Custom Setoran / Nilai input forms (POST to their pre-filled-link forms) ----
+    const santriOpts = kehSantriOpts; // shared santri dropdown
+    const sJenisCol={'Ziyadah':'#2f8f3a','Muroja’ah':'#cfa02c','Tahsin':'#3f6fa8'};
+    const sJenisChips=['Ziyadah','Muroja’ah','Tahsin'].map(vv=>{ const active=(st.sJenis||'Ziyadah')===vv, c=sJenisCol[vv]; return {v:vv, style:'flex:1;padding:9px 6px;border-radius:9px;border:1px solid '+(active?c:'#e6e1d5')+';background:'+(active?c:'#fff')+';color:'+(active?'#fff':'#16264d')+';font-weight:700;font-size:12px;cursor:pointer', onPick:()=>this.setState({sJenis:vv})}; });
+    const sRating=st.sRating||0;
+    const sStars=[1,2,3,4,5].map(n=>({n, star:(n<=sRating?'★':'☆'), col:(n<=sRating?'#e0a92c':'#d8d5cc'), onPick:()=>this.setState({sRating:n})}));
+    const nBidangChips=['Diniyah','Akademik','Ekstrakurikuler'].map(vv=>{ const active=(st.nBidang||'Diniyah')===vv, c='#0a4631'; return {v:vv, style:'flex:1;padding:9px 5px;border-radius:9px;border:1px solid '+(active?c:'#e6e1d5')+';background:'+(active?c:'#fff')+';color:'+(active?'#fff':'#16264d')+';font-weight:700;font-size:11px;cursor:pointer', onPick:()=>this.setState({nBidang:vv, nMapel:''})}; });
+    const nMapelOpts=activeMapel.filter(d=>normBidang(d.bidang)===(st.nBidang||'Diniyah')).map(d=>({v:d.mapel, label:d.mapel}));
+    const setoranReady=!!parseFormLink(st.setoranFormId), nilaiReady=!!parseFormLink(st.nilaiFormId);
+
     return {
       view:v, role:st.role, roleLabel, userName:st.userName, greeting: st.userName?('Halo, '+st.userName):'',
       isLogin:v==='login', isGallery:v==='gallery', isDetail:v==='detail', isDashboard:v==='dashboard',
@@ -1275,18 +1351,32 @@ class Component extends DCLogic {
       loginMudir:()=>this.setState({role:'mudir', view:'dashboard', loginOpen:false}),
       loginMusyrif:()=>this.setState({role:'musyrif', view:'dashboard', loginOpen:false}),
       loginPublic:()=>this.setState({role:'public', view:'gallery'}),
-      // Two embedded input forms (+ Input toggle): daily Setoran + periodic Nilai ujian. (Absensi is a separate admin screen.)
+      // Custom input forms (+ Input toggle): daily Setoran + periodic Nilai ujian, both POST to their forms.
       entryKind, isSetoran: entryKind==='setoran', isNilai: entryKind==='nilai',
       entryTitle: entryKind==='nilai' ? 'Input Nilai Ujian/Tes' : 'Input Setoran Harian',
       segSetoranStyle: entryKind==='setoran'?SEG_ON:SEG_OFF, segNilaiStyle: entryKind==='nilai'?SEG_ON:SEG_OFF,
       showSetoran:()=>this.setState({entryKind:'setoran'}),
       showNilai:()=>this.setState({entryKind:'nilai'}),
+      santriOpts,
+      // Setoran form
+      sSantri:st.sSantri, sDate:st.sDate||todayStr(), sJenisChips, sJuz:st.sJuz, sHalaman:st.sHalaman, sSurah:st.sSurah, sAyatDari:st.sAyatDari, sAyatKe:st.sAyatKe, sStars, sCatatan:st.sCatatan, sMsg:st.sMsg, setoranReady, setoranNotReady:!setoranReady,
+      setSSantri:(e)=>this.setState({sSantri:e.target.value}), setSDate:(e)=>this.setState({sDate:e.target.value}),
+      setSJuz:(e)=>this.setState({sJuz:e.target.value}), setSHalaman:(e)=>this.setState({sHalaman:e.target.value}),
+      setSSurah:(e)=>this.setState({sSurah:e.target.value}), setSAyatDari:(e)=>this.setState({sAyatDari:e.target.value}), setSAyatKe:(e)=>this.setState({sAyatKe:e.target.value}),
+      setSCatatan:(e)=>this.setState({sCatatan:e.target.value}),
+      saveSetoran:()=>{ const s=this.state; const id=(s.sSantri||'').trim(); if(!id){ this.setState({sMsg:'Pilih santri dahulu.'}); return; }
+        const rec={ id, tanggal:(s.sDate||todayStr()), jenis:s.sJenis||'Ziyadah', juz:String(s.sJuz||'').trim(), halaman:String(s.sHalaman||'').trim(), surah:String(s.sSurah||'').trim(), ayat_dari:String(s.sAyatDari||'').trim(), ayat_ke:String(s.sAyatKe||'').trim(), nilai:(s.sRating?String(s.sRating):''), catatan:String(s.sCatatan||'').trim() };
+        const ok=postForm(parseFormLink(s.setoranFormId), rec);
+        this.setState({ sJuz:'', sHalaman:'', sSurah:'', sAyatDari:'', sAyatKe:'', sRating:0, sCatatan:'', sMsg: ok?'Setoran tersimpan ✓':'Belum tersimpan — form Setoran perlu pre-filled link (Konfigurasi, GUIDE §5).' }); },
+      // Nilai form
+      nSantri:st.nSantri, nDate:st.nDate||todayStr(), nBidangChips, nMapel:st.nMapel, nMapelOpts, nJenis:st.nJenis, nNilai:st.nNilai, nMsg:st.nMsg, nilaiReady, nilaiNotReady:!nilaiReady,
+      setNSantri:(e)=>this.setState({nSantri:e.target.value}), setNDate:(e)=>this.setState({nDate:e.target.value}),
+      setNMapel:(e)=>this.setState({nMapel:e.target.value}), setNJenis:(e)=>this.setState({nJenis:e.target.value}), setNNilai:(e)=>this.setState({nNilai:e.target.value}),
+      saveNilai:()=>{ const s=this.state; const id=(s.nSantri||'').trim(); if(!id){ this.setState({nMsg:'Pilih santri dahulu.'}); return; } if(!(s.nMapel||'').trim()){ this.setState({nMsg:'Pilih mapel dahulu.'}); return; }
+        const rec={ id, tanggal:(s.nDate||todayStr()), bidang:s.nBidang||'Diniyah', mapel:s.nMapel, jenis:s.nJenis||'Tes / Kuis', nilai:String(s.nNilai||'').trim() };
+        const ok=postForm(parseFormLink(s.nilaiFormId), rec);
+        this.setState({ nMapel:'', nNilai:'', nMsg: ok?'Nilai tersimpan ✓':'Belum tersimpan — form Nilai perlu pre-filled link (Konfigurasi, GUIDE §5).' }); },
       setoranFormId:st.setoranFormId, nilaiFormId:st.nilaiFormId,
-      formEmbedUrl:'https://docs.google.com/forms/d/e/'+activeFormId+'/viewform?embedded=true',
-      formOpenUrl:'https://docs.google.com/forms/d/e/'+activeFormId+'/viewform',
-      formConfigured, formNotConfigured: !formConfigured,
-      setSetoranFormId:(ev)=>this.setState({setoranFormId:ev.target.value}),
-      setNilaiFormId:(ev)=>this.setState({nilaiFormId:ev.target.value}),
       dataStatus, sheetId:st.sheetId,
       setSheetId:(ev)=>this.setState({sheetId:ev.target.value}),
       // Config sheet (read-only display)
@@ -1294,8 +1384,8 @@ class Component extends DCLogic {
       reloadConfig:()=>this.loadConfig(),
       cfgRows:[
         { label:'Sumber data (Sheet)', ok:!!(st.sheetId&&st.sheetId!==CONFIG_ID), dot:(st.sheetId?'#1f7a34':'#c9cdd4'), val: st.sheetId?(String(st.sheetId).slice(0,8)+'…'):'— config sheet' },
-        { label:'Form Setoran Harian', ok:!!st.setoranFormId, dot:(st.setoranFormId?'#1f7a34':'#c9cdd4'), val: st.setoranFormId?'terhubung':'belum diisi' },
-        { label:'Form Nilai Ujian/Tes', ok:!!st.nilaiFormId, dot:(st.nilaiFormId?'#1f7a34':'#c9cdd4'), val: st.nilaiFormId?'terhubung':'belum diisi' },
+        { label:'Form Setoran Harian', ok:setoranReady, dot:(setoranReady?'#1f7a34':(st.setoranFormId?'#cfa02c':'#c9cdd4')), val: setoranReady?'terhubung':(st.setoranFormId?'perlu pre-filled link':'belum diisi') },
+        { label:'Form Nilai Ujian/Tes', ok:nilaiReady, dot:(nilaiReady?'#1f7a34':(st.nilaiFormId?'#cfa02c':'#c9cdd4')), val: nilaiReady?'terhubung':(st.nilaiFormId?'perlu pre-filled link':'belum diisi') },
         { label:'Absensi (pre-filled link)', ok:kehConfigured, dot:(kehConfigured?'#1f7a34':'#c9cdd4'), val: kehConfigured?'terhubung':'belum diisi' },
       ],
       reloadRoster:()=>{ this.loadRoster(); this.loadNilai(); this.loadSetoran(); this.loadKehadiran(); this.loadMapel(); this.loadHalaqah(); },
