@@ -502,9 +502,11 @@ both ayat fields are blank (whole surah). Question titles can be `ayat_dari`/`ay
 → Link to the **Private** spreadsheet → rename the response tab to **`Nilai`** (§2c). No reshape
 needed — the app reads by header and ignores the `Timestamp` column.
 
-**Form C — Kehadiran** *(optional, attendance; §2f)*. This form is the **write endpoint for the
-in-app admin quick-log** (the app POSTs to it). So make every question **Short answer** (single value
-→ simple POST), **not** Date/Dropdown/Multiple-choice:
+**Form C — Kehadiran** *(optional, attendance; §2f)*. **Unlike Forms A/B, nobody ever opens this
+form** — it's just the invisible **write endpoint** the in-app admin quick-log POSTs to (the admin
+uses the app's own santri dropdown / status buttons / date-picker / time input). Because a
+programmatic POST needs one value per field — and Google splits **Date** into `_year/_month/_day` and
+**Time** into `_hour/_minute` — make every question **Short answer**, not Date/Time/Dropdown:
 
 | Question title | Google Forms type | Required | Notes |
 |----------------|-------------------|----------|-------|
