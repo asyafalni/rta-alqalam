@@ -815,15 +815,15 @@ class Component extends DCLogic {
     if(!CONFIG_ID){ this.setState({loadState:'demo'}); return; }
     this.setState({loadState:'loading'});
     try{
-      const url='https://docs.google.com/spreadsheets/d/'+CONFIG_ID+'/gviz/tq?tqx=out:json&headers=1&sheet=Config';
+      // Read raw (no headers=1): column A = key, column B = value. No header row needed.
+      const url='https://docs.google.com/spreadsheets/d/'+CONFIG_ID+'/gviz/tq?tqx=out:json&sheet=Config';
       const text=await (await fetch(url)).text();
       const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
-      const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
-      // GViz returns the FIRST sheet when "Config" is missing → only trust it if it has a `key` column.
-      const hasKey=cols.indexOf('key')>=0;
-      const map={}; if(hasKey){ (json.table.rows||[]).forEach(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); const k=String(o.key!=null?o.key:'').trim().toLowerCase(); if(k) map[k]=(o.value!=null?String(o.value):'').trim(); }); }
+      const map={}; (json.table.rows||[]).forEach(r=>{ const c=r.c||[]; const k=String((c[0]&&c[0].v!=null)?c[0].v:'').trim().toLowerCase(); const val=String((c[1]&&c[1].v!=null)?c[1].v:'').trim(); if(k&&k!=='key') map[k]=val; });
+      // Only a real Config tab has these keys (else GViz returned the default sheet, e.g. Roster).
+      const isConfig=['sheet_id','sheetid','setoran','nilai','absensi'].some(k=>k in map);
       const sheetId=(map.sheet_id||map.sheetid||'').trim()||CONFIG_ID;
-      this.setState({ sheetId, setoranFormId:map.setoran||map.setoran_link||'', nilaiFormId:map.nilai||map.nilai_link||'', kehLink:map.absensi||map.absensi_link||'', cfgFound: hasKey && Object.keys(map).length>0 });
+      this.setState({ sheetId, setoranFormId:map.setoran||map.setoran_link||'', nilaiFormId:map.nilai||map.nilai_link||'', kehLink:map.absensi||map.absensi_link||'', cfgFound:isConfig });
       // give setState a tick to flush, then load the data tabs from sheetId
       setTimeout(()=>{ this.loadRoster(); this.loadNilai(); this.loadSetoran(); this.loadKehadiran(); this.loadMapel(); this.loadHalaqah(); }, 0);
     }catch(e){
