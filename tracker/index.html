@@ -1147,7 +1147,7 @@ class Component extends DCLogic {
       divStyle:{borderColor:v.divider},
       barTrack:{background:theme==='minimal'?'#eef0f4':'rgba(255,255,255,.14)'},
       onOpen:()=>this.setState({selectedId:r.id, view:'detail'}),
-      onEntry:()=>this.setState({entryOpen:true}),
+      onEntry:()=>this.setState({entryOpen:true, sSantri:r.id, nSantri:r.id}),
     };
   }
 
