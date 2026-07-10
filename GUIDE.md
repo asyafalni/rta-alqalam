@@ -572,13 +572,13 @@ A/B** — consistent, and the raw sheet gets clean typed data:
 
 → Link to the **Private** spreadsheet → rename the response tab to **`Absensi`**.
 
-**Wire it to the app (one paste):** in the form, **⋮ → Get pre-filled link**, then fill it with any
-recognisable values — `id` = pick any santri, `tanggal` = pick any date, `status` = pick any status,
-`jam` = pick any time, `reason` = type **`__REASON__`** (or leave blank) — **Get link**, and paste that
-URL into **Konfigurasi → Absensi (pre-filled link)**. The app auto-detects each field (the Date field
-by its `_year` part, Time by `_hour`, `status` by its value, `reason` by the sentinel, and `id` = the
-remaining one) — **no per-field IDs to copy**. Konfigurasi shows **✓ Form absensi terhubung** when it
-parsed. *(Prefer Short answer everywhere with `__ID__`/`__TANGGAL__`/… sentinels? That still works too.
+**Wire it to the app (one paste):** in the form, **⋮ → Get pre-filled link**, then fill it with a
+**real example** — `id` = a santri like `s1`, `tanggal` = `2026-07-10`, `status` = `Izin`, `jam` =
+`15:00`, `reason` = anything (e.g. `Dijemput orang tua`) — **Get link**, and paste that URL into
+**Konfigurasi → Absensi (pre-filled link)**. The app auto-detects each field by its **value pattern**
+(date `YYYY-MM-DD` → `tanggal`, `HH:MM` → `jam`, a status word → `status`, `s`+number → `id`, the
+leftover → `reason`) — **no per-field IDs to copy**. Konfigurasi shows **✓ Form absensi terhubung** when
+it parsed. *(Prefer Short answer everywhere with `__ID__`/`__TANGGAL__`/… sentinels? That still works too.
 Or just type the tab by hand — the quick-log logs in-session regardless.)*
 
 > **Field-type tips**
