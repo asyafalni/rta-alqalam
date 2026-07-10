@@ -776,18 +776,22 @@ function parseKehLink(link){
   if(!cfg.id||!cfg.tanggal||!cfg.status) return null;
   return cfg;
 }
-// Generic pre-filled-link parser for the Setoran/Nilai custom forms. Each field is identified by a
-// __KEY__ sentinel in the pre-fill (Date fields by their _year part, Time by _hour). → {action, map}.
-function parseFormLink(link){
-  link=String(link||'').trim(); if(!link) return null;
+// Field order for the Setoran / Nilai forms (used for order-based pre-fill mapping).
+const SETORAN_KEYS=['id','tanggal','jenis','juz','halaman','surah','ayat_dari','ayat_ke','nilai','catatan'];
+const NILAI_KEYS=['id','tanggal','bidang','mapel','jenis','nilai'];
+// Pre-filled-link parser for the Setoran/Nilai custom forms. Maps each entry to a field by POSITION
+// (fill the pre-fill with real example values in field order), and a __KEY__ sentinel value overrides
+// the position for that field (order-independent). Date/Time sub-parts collapse to one slot.
+function parseFormLink(link, keys){
+  link=String(link||'').trim(); if(!link || !keys) return null;
   const fm=link.match(/forms\/d\/e\/([^\/?#]+)/); if(!fm) return null;
   const action='https://docs.google.com/forms/d/e/'+fm[1]+'/formResponse';
-  const map={}; const re=/entry\.(\d+)(_year|_month|_day|_hour|_minute)?=([^&#]*)/g; let m;
+  const slots=[], seen={}; const re=/entry\.(\d+)(_year|_month|_day|_hour|_minute)?=([^&#]*)/g; let m;
   while((m=re.exec(link))){ const num=m[1], suf=m[2]||'', val=decodeURIComponent((m[3]||'').replace(/\+/g,' '));
-    if(suf==='_year'){ map.tanggal={dateBase:num}; continue; }
-    if(suf==='_hour'){ map.jam={timeBase:num}; continue; }
-    if(suf) continue;
-    const mm=val.match(/^__([A-Z_]+)__$/); if(mm) map[mm[1].toLowerCase()]={simple:'entry.'+num}; }
+    if(suf){ if(!seen[num]){ seen[num]=1; slots.push(/_(year|month|day)/.test(suf)?{dateBase:num}:{timeBase:num}); } }
+    else slots.push({simple:'entry.'+num, val}); }
+  const map={};
+  slots.forEach((s,i)=>{ let key=keys[i]; if(s.val){ const mm=s.val.match(/^__([A-Z_]+)__$/); if(mm) key=mm[1].toLowerCase(); } if(key) map[key]=s; });
   return (map.id && map.tanggal) ? {action, map} : null;
 }
 // Build a no-cors POST body from a parsed config + a record. Splits date (YYYY-MM-DD) / time (HH:MM).
@@ -1270,7 +1274,7 @@ class Component extends DCLogic {
     const sStars=[1,2,3,4,5].map(n=>({n, star:(n<=sRating?'★':'☆'), col:(n<=sRating?'#e0a92c':'#d8d5cc'), onPick:()=>this.setState({sRating:n})}));
     const nBidangChips=['Diniyah','Akademik','Ekstrakurikuler'].map(vv=>{ const active=(st.nBidang||'Diniyah')===vv, c='#0a4631'; return {v:vv, style:'flex:1;padding:9px 5px;border-radius:9px;border:1px solid '+(active?c:'#e6e1d5')+';background:'+(active?c:'#fff')+';color:'+(active?'#fff':'#16264d')+';font-weight:700;font-size:11px;cursor:pointer', onPick:()=>this.setState({nBidang:vv, nMapel:''})}; });
     const nMapelOpts=activeMapel.filter(d=>normBidang(d.bidang)===(st.nBidang||'Diniyah')).map(d=>({v:d.mapel, label:d.mapel}));
-    const setoranReady=!!parseFormLink(st.setoranFormId), nilaiReady=!!parseFormLink(st.nilaiFormId);
+    const setoranReady=!!parseFormLink(st.setoranFormId, SETORAN_KEYS), nilaiReady=!!parseFormLink(st.nilaiFormId, NILAI_KEYS);
 
     return {
       view:v, role:st.role, roleLabel, userName:st.userName, greeting: st.userName?('Halo, '+st.userName):'',
@@ -1371,7 +1375,7 @@ class Component extends DCLogic {
       setSCatatan:(e)=>this.setState({sCatatan:e.target.value}),
       saveSetoran:()=>{ const s=this.state; const id=(s.sSantri||'').trim(); if(!id){ this.setState({sMsg:'Pilih santri dahulu.'}); return; }
         const rec={ id, tanggal:(s.sDate||todayStr()), jenis:s.sJenis||'Ziyadah', juz:String(s.sJuz||'').trim(), halaman:String(s.sHalaman||'').trim(), surah:String(s.sSurah||'').trim(), ayat_dari:String(s.sAyatDari||'').trim(), ayat_ke:String(s.sAyatKe||'').trim(), nilai:(s.sRating?String(s.sRating):''), catatan:String(s.sCatatan||'').trim() };
-        const ok=postForm(parseFormLink(s.setoranFormId), rec);
+        const ok=postForm(parseFormLink(s.setoranFormId, SETORAN_KEYS), rec);
         this.setState({ sJuz:'', sHalaman:'', sSurah:'', sAyatDari:'', sAyatKe:'', sRating:0, sCatatan:'', sMsg: ok?'Setoran tersimpan ✓':'Belum tersimpan — form Setoran perlu pre-filled link (Konfigurasi, GUIDE §5).' }); },
       // Nilai form
       nSantri:st.nSantri, nDate:st.nDate||todayStr(), nBidangChips, nMapel:st.nMapel, nMapelOpts, nJenis:st.nJenis, nNilai:st.nNilai, nMsg:st.nMsg, nilaiReady, nilaiNotReady:!nilaiReady,
@@ -1379,7 +1383,7 @@ class Component extends DCLogic {
       setNMapel:(e)=>this.setState({nMapel:e.target.value}), setNJenis:(e)=>this.setState({nJenis:e.target.value}), setNNilai:(e)=>this.setState({nNilai:e.target.value}),
       saveNilai:()=>{ const s=this.state; const id=(s.nSantri||'').trim(); if(!id){ this.setState({nMsg:'Pilih santri dahulu.'}); return; } if(!(s.nMapel||'').trim()){ this.setState({nMsg:'Pilih mapel dahulu.'}); return; }
         const rec={ id, tanggal:(s.nDate||todayStr()), bidang:s.nBidang||'Diniyah', mapel:s.nMapel, jenis:s.nJenis||'Tes / Kuis', nilai:String(s.nNilai||'').trim() };
-        const ok=postForm(parseFormLink(s.nilaiFormId), rec);
+        const ok=postForm(parseFormLink(s.nilaiFormId, NILAI_KEYS), rec);
         this.setState({ nMapel:'', nNilai:'', nMsg: ok?'Nilai tersimpan ✓':'Belum tersimpan — form Nilai perlu pre-filled link (Konfigurasi, GUIDE §5).' }); },
       setoranFormId:st.setoranFormId, nilaiFormId:st.nilaiFormId,
       dataStatus, sheetId:st.sheetId,
