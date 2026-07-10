@@ -23,6 +23,7 @@ academics, reporting).
  │  ├─ tab: Master               │   one row per santri (public A–R · private S+)
  │  ├─ tab: Nilai                │   one row per test (Diniyah/Akademik/Ekstrakurikuler)
  │  ├─ tab: Mapel                │   subject definitions per group (bidang, mapel)
+ │  ├─ tab: Halaqah              │   circle names + musyrif (hal, nama, musyrif)
  │  └─ tab: Absensi              │   one row per absence (id, tanggal, status, …)
  └───────────────┬───────────────┘
                  │  IMPORTRANGE (one-way, authorized once)
@@ -32,6 +33,7 @@ academics, reporting).
  │  ├─ tab: Roster               │   public columns A–R only, mirrored live
  │  ├─ tab: Nilai                │   per-test scores, mirrored live
  │  ├─ tab: Mapel                │   subject definitions, mirrored live
+ │  ├─ tab: Halaqah              │   circle names + musyrif, mirrored live
  │  ├─ tab: Setoran              │   daily log (id,tanggal,jenis,juz,…), mirrored live
  │  └─ tab: Absensi              │   only absences (id,tanggal,status,…), mirrored live
  └───────────────┬───────────────┘
@@ -75,12 +77,14 @@ New to Google Sheets/Forms? Follow these steps top to bottom. Sections §2–§7
    how every other tab links to the student, so keep it stable. Put private data (wali, phone, …)
    **from column R onward** (see the ⚠️ in §2b).
 
-### Step 3 — Add the `Mapel` tab
+### Step 3 — Add the `Mapel` and `Halaqah` tabs
 1. Bottom-left **＋** to add a tab → name it **`Mapel`**. Row 1: `bidang` , `mapel`. List your
    subjects, one per row (which `bidang` values are allowed → **§2d**).
+2. Add another tab → **`Halaqah`**. Row 1: `hal  nama  musyrif` — one row per circle, e.g.
+   `1 · Umar bin Khattab · Ustadz Salman Al-Farisi` (§2g). `hal` matches the `hal` column in `Master`.
 
-> **That's the only tab you create by hand.** The `Setoran`, `Nilai`, and (optional) `Absensi` tabs
-> are **created automatically** when you link their forms in Step 4 — do **not** pre-create empty
+> **Those are the only tabs you create by hand.** The `Setoran`, `Nilai`, and (optional) `Absensi`
+> tabs are **created automatically** when you link their forms in Step 4 — do **not** pre-create empty
 > versions, or you'll end up with duplicates. (Prefer to hand-build `Absensi` instead of a form?
 > Then add it here with row 1 `id  tanggal  status  jam  reason` — §2f.)
 
@@ -125,15 +129,16 @@ Send yourself one test submission through each form and confirm a row lands in t
    ```
 3. Press Enter → the cell shows **`#REF!`** with an **Allow access** button → click it **once**
    (this authorises Private→Public forever). Rows should fill in.
-4. Add three more tabs and paste one formula in A1 of each (details/variants in **§2c/§2d/§2a**):
+4. Add more tabs and paste one formula in A1 of each (details/variants in **§2c/§2d/§2g/§2a**):
    - **`Nilai`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Nilai!A1:Z"),"where Col2 is not null",1)`
    - **`Mapel`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Mapel!A1:B"),"where Col1 is not null",1)`
+   - **`Halaqah`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Halaqah!A1:C"),"where Col1 is not null",1)`
    - **`Setoran`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Setoran!A1:Z"),"where Col2 is not null",1)`
    - **`Absensi`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Absensi!A1:Z"),"where Col2 is not null",1)`
    Click **Allow access** on each the first time.
 
-> Only need the roster to start? Just do the `Roster` tab; add `Nilai`/`Mapel`/`Setoran`/`Absensi`
-> later. Any tab you skip, the app fills with demo data.
+> Only need the roster to start? Just do the `Roster` tab; add `Nilai`/`Mapel`/`Halaqah`/`Setoran`/
+> `Absensi` later. Any tab you skip, the app fills with demo data.
 
 ### Step 6 — Share settings (this is what makes it safe → §4)
 - **PRIVATE** sheet & both forms: **Share** → keep **Restricted**, invite only staff emails
@@ -199,7 +204,7 @@ keys (the tracker matches by header):
 | C | `nick` | nickname / panggilan | text | staff |
 | D | `kota` | city | text | staff |
 | E | `prov` | province | text | staff |
-| F | `hal`  | halaqah number | number | staff |
+| F | `hal`  | halaqah key — a number/id that links the santri to the **`Halaqah`** tab (§2g) for the circle's name + musyrif | number | staff |
 | G | `haf`  | Hafalan (0–100) | number | Musyrif/Mudir |
 | H | `tah`  | Tahsin — tajwid+kelancaran (0–100) | number | Musyrif/Mudir |
 | I | `mur`  | Muroja'ah (0–100) | number | Musyrif/Mudir |
@@ -223,9 +228,9 @@ keys (the tracker matches by header):
 > exact, copy-paste formulas per pillar. Keeping `Master` current (manual vs formula) is your
 > choice — the tracker only needs this row-per-santri shape.
 >
-> **Musyrif & Mudir** are set in code, not the sheet: edit the `HALAQAH` map
-> (halaqah → list of musyrif names; add names as you hire) and the `MUDIR`
-> constant near the top of `tracker/index.html`’s `<script>`.
+> **Halaqah & Musyrif** are defined in the **`Halaqah` tab (§2g)** — each halaqah has a free-text
+> name and a single musyrif, keyed by `hal`. Only the **Mudir** stays a code constant (`MUDIR`, one
+> per school) near the top of `tracker/index.html`’s `<script>`.
 >
 > **Tracking by page (`curpg`):** the app assumes the standard 604-page Madinah/Uthmani mushaf
 > (Juz 1 = pages 1–21, then 20 pages/juz). Enter the page a santri is currently on and it computes
@@ -433,6 +438,25 @@ like — the point is different absence types **deduct differently** (Alpa hurts
 
 ---
 
+### 2g. Tab `Halaqah` (circle definitions) — free-text names + one musyrif each
+Give each halaqah a **name** and a **single musyrif**. One row per circle:
+
+| hal | nama | musyrif |
+|-----|------|---------|
+| 1 | Umar bin Khattab | Ustadz Salman Al-Farisi |
+| 2 | Abu Bakar Ash-Shiddiq | Ustadz Hamzah Abdurrahman |
+
+- `hal` matches the **`hal`** value in `Master` (the santri's halaqah). `nama` is the circle's name —
+  the app shows **"Halaqah {nama}"** (e.g. *Halaqah Umar bin Khattab*), so type the name only. `musyrif`
+  is the one teacher for that circle.
+- Used on each santri's detail + Rapor, and the **Halaqah filter** shows these names.
+- Mirror to the **PUBLIC** sheet as a tab named exactly `Halaqah`:
+  `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Halaqah!A1:C"), "where Col1 is not null", 1)`
+- Until the tab exists, the tracker uses a built-in demo. Add a row whenever you open a new circle or
+  hire a musyrif — no code change.
+
+---
+
 ## 3. PUBLIC sheet — the reference (mirror)
 
 Create a **second** spreadsheet (e.g. **"RTA Tracker — PUBLIC"**). It contains **one tab named
@@ -579,8 +603,9 @@ dikonfigurasi" prompt (Setoran/Nilai) or logs in-session only (Absensi).
 2. Paste the **PUBLIC** Sheet ID into **Google Sheet ID** and click **Muat Data**.
 3. Status flips from *"Data contoh (demo)"* → *"Live · Google Sheet"*.
 
-From that **one** Public Sheet ID the tracker reads five tabs via GViz — **`Roster`** (santri),
-**`Nilai`** (tests), **`Mapel`** (subjects), **`Setoran`** (daily log), **`Absensi`** (absences) — e.g.
+From that **one** Public Sheet ID the tracker reads six tabs via GViz — **`Roster`** (santri),
+**`Nilai`** (tests), **`Mapel`** (subjects), **`Halaqah`** (circles), **`Setoran`** (daily log),
+**`Absensi`** (absences) — e.g.
 `https://docs.google.com/spreadsheets/d/<PUBLIC_ID>/gviz/tq?tqx=out:json&sheet=Roster`
 Each tab is optional: any that's missing or unreachable falls back to built-in demo data automatically.
 

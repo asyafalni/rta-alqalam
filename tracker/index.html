@@ -131,7 +131,7 @@
             <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">NIS</span><span style="font-weight:700">: {{ selNis }}</span></div>
             <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Kelas</span><span style="font-weight:700">: {{ sel.kelas }}</span></div>
             <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Peringkat</span><span style="font-weight:700">: {{ selRankLabel }}</span></div>
-            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Halaqah</span><span style="font-weight:700">: Halaqah {{ sel.hal }}</span></div>
+            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Halaqah</span><span style="font-weight:700">: {{ sel.halaqahLabel }}</span></div>
             <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Musyrif</span><span style="font-weight:700">: {{ sel.musyrif }}</span></div>
             <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Asal</span><span style="font-weight:700">: {{ sel.kota }}, {{ sel.prov }}</span></div>
             <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Mudir</span><span style="font-weight:700">: {{ sel.mudir }}</span></div>
@@ -297,7 +297,7 @@
           </div>
           <div style="margin-top:16px;text-align:left;font-size:11.5px;color:rgba(245,243,236,.55);line-height:1.7">
             <div style="display:flex;justify-content:space-between;gap:12px"><span>Kelas</span><span style="color:#f5f3ec;font-weight:600;text-align:right">Kelas {{ sel.kelas }}</span></div>
-            <div style="display:flex;justify-content:space-between;gap:12px"><span>Halaqah</span><span style="color:#f5f3ec;font-weight:600;text-align:right">Halaqah {{ sel.hal }}</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span>Halaqah</span><span style="color:#f5f3ec;font-weight:600;text-align:right">{{ sel.halaqahLabel }}</span></div>
             <div style="display:flex;justify-content:space-between;gap:12px"><span>Musyrif</span><span style="color:#f5f3ec;font-weight:600;text-align:right">{{ sel.musyrif }}</span></div>
             <div style="display:flex;justify-content:space-between;gap:12px"><span>Mudir</span><span style="color:#f5f3ec;font-weight:600;text-align:right">{{ sel.mudir }}</span></div>
           </div>
@@ -456,7 +456,7 @@
           <div class="roster-row" style="padding:12px 18px;border-bottom:1px solid #f0ede4">
             <div class="r-santri" style="display:flex;align-items:center;gap:10px;min-width:0">
               <span title="{{ s.tier }}" style="width:34px;height:34px;border-radius:50%;background:{{ s.tierColor }};color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.12)">{{ s.initials }}</span>
-              <div style="min-width:0"><div style="display:flex;align-items:center;gap:6px;min-width:0"><span style="font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.nick }}</span><span style="flex:none;font-size:9.5px;font-weight:800;color:#8a6d1e;background:#f5ecd3;border:1px solid #e6d3a0;padding:1px 6px;border-radius:6px">{{ s.kelas }}</span></div><div style="font-size:11px;color:#9aa1ad">Halaqah {{ s.hal }}</div></div>
+              <div style="min-width:0"><div style="display:flex;align-items:center;gap:6px;min-width:0"><span style="font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.nick }}</span><span style="flex:none;font-size:9.5px;font-weight:800;color:#8a6d1e;background:#f5ecd3;border:1px solid #e6d3a0;padding:1px 6px;border-radius:6px">{{ s.kelas }}</span></div><div style="font-size:11px;color:#9aa1ad">{{ s.halaqahLabel }}</div></div>
             </div>
             <div class="r-prog">
               <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:4px"><span>{{ s.juz }}/15 Juz</span><span>{{ s.juzPct }}%</span></div>
@@ -627,8 +627,12 @@ const RAW = [
   {id:'s10',name:'Rasyid Pratama Wijaya', nick:'Rasyid', kelas:'VII', kota:'Sungailiat', prov:'Kep. Bangka Belitung', hal:2, haf:74,tah:77,mur:72,ilm:75,akh:80,akd:80,bhs:76, juzdone:'1,2,3,29,30', curpg:550, nis:'2426010'},
   {id:'s11',name:'Abdullah Hafizhan', nick:'Abdullah', kelas:'VIII', kota:'Garut', prov:'Jawa Barat', hal:1, haf:97,tah:95,mur:94,ilm:95,akh:96,akd:91,bhs:93, juzdone:'26,27,28,29,30,1,2,3,4,5,6,7,8,9,10,11,12,13', curpg:268, nis:'2426011'},
 ];
-// Each halaqah can have one or more musyrif (add names as you hire).
-const HALAQAH = { 1:['Ustadz Salman Al-Farisi'], 2:['Ustadz Hamzah Abdurrahman'] };
+// Halaqah = a named memorization circle with a single musyrif. Keyed by the `hal` value in Master.
+// Editable in the public "Halaqah" sheet tab (hal, nama, musyrif); this is the demo fallback.
+const HALAQAH = {
+  '1': { nama:'Umar bin Khattab', musyrif:'Ustadz Salman Al-Farisi' },
+  '2': { nama:'Abu Bakar Ash-Shiddiq', musyrif:'Ustadz Hamzah Abdurrahman' },
+};
 // One mudir for the whole school.
 const MUDIR = 'Ustadz Abdul Hakim, Lc.';
 // Academic terms for the report card (newest first). `start`/`end` bound which Nilai rows the
@@ -793,14 +797,14 @@ class Component extends DCLogic {
     setoranFormId:'', nilaiFormId:'', entryKind:'setoran',
     sheetId:'', sheetTab:'Roster', students:null, loadState:'demo',
     clerkReady:false, userName:'', entryOpen:false, configOpen:false,
-    nilai:null, setoran:null, kehadiran:null, mapelDef:null, raporOpen:false, termId:'2026g', groupFilter:'all', filterOpen:false,
+    nilai:null, setoran:null, kehadiran:null, mapelDef:null, halaqahDef:null, raporOpen:false, termId:'2026g', groupFilter:'all', filterOpen:false,
     // Admin attendance quick-log
     kehOpen:false, kehDate:'', kehSantri:'', kehStatus:'Izin', kehJam:'', kehReason:'', kehPending:[], kehLink:'', kehMsg:'',
   };
 
   // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
   //      the demo RAW until a viewable sheet + "Roster" tab are configured.
-  componentDidMount(){ if((this.state.sheetId||'').trim()){ this.loadRoster(); this.loadNilai(); this.loadSetoran(); this.loadKehadiran(); this.loadMapel(); } this.initClerk(); }
+  componentDidMount(){ if((this.state.sheetId||'').trim()){ this.loadRoster(); this.loadNilai(); this.loadSetoran(); this.loadKehadiran(); this.loadMapel(); this.loadHalaqah(); } this.initClerk(); }
 
   // ---- Auth: Clerk (client-side). Reads the signed-in user's role from
   //      publicMetadata.role (admin/mudir/musyrif); falls back to the demo
@@ -906,6 +910,19 @@ class Component extends DCLogic {
     }catch(e){ console.error('loadMapel failed', e); this.setState({mapelDef:null}); }
   }
 
+  async loadHalaqah(){
+    const id=(this.state.sheetId||'').trim();
+    if(!id){ this.setState({halaqahDef:null}); return; }
+    try{
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&headers=1&sheet=Halaqah';
+      const text=await (await fetch(url)).text();
+      const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
+      const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
+      const map={}; (json.table.rows||[]).forEach(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); const h=(o.hal!=null?String(o.hal):'').trim(); if(h) map[h]={ nama:(o.nama||o.name||'').toString().trim(), musyrif:(o.musyrif||'').toString().trim() }; });
+      this.setState({halaqahDef:Object.keys(map).length?map:null});
+    }catch(e){ console.error('loadHalaqah failed', e); this.setState({halaqahDef:null}); }
+  }
+
   mapRow(o){
     const num=x=>{ const n=Number(x); return isFinite(n)?n:0; };
     return { id:String(o.id!=null?o.id:''), name:o.name||o.nama||'',
@@ -956,6 +973,11 @@ class Component extends DCLogic {
 
   enrich(r){
     const theme=this.state.theme;
+    // Halaqah: named circle + single musyrif, from the "Halaqah" sheet (fallback: HALAQAH constant).
+    const halMap=(this.state.halaqahDef&&Object.keys(this.state.halaqahDef).length)?this.state.halaqahDef:HALAQAH;
+    const hdef=halMap[String(r.hal)]||null;
+    const hd={ nama:(hdef&&hdef.nama)?hdef.nama:String(r.hal||'—'), musyrif:(hdef&&hdef.musyrif)?hdef.musyrif:'—' };
+    hd.label='Halaqah '+hd.nama;
     // which specific juz are memorized (any order); count & progress derive from it
     const juzDone=(r.juzdone!=null&&String(r.juzdone).length)
       ? String(r.juzdone).split(/[^0-9]+/).map(Number).filter(n=>n>=1&&n<=30)
@@ -976,7 +998,7 @@ class Component extends DCLogic {
     return {...r, initials, overall, gLetter:og.l, gName:og.name, gColor:og.c, tier, tierColor:TIER_ACCENT[tier],
       juz:juzCount, curJuz, juzDone,
       curpg:pg, hasPage:!!pInfo, pgInJuz:pInfo?pInfo.inJuz:0, pgLenJuz:pInfo?pInfo.lenJuz:0, pgPctJuz:pInfo?pInfo.pctJuz:0, pgLeft:pInfo?pInfo.leftInJuz:0, pgNextJuz:pInfo?pInfo.nextJuz:0,
-      juzPct:hafPct, barBase, barOver, overTarget, hafPctColor:(overTarget?'#a07d1e':'#2f8f3a'), musyrif:(HALAQAH[r.hal]||[]).join(', '), mudir:MUDIR, kelas:r.kelas||'—',
+      juzPct:hafPct, barBase, barOver, overTarget, hafPctColor:(overTarget?'#a07d1e':'#2f8f3a'), halaqahLabel:hd.label, halaqahName:hd.nama, musyrif:hd.musyrif, mudir:MUDIR, kelas:r.kelas||'—',
       curArab:String(curJuz).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d)),
       pillars:scores.map(s=>({abbr:s.abbr, label:s.label, score:s.score, letter:s.g.l, color:s.g.c, grp:s.grp, pname:s.g.name})),
       cardStyle:v.card, nameStyle:v.name, subStyle:v.sub, ratingStyle:v.rating, ratingSubStyle:v.ratingSub,
@@ -1053,12 +1075,13 @@ class Component extends DCLogic {
     const filterCount=all.filter(groupMatch).length;
     const kelasList=Array.from(new Set(all.map(s=>String(s.kelas||'').trim()).filter(k=>k&&k!=='—'))).sort((a,b)=>kelasRank(a)-kelasRank(b));
     const halList=Array.from(new Set(all.map(s=>String(s.hal||'').trim()).filter(Boolean))).sort((a,b)=>(+a)-(+b));
+    const halNameByHal={}; all.forEach(s=>{ halNameByHal[String(s.hal)]=s.halaqahName; });
     // Popover filter: chips carry their own onPick + active-state colors (like s.onOpen).
     const mkChip=(v,label)=>{ const active=gf===v; return {v, label, active, bg:active?'#0a4631':'#f7f6f2', fg:active?'#fff':'#16264d', bd:active?'#0a4631':'#e6e1d5', onPick:()=>this.setState({groupFilter:v, filterOpen:false})}; };
     const allChip=mkChip('all','Semua Santri');
     const kelasChips=kelasList.map(k=>mkChip('kelas:'+k, k));
-    const halChips=halList.map(h=>mkChip('hal:'+h, h));
-    const filterLabel = gf==='all' ? 'Semua Santri' : gf.indexOf('kelas:')===0 ? 'Kelas '+gf.slice(6) : 'Halaqah '+gf.slice(4);
+    const halChips=halList.map(h=>mkChip('hal:'+h, halNameByHal[h]||h));
+    const filterLabel = gf==='all' ? 'Semua Santri' : gf.indexOf('kelas:')===0 ? 'Kelas '+gf.slice(6) : 'Halaqah '+(halNameByHal[gf.slice(4)]||gf.slice(4));
     let gallery=all.filter(s=> groupMatch(s) && (!q || s.name.toLowerCase().includes(q) || s.kota.toLowerCase().includes(q)));
     gallery=gallery.slice().sort((a,b)=>b.overall-a.overall);
     // dashboard roster (for now all staff roles see every halaqah; musyrif scope TODO)
@@ -1234,7 +1257,7 @@ class Component extends DCLogic {
       setNilaiFormId:(ev)=>this.setState({nilaiFormId:ev.target.value}),
       dataStatus, sheetId:st.sheetId,
       setSheetId:(ev)=>this.setState({sheetId:ev.target.value}),
-      reloadRoster:()=>{ this.loadRoster(); this.loadNilai(); this.loadSetoran(); this.loadKehadiran(); this.loadMapel(); },
+      reloadRoster:()=>{ this.loadRoster(); this.loadNilai(); this.loadSetoran(); this.loadKehadiran(); this.loadMapel(); this.loadHalaqah(); },
     };
   }
 }
