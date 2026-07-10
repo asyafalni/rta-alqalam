@@ -132,7 +132,7 @@
             <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">NIS</span><span style="font-weight:700">: {{ selNis }}</span></div>
             <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Kelas</span><span style="font-weight:700">: {{ sel.kelas }}</span></div>
             <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Peringkat</span><span style="font-weight:700">: {{ selRankLabel }}</span></div>
-            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Halaqah</span><span style="font-weight:700">: {{ sel.halaqahLabel }}</span></div>
+            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Halaqah</span><span style="font-weight:700">: {{ sel.halaqahName }}</span></div>
             <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Musyrif</span><span style="font-weight:700">: {{ sel.musyrif }}</span></div>
             <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Asal</span><span style="font-weight:700">: {{ sel.kota }}, {{ sel.prov }}</span></div>
             <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Mudir</span><span style="font-weight:700">: {{ sel.mudir }}</span></div>
@@ -309,7 +309,7 @@
           </div>
           <div style="margin-top:16px;text-align:left;font-size:11.5px;color:rgba(245,243,236,.55);line-height:1.7">
             <div style="display:flex;justify-content:space-between;gap:12px"><span>Kelas</span><span style="color:#f5f3ec;font-weight:600;text-align:right">Kelas {{ sel.kelas }}</span></div>
-            <div style="display:flex;justify-content:space-between;gap:12px"><span>Halaqah</span><span style="color:#f5f3ec;font-weight:600;text-align:right">{{ sel.halaqahLabel }}</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span>Halaqah</span><span style="color:#f5f3ec;font-weight:600;text-align:right">{{ sel.halaqahName }}</span></div>
             <div style="display:flex;justify-content:space-between;gap:12px"><span>Musyrif</span><span style="color:#f5f3ec;font-weight:600;text-align:right">{{ sel.musyrif }}</span></div>
             <div style="display:flex;justify-content:space-between;gap:12px"><span>Mudir</span><span style="color:#f5f3ec;font-weight:600;text-align:right">{{ sel.mudir }}</span></div>
           </div>
@@ -323,8 +323,8 @@
               <div style="display:flex;flex-direction:column;gap:11px">
                 <sc-for list="{{ sel.pillars }}" as="p" hint-placeholder-count="6">
                   <div>
-                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="font-weight:600;color:#16264d">{{ p.label }}</span><span style="font-weight:800;color:{{ p.color }}">{{ p.letter }} · {{ p.score }}</span></div>
-                    <div style="height:7px;border-radius:6px;background:#eef0f4;overflow:hidden"><div style="height:100%;width:{{ p.score }}%;background:{{ p.color }};border-radius:6px"></div></div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="font-weight:600;color:#16264d">{{ p.label }}</span><span style="font-weight:800;color:{{ p.color }}">{{ p.tag }}</span></div>
+                    <div style="height:7px;border-radius:6px;background:#eef0f4;overflow:hidden"><div style="height:100%;width:{{ p.pct }}%;background:{{ p.color }};border-radius:6px"></div></div>
                   </div>
                 </sc-for>
               </div>
@@ -694,7 +694,7 @@ const HALAQAH = {
   'Al-Khattab': { nama:'Al-Khattab', musyrif:'Ustadz Hamzah Abdurrahman' },
 };
 // One mudir for the whole school.
-const MUDIR = 'Ustadz Abdul Hakim, Lc.';
+const MUDIR = 'Ustadz Alfath Syam, Lc.';
 // Academic terms for the report card (newest first). `start`/`end` bound which Nilai rows the
 // Rapor averages (inclusive, YYYY-MM-DD). `days` = jumlah hari efektif in the term → the Kehadiran
 // score = (days − jumlah absensi) / days. Semester Ganjil ≈ Jul–Dec, Genap ≈ Jan–Jun.
@@ -868,6 +868,9 @@ const MAPEL = [
 ];
 
 function grade(n){
+  // No score yet (blank cell) → N/A, NOT the lowest grade. Dha'if means "assessed & weak",
+  // which is different from "not assessed".
+  if(n==null || isNaN(n)) return {l:'–', name:'N/A', c:'#9aa1ad', na:true};
   if(n>=90) return {l:'A', name:'Mumtaz', c:'#1f7a34'};
   if(n>=80) return {l:'B', name:'Jayyid Jiddan', c:'#3f9a49'};
   if(n>=70) return {l:'C', name:'Jayyid', c:GOLD};
@@ -1055,10 +1058,12 @@ class Component extends DCLogic {
 
   mapRow(o){
     const num=x=>{ const n=Number(x); return isFinite(n)?n:0; };
+    // Score cells: blank → null ("not assessed"), so we don't average a missing value as 0.
+    const sc=x=>{ if(x==null||String(x).trim()==='') return null; const n=Number(x); return isFinite(n)?n:null; };
     return { id:String(o.id!=null?o.id:''), name:o.name||o.nama||'',
       nick:o.nick||o.panggilan||(o.name?String(o.name).split(' ')[0]:''),
       kota:o.kota||'', prov:o.prov||o.provinsi||'', kelas:o.kelas!=null?String(o.kelas):'', hal:(o.hal!=null?String(o.hal):'').trim(), juz:num(o.juz), curpg:num(o.curpg), juzdone:o.juzdone!=null?String(o.juzdone):'',
-      haf:num(o.haf), tah:num(o.tah), mur:num(o.mur), ilm:num(o.ilm), akh:num(o.akh), akd:num(o.akd), bhs:num(o.bhs),
+      haf:sc(o.haf), tah:sc(o.tah), mur:sc(o.mur), ilm:sc(o.ilm), akh:sc(o.akh), akd:sc(o.akd), bhs:sc(o.bhs),
       nis:o.nis!=null?String(o.nis):'',
       khd:(o.khd!=null&&String(o.khd).trim()!=='')?num(o.khd):null };
   }
@@ -1123,8 +1128,10 @@ class Component extends DCLogic {
     const pInfo = pg ? mushafInfo(pg) : null;
     const curJuz = pInfo ? pInfo.juz : nextProgramJuz(doneSet);
     const scores=PILLARS.map(p=>({...p, score:r[p.key], g:grade(r[p.key])}));
-    const overall=Math.round(scores.reduce((a,s)=>a+s.score,0)/scores.length);
-    const og=grade(overall), tier=tierOf(overall), v=this.cardVisual(theme,tier);
+    const avail=scores.filter(s=>s.score!=null && !isNaN(s.score));
+    const overall = avail.length ? Math.round(avail.reduce((a,s)=>a+s.score,0)/avail.length) : null;
+    const noScores = avail.length===0;
+    const og=grade(overall), tier=tierOf(overall==null?0:overall), v=this.cardVisual(theme,tier);
     const initials=r.nick.slice(0,2).toUpperCase();
     return {...r, initials, overall, gLetter:og.l, gName:og.name, gColor:og.c, tier, tierColor:TIER_ACCENT[tier],
       juz:juzCount, curJuz, juzDone,
@@ -1132,7 +1139,8 @@ class Component extends DCLogic {
       juzPct:hafPct, barBase, barOver, overTarget, hafPctColor:(overTarget?'#a07d1e':'#2f8f3a'), halaqahLabel:hd.label, halaqahName:hd.nama, musyrif:hd.musyrif, mudir:MUDIR, kelas:r.kelas||'—',
       subLine:([hd.label!=='—'?hd.label:'', String(r.kota||'').trim()].filter(Boolean).join(' · ')||'—'),
       curArab:String(curJuz).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d)),
-      pillars:scores.map(s=>({abbr:s.abbr, label:s.label, score:s.score, letter:s.g.l, color:s.g.c, grp:s.grp, pname:s.g.name})),
+      pillars:scores.map(s=>({abbr:s.abbr, label:s.label, score:(s.score==null?'—':s.score), pct:(s.score==null?0:s.score), letter:s.g.l, color:s.g.c, grp:s.grp, pname:s.g.name, tag:(s.score==null?'N/A':(s.g.l+' · '+s.score))})),
+      overallScore:(overall==null?'—':overall), noScores,
       cardStyle:v.card, nameStyle:v.name, subStyle:v.sub, ratingStyle:v.rating, ratingSubStyle:v.ratingSub,
       chipStyle:v.chip, statLabelStyle:v.statLabel, statValStyle:v.statVal,
       avStyle:{background:v.avBg, color:v.avColor, border:'2px solid '+v.ring},
@@ -1173,7 +1181,7 @@ class Component extends DCLogic {
     const rings=[0.25,0.5,0.75,1].map((f,k)=>React.createElement('polygon',{key:'r'+k,
       points:Array.from({length:N},(_,i)=>pt(i,R*f).join(',')).join(' '), fill:'none', stroke:'rgba(20,30,60,.12)', strokeWidth:1}));
     const spokes=Array.from({length:N},(_,i)=>{const[x,y]=pt(i,R);return React.createElement('line',{key:'s'+i,x1:cx,y1:cy,x2:x,y2:y,stroke:'rgba(20,30,60,.1)',strokeWidth:1});});
-    const dataPts=s.pillars.map((p,i)=>pt(i,R*(p.score/100)));
+    const dataPts=s.pillars.map((p,i)=>pt(i,R*((p.pct||0)/100)));
     const poly=React.createElement('polygon',{points:dataPts.map(p=>p.join(',')).join(' '), fill:'rgba(47,143,58,.20)', stroke:GREEN, strokeWidth:2});
     const dots=dataPts.map((p,i)=>React.createElement('circle',{key:'d'+i,cx:p[0],cy:p[1],r:2.6,fill:GREEN}));
     const labels=s.pillars.map((p,i)=>{const[x,y]=pt(i,R+15);return React.createElement('text',{key:'l'+i,x,y,fontSize:9,fontWeight:700,fill:NAVY,textAnchor:'middle',dominantBaseline:'middle',fontFamily:'ui-monospace,monospace'},p.abbr);});
@@ -1288,7 +1296,7 @@ class Component extends DCLogic {
       return list.map(def=>{
         const arr = nil.filter(n=>defs.length ? mapelMatch(n.mapel, def) : n.mapel===def.mapel).map(n=>n.nilai);
         let v = arr.length ? Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) : null;
-        if(v==null && bidangKey==='Diniyah' && /akhlak/i.test(def.mapel)){ const akh=sel.pillars.find(p=>p.abbr==='AKH'); if(akh) v=akh.score; }
+        if(v==null && bidangKey==='Diniyah' && /akhlak/i.test(def.mapel)){ const akh=sel.pillars.find(p=>p.abbr==='AKH'); if(akh && akh.pct) v=akh.pct; }
         if(v==null) return {label:def.mapel, score:'—', pname:'Belum dinilai', color:'#9aa1ad'};
         const g=grade(v); return {label:def.mapel, score:v, pname:g.name, color:g.c};
       });

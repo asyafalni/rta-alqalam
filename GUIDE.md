@@ -233,6 +233,10 @@ keys (the tracker matches by header):
 > exact, copy-paste formulas per pillar. Keeping `Master` current (manual vs formula) is your
 > choice — the tracker only needs this row-per-santri shape.
 >
+> **Blank = N/A, not zero.** Leave a score cell empty and that pillar shows **N/A** ("belum dinilai"),
+> and it's **excluded** from the overall predikat. A santri with no scores yet shows **N/A**, never the
+> lowest grade (Dha'if). Only enter a number once the pillar is actually assessed.
+>
 > **Halaqah & Musyrif** are defined in the **`Halaqah` tab (§2g)** — each halaqah has a free-text
 > name and a single musyrif, keyed by `hal`. Only the **Mudir** stays a code constant (`MUDIR`, one
 > per school) near the top of `tracker/index.html`’s `<script>`.
