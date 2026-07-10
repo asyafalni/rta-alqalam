@@ -523,7 +523,7 @@
         <p style="font-size:12.5px;color:#6b7280;margin:0 0 16px;line-height:1.5">Hubungkan tracker ke Google Form (jalur input) dan Google Sheet publik (jalur baca).</p>
         <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:18px;margin-bottom:14px">
           <div style="font-weight:800;font-size:13.5px;margin-bottom:4px">📝 Google Form — jalur input</div>
-          <p style="font-size:11.5px;color:#9aa1ad;margin:0 0 12px;line-height:1.5">Dua form terpisah: <b>Setoran Harian</b> (Musyrif/Mudir) menulis ke tab <code>Setoran</code>; <b>Nilai Ujian/Tes</b> (Mudir &amp; guru akademik) menulis ke tab <code>Nilai</code>. Isi bagian ID dari .../forms/d/e/<b>ID</b>/viewform.</p>
+          <p style="font-size:11.5px;color:#9aa1ad;margin:0 0 12px;line-height:1.5">Tiga jalur input. Isi <b>Form ID</b> (bagian .../forms/d/e/<b>ID</b>/viewform) untuk <b>Setoran Harian</b> → tab <code>Setoran</code> dan <b>Nilai Ujian/Tes</b> → tab <code>Nilai</code>. Untuk <b>Absensi</b> → tab <code>Absensi</code>, isi <b>pre-filled link</b> (lihat GUIDE §5).</p>
           <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Form Setoran Harian
             <input value="{{ setoranFormId }}" onInput="{{ setSetoranFormId }}" placeholder="ID form setoran harian" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
           </label>
@@ -840,12 +840,12 @@ class Component extends DCLogic {
     if(!id){ this.setState({students:null, loadState:'demo'}); return; }
     this.setState({loadState:'loading'});
     try{
-      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&sheet='+encodeURIComponent(this.state.sheetTab||'Roster');
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&headers=1&sheet='+encodeURIComponent(this.state.sheetTab||'Roster');
       const text=await (await fetch(url)).text();
       const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
       const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
       const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); return this.mapRow(o); }).filter(s=>s.id&&s.name);
-      this.setState(rows.length?{students:rows, loadState:'live'}:{students:null, loadState:'error'});
+      this.setState(rows.length?{students:rows, loadState:'live'}:{students:null, loadState:'empty'});
     }catch(e){ console.error('loadRoster failed', e); this.setState({students:null, loadState:'error'}); }
   }
 
@@ -853,7 +853,7 @@ class Component extends DCLogic {
     const id=(this.state.sheetId||'').trim();
     if(!id){ this.setState({nilai:null}); return; }
     try{
-      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&sheet=Nilai';
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&headers=1&sheet=Nilai';
       const text=await (await fetch(url)).text();
       const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
       const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
@@ -867,7 +867,7 @@ class Component extends DCLogic {
     const id=(this.state.sheetId||'').trim();
     if(!id){ this.setState({setoran:null}); return; }
     try{
-      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&sheet=Setoran';
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&headers=1&sheet=Setoran';
       const text=await (await fetch(url)).text();
       const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
       const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
@@ -884,7 +884,7 @@ class Component extends DCLogic {
     const id=(this.state.sheetId||'').trim();
     if(!id){ this.setState({kehadiran:null}); return; }
     try{
-      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&sheet=Absensi';
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&headers=1&sheet=Absensi';
       const text=await (await fetch(url)).text();
       const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
       const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
@@ -897,7 +897,7 @@ class Component extends DCLogic {
     const id=(this.state.sheetId||'').trim();
     if(!id){ this.setState({mapelDef:null}); return; }
     try{
-      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&sheet=Mapel';
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&headers=1&sheet=Mapel';
       const text=await (await fetch(url)).text();
       const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
       const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
@@ -1043,7 +1043,8 @@ class Component extends DCLogic {
     const all=source.map(r=>this.enrich(r));
     const dataStatus = st.loadState==='live'?'Live · Google Sheet'
       : st.loadState==='loading'?'Memuat data…'
-      : st.loadState==='error'?'Gagal muat · memakai data contoh'
+      : st.loadState==='empty'?'Terhubung · tab Roster masih kosong (belum ada baris santri)'
+      : st.loadState==='error'?'Gagal muat · cek Sheet ID / sharing (Anyone with link → Viewer) & tab "Roster"'
       : 'Data contoh (demo)';
     const q=st.search.trim().toLowerCase();
     // One combined filter (shared by gallery + roster): 'all' | 'kelas:VII' | 'hal:1'.
@@ -1219,7 +1220,7 @@ class Component extends DCLogic {
       loginMudir:()=>this.setState({role:'mudir', view:'dashboard', loginOpen:false}),
       loginMusyrif:()=>this.setState({role:'musyrif', view:'dashboard', loginOpen:false}),
       loginPublic:()=>this.setState({role:'public', view:'gallery'}),
-      // Two input forms: daily Setoran (Musyrif/Mudir) + periodic Nilai ujian (Mudir + guru akademik).
+      // Two embedded input forms (+ Input toggle): daily Setoran + periodic Nilai ujian. (Absensi is a separate admin screen.)
       entryKind, isSetoran: entryKind==='setoran', isNilai: entryKind==='nilai',
       entryTitle: entryKind==='nilai' ? 'Input Nilai Ujian/Tes' : 'Input Setoran Harian',
       segSetoranStyle: entryKind==='setoran'?SEG_ON:SEG_OFF, segNilaiStyle: entryKind==='nilai'?SEG_ON:SEG_OFF,
