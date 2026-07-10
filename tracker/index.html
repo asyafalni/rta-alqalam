@@ -161,9 +161,12 @@
           </sc-if>
           <div style="background:#fbf7ea;border:1px solid #ecdfae;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12.5px;line-height:1.6"><span style="font-weight:800;color:#8a6d1e">Capaian Hafalan:</span> {{ raporHafalanNote }} · Predikat umum: <b>{{ sel.gName }}</b></div>
           <sc-if value="{{ hasAttendance }}" hint-placeholder-val="{{ true }}">
-          <div style="font-weight:800;font-size:13px;color:#0a4631;margin-bottom:6px">Kehadiran</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px">
+            <span style="font-weight:800;font-size:13px;color:#0a4631">Kehadiran</span>
+            <span style="font-size:12px;color:#6b7280">Skor Kehadiran: <b style="font-size:15px;color:#1f7a34">{{ kehScore }}</b> · Hadir {{ attHadir }} dari {{ attTotal }} hari efektif</span>
+          </div>
           <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px">
-            <thead><tr style="background:#eef4ee"><th style="padding:7px 10px;border:1px solid #d8e3d8">Hadir</th><th style="padding:7px 10px;border:1px solid #d8e3d8">Sakit</th><th style="padding:7px 10px;border:1px solid #d8e3d8">Izin</th><th style="padding:7px 10px;border:1px solid #d8e3d8">Alpa</th><th style="padding:7px 10px;border:1px solid #d8e3d8">Total Hari</th></tr></thead>
+            <thead><tr style="background:#eef4ee"><th style="padding:7px 10px;border:1px solid #d8e3d8">Hadir</th><th style="padding:7px 10px;border:1px solid #d8e3d8">Sakit</th><th style="padding:7px 10px;border:1px solid #d8e3d8">Izin</th><th style="padding:7px 10px;border:1px solid #d8e3d8">Alpa</th><th style="padding:7px 10px;border:1px solid #d8e3d8">Hari Efektif</th></tr></thead>
             <tbody><tr>
               <td style="text-align:center;font-weight:700;color:#1f7a34;padding:7px 10px;border:1px solid #e6e1d5">{{ attHadir }}</td>
               <td style="text-align:center;font-weight:700;padding:7px 10px;border:1px solid #e6e1d5">{{ attSakit }}</td>
@@ -403,7 +406,7 @@
         <button onClick="{{ goGallery }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Progres Santri</button>
         <button onClick="{{ goEntry }}" style="padding:8px 14px;border-radius:9px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer">+ Input</button>
         <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ true }}">
-          <button onClick="{{ openKeh }}" style="padding:8px 14px;border-radius:9px;border:1px solid #0a4631;background:#eef4ee;color:#0a4631;font-weight:700;font-size:12.5px;cursor:pointer">Kehadiran</button>
+          <button onClick="{{ openKeh }}" style="padding:8px 14px;border-radius:9px;border:1px solid #0a4631;background:#eef4ee;color:#0a4631;font-weight:700;font-size:12.5px;cursor:pointer">Absensi</button>
         </sc-if>
         <button onClick="{{ goConfig }}" title="Konfigurasi" style="width:36px;height:34px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#0a4631;cursor:pointer;display:grid;place-items:center;padding:0">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
@@ -527,9 +530,9 @@
           <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Form Nilai Ujian/Tes
             <input value="{{ nilaiFormId }}" onInput="{{ setNilaiFormId }}" placeholder="ID form nilai ujian/tes" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12.5px;font-family:ui-monospace,monospace;color:#16264d" />
           </label>
-          <label style="font-size:11.5px;color:#6b7280;display:block">Kehadiran — <b>pre-filled link</b> <span style="color:#9aa1ad">(dipakai tombol Kehadiran; lihat GUIDE §2f)</span>
+          <label style="font-size:11.5px;color:#6b7280;display:block">Absensi — <b>pre-filled link</b> <span style="color:#9aa1ad">(dipakai tombol Absensi; lihat GUIDE §2f)</span>
             <input value="{{ kehLink }}" onInput="{{ setKehLink }}" placeholder="https://docs.google.com/forms/d/e/.../viewform?entry.123=__ID__&entry.456=__TANGGAL__&..." style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:12px;font-family:ui-monospace,monospace;color:#16264d" />
-            <div style="margin-top:6px;font-size:11px;font-weight:700"><sc-if value="{{ kehConfigured }}" hint-placeholder-val="{{ true }}"><span style="color:#1f7a34">✓ Form kehadiran terhubung</span></sc-if><sc-if value="{{ kehNotConfigured }}" hint-placeholder-val="{{ false }}"><span style="color:#9aa1ad">Belum terhubung — input kehadiran hanya tersimpan di sesi ini.</span></sc-if></div>
+            <div style="margin-top:6px;font-size:11px;font-weight:700"><sc-if value="{{ kehConfigured }}" hint-placeholder-val="{{ true }}"><span style="color:#1f7a34">✓ Form absensi terhubung</span></sc-if><sc-if value="{{ kehNotConfigured }}" hint-placeholder-val="{{ false }}"><span style="color:#9aa1ad">Belum terhubung — input absensi hanya tersimpan di sesi ini.</span></sc-if></div>
           </label>
         </div>
         <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:18px">
@@ -551,7 +554,7 @@
     <div onClick="{{ closeKeh }}" class="sheet-backdrop"></div>
     <div class="sheet">
       <div style="display:flex;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid #e6ddc8;background:#fff">
-        <div style="flex:1"><h1 style="font-size:17px;font-weight:800;margin:0;color:#0a4631">Kehadiran</h1><div style="font-size:11.5px;color:#9aa1ad">Semua Hadir — catat yang izin/sakit/alpa saja</div></div>
+        <div style="flex:1"><h1 style="font-size:17px;font-weight:800;margin:0;color:#0a4631">Absensi</h1><div style="font-size:11.5px;color:#9aa1ad">Semua Hadir — catat hanya yang izin/sakit/alpa</div></div>
         <button onClick="{{ closeKeh }}" title="Tutup" style="width:32px;height:32px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;cursor:pointer;display:grid;place-items:center;padding:0">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </button>
@@ -597,7 +600,7 @@
           </div>
         </sc-if>
         <sc-if value="{{ kehNotConfigured }}" hint-placeholder-val="{{ false }}">
-          <p style="font-size:11px;color:#b58a3a;background:#fbf5e4;border:1px solid #ecdcae;border-radius:8px;padding:8px 11px;margin-top:12px;line-height:1.5">Form kehadiran belum dikonfigurasi (Konfigurasi → pre-filled link). Entri di sini hanya tersimpan sesi ini dan belum tertulis ke sheet.</p>
+          <p style="font-size:11px;color:#b58a3a;background:#fbf5e4;border:1px solid #ecdcae;border-radius:8px;padding:8px 11px;margin-top:12px;line-height:1.5">Form absensi belum dikonfigurasi (Konfigurasi → pre-filled link). Entri di sini hanya tersimpan sesi ini dan belum tertulis ke sheet.</p>
         </sc-if>
       </div>
     </div>
@@ -629,12 +632,13 @@ const HALAQAH = { 1:['Ustadz Salman Al-Farisi'], 2:['Ustadz Hamzah Abdurrahman']
 // One mudir for the whole school.
 const MUDIR = 'Ustadz Abdul Hakim, Lc.';
 // Academic terms for the report card (newest first). `start`/`end` bound which Nilai rows the
-// Rapor averages (inclusive, YYYY-MM-DD). Semester Ganjil ≈ Jul–Dec, Genap ≈ Jan–Jun.
+// Rapor averages (inclusive, YYYY-MM-DD). `days` = jumlah hari efektif in the term → the Kehadiran
+// score = (days − jumlah absensi) / days. Semester Ganjil ≈ Jul–Dec, Genap ≈ Jan–Jun.
 // Admin picks the term from a dropdown on the Rapor; TERMS[0] is the default (current) term.
 const TERMS = [
-  { id:'2026g', label:'Semester Ganjil · Tahun Ajaran 2026/2027', start:'2026-07-01', end:'2026-12-31' },
-  { id:'2025e', label:'Semester Genap · Tahun Ajaran 2025/2026', start:'2026-01-01', end:'2026-06-30' },
-  { id:'2025g', label:'Semester Ganjil · Tahun Ajaran 2025/2026', start:'2025-07-01', end:'2025-12-31' },
+  { id:'2026g', label:'Semester Ganjil · Tahun Ajaran 2026/2027', start:'2026-07-01', end:'2026-12-31', days:110 },
+  { id:'2025e', label:'Semester Genap · Tahun Ajaran 2025/2026', start:'2026-01-01', end:'2026-06-30', days:112 },
+  { id:'2025g', label:'Semester Ganjil · Tahun Ajaran 2025/2026', start:'2025-07-01', end:'2025-12-31', days:108 },
 ];
 // Normalize a sheet date cell (ISO text or GViz "Date(y,m,d)") to YYYY-MM-DD.
 function ymd(t){ t=String(t||''); const m=t.match(/Date\((\d+),(\d+),(\d+)/); if(m){ return m[1]+'-'+String(+m[2]+1).padStart(2,'0')+'-'+String(+m[3]).padStart(2,'0'); } return t.slice(0,10); }
@@ -685,14 +689,13 @@ function setoranColor(j){ const c=setoranCat(j); return c==='zi'?'#2f8f3a':c==='
 // Attendance status → canonical key. Blank/unknown defaults to 'hadir'.
 function attStatus(s){ s=String(s||'').trim().toLowerCase(); if(/sakit|^s$/.test(s)) return 'sakit'; if(/izin|ijin|^i$/.test(s)) return 'izin'; if(/alpa|alfa|tanpa|bolos|^a$/.test(s)) return 'alpa'; return 'hadir'; }
 // Daily attendance log (one row per santri per day). Same shape as the 'Kehadiran' sheet tab.
+// Absensi log — only NON-present days are recorded (Sakit/Izin/Alpa). Presence is the default.
 const KEHADIRAN = [
-  {id:'s3', tanggal:'2026-10-01', status:'Hadir', reason:''}, {id:'s3', tanggal:'2026-10-02', status:'Hadir', reason:''},
-  {id:'s3', tanggal:'2026-10-03', status:'Sakit', jam:'', reason:'Demam, ada surat dokter'}, {id:'s3', tanggal:'2026-10-04', status:'Hadir', reason:''},
-  {id:'s3', tanggal:'2026-10-05', status:'Izin', jam:'10:30', reason:'Pulang, acara keluarga'}, {id:'s3', tanggal:'2026-10-06', status:'Hadir', reason:''},
-  {id:'s1', tanggal:'2026-10-01', status:'Hadir', reason:''}, {id:'s1', tanggal:'2026-10-02', status:'Alpa', reason:'Tanpa keterangan'},
-  {id:'s1', tanggal:'2026-10-03', status:'Hadir', reason:''},
-  {id:'s11', tanggal:'2026-10-01', status:'Hadir', reason:''}, {id:'s11', tanggal:'2026-10-02', status:'Hadir', reason:''},
-  {id:'s11', tanggal:'2026-10-03', status:'Izin', reason:'Lomba tahfidz antar pesantren'}, {id:'s11', tanggal:'2026-10-04', status:'Hadir', reason:''},
+  {id:'s3', tanggal:'2026-09-08', status:'Sakit', jam:'', reason:'Demam, ada surat dokter'},
+  {id:'s3', tanggal:'2026-10-05', status:'Izin', jam:'10:30', reason:'Pulang, acara keluarga'},
+  {id:'s1', tanggal:'2026-09-14', status:'Alpa', jam:'', reason:'Tanpa keterangan'},
+  {id:'s1', tanggal:'2026-10-02', status:'Sakit', jam:'', reason:'Batuk pilek'},
+  {id:'s11', tanggal:'2026-10-03', status:'Izin', jam:'', reason:'Lomba tahfidz antar pesantren'},
 ];
 // Local date/time (browser) for the attendance quick-log.
 function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
@@ -881,7 +884,7 @@ class Component extends DCLogic {
     const id=(this.state.sheetId||'').trim();
     if(!id){ this.setState({kehadiran:null}); return; }
     try{
-      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&sheet=Kehadiran';
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&sheet=Absensi';
       const text=await (await fetch(url)).text();
       const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
       const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
@@ -909,7 +912,8 @@ class Component extends DCLogic {
       nick:o.nick||o.panggilan||(o.name?String(o.name).split(' ')[0]:''),
       kota:o.kota||'', prov:o.prov||o.provinsi||'', kelas:o.kelas!=null?String(o.kelas):'', hal:num(o.hal!=null?o.hal:1), juz:num(o.juz), curpg:num(o.curpg), juzdone:o.juzdone!=null?String(o.juzdone):'',
       haf:num(o.haf), tah:num(o.tah), mur:num(o.mur), ilm:num(o.ilm), akh:num(o.akh), akd:num(o.akd), bhs:num(o.bhs),
-      nis:o.nis!=null?String(o.nis):'' };
+      nis:o.nis!=null?String(o.nis):'',
+      khd:(o.khd!=null&&String(o.khd).trim()!=='')?num(o.khd):null };
   }
 
   sortBy(key){
@@ -1070,12 +1074,18 @@ class Component extends DCLogic {
     let selRank=0, selRankTotal=0;
     if(sel){ const peers=all.filter(s=>String(s.kelas)===String(sel.kelas)).slice().sort((a,b)=>b.overall-a.overall); selRankTotal=peers.length; selRank=peers.findIndex(s=>s.id===sel.id)+1; }
     const activeKehadiran = (st.kehadiran&&st.kehadiran.length)?st.kehadiran:KEHADIRAN;
-    const selAtt = sel ? activeKehadiran.filter(r=>r.id===sel.id && inTerm(r.tanggal, term)) : [];
-    const att = {hadir:0, sakit:0, izin:0, alpa:0};
-    selAtt.forEach(r=>{ att[attStatus(r.status)]++; });
-    const attTotal = selAtt.length;
-    const hasAttendance = attTotal>0;
-    // Absence notes: non-Hadir days with the reason the mudir/musyrif recorded.
+    // Only absences are recorded → count S/I/A; Hadir & the Kehadiran score derive from hari efektif.
+    const selAtt = sel ? activeKehadiran.filter(r=>r.id===sel.id && inTerm(r.tanggal, term) && attStatus(r.status)!=='hadir') : [];
+    const att = {sakit:0, izin:0, alpa:0};
+    selAtt.forEach(r=>{ const k=attStatus(r.status); if(att[k]!=null) att[k]++; });
+    const absTotal = att.sakit+att.izin+att.alpa;
+    const hariEfektif = term.days||0;
+    const attHadir = Math.max(0, hariEfektif-absTotal);
+    // Kehadiran score: sheet-computed `khd` (weighted formula, §2f) wins; else a simple presence %.
+    const kehDerived = hariEfektif ? Math.round(attHadir/hariEfektif*100) : 0;
+    const kehScore = (sel && sel.khd!=null) ? sel.khd : kehDerived;
+    const hasAttendance = (sel && sel.khd!=null) || hariEfektif>0;
+    // Absence notes: each recorded absence with time + reason.
     const ATT_LABEL={sakit:'Sakit', izin:'Izin', alpa:'Alpa'}, ATT_COLOR={sakit:'#3f6fa8', izin:'#8a6d1e', alpa:'#b4483a'};
     const attNotes = selAtt.filter(r=>attStatus(r.status)!=='hadir').map(r=>{ const k=attStatus(r.status); const jam=String(r.jam||'').trim(); return {tgl:ymd(r.tanggal), waktu: jam?(' · '+jam):'', label:ATT_LABEL[k], color:ATT_COLOR[k], reason:String(r.reason||'').trim()||'—'}; }).sort((a,b)=>(a.tgl||'').localeCompare(b.tgl||''));
     const hasAttNotes = attNotes.length>0;
@@ -1152,7 +1162,7 @@ class Component extends DCLogic {
       raporHafalanNote,
       selNis: sel ? (sel.nis||'—') : '',
       selRankLabel: (sel&&selRank) ? (selRank+' dari '+selRankTotal+' santri · Kelas '+sel.kelas) : '—',
-      hasAttendance, attHadir:att.hadir, attSakit:att.sakit, attIzin:att.izin, attAlpa:att.alpa, attTotal,
+      hasAttendance, attHadir, attSakit:att.sakit, attIzin:att.izin, attAlpa:att.alpa, attTotal:hariEfektif, kehScore,
       attNotes, hasAttNotes,
       canRapor: st.role==='admin', raporOpen:st.raporOpen,
       raporDiniyah: diniyahRows, raporAkademik: akademikRows,

@@ -20,20 +20,20 @@ academics, reporting).
  ┌───────────────────────────────┐
  │  PRIVATE sheet  (source truth)│   restricted access — staff only
  │  ├─ tab: Setoran (Form resp.) │   raw per-event submissions
- │  ├─ tab: Master               │   one row per santri (public A–Q · private R+)
+ │  ├─ tab: Master               │   one row per santri (public A–R · private S+)
  │  ├─ tab: Nilai                │   one row per test (Diniyah/Akademik/Ekstrakurikuler)
  │  ├─ tab: Mapel                │   subject definitions per group (bidang, mapel)
- │  └─ tab: Kehadiran            │   one row per santri per day (id, tanggal, status)
+ │  └─ tab: Absensi              │   one row per absence (id, tanggal, status, …)
  └───────────────┬───────────────┘
                  │  IMPORTRANGE (one-way, authorized once)
                  ▼
  ┌───────────────────────────────┐
  │  PUBLIC sheet   (reference)   │   "Anyone with link → Viewer"
- │  ├─ tab: Roster               │   public columns A–Q only, mirrored live
+ │  ├─ tab: Roster               │   public columns A–R only, mirrored live
  │  ├─ tab: Nilai                │   per-test scores, mirrored live
  │  ├─ tab: Mapel                │   subject definitions, mirrored live
  │  ├─ tab: Setoran              │   daily log (id,tanggal,jenis,juz,…), mirrored live
- │  └─ tab: Kehadiran            │   daily attendance (id,tanggal,status), mirrored live
+ │  └─ tab: Absensi              │   only absences (id,tanggal,status,…), mirrored live
  └───────────────┬───────────────┘
                  │  GViz JSON (no API key)
                  ▼
@@ -79,10 +79,10 @@ New to Google Sheets/Forms? Follow these steps top to bottom. Sections §2–§7
 1. Bottom-left **＋** to add a tab → name it **`Mapel`**. Row 1: `bidang` , `mapel`. List your
    subjects, one per row (which `bidang` values are allowed → **§2d**).
 
-> **That's the only tab you create by hand.** The `Setoran`, `Nilai`, and (optional) `Kehadiran` tabs
+> **That's the only tab you create by hand.** The `Setoran`, `Nilai`, and (optional) `Absensi` tabs
 > are **created automatically** when you link their forms in Step 4 — do **not** pre-create empty
-> versions, or you'll end up with duplicates. (Prefer to hand-build `Kehadiran` instead of a form?
-> Then add it here with row 1 `id  tanggal  status  reason` — §2f.)
+> versions, or you'll end up with duplicates. (Prefer to hand-build `Absensi` instead of a form?
+> Then add it here with row 1 `id  tanggal  status  jam  reason` — §2f.)
 
 ### Step 4 — Build the two input Forms (why two → §5)
 For **each** form: **New → Google Forms** inside the folder.
@@ -105,7 +105,7 @@ used by the §2e formulas).
 rename it to the app's name:
 - Form A's response tab → rename to **`Setoran`**.
 - Form B's response tab → rename to **`Nilai`**.
-- (Optional Form C's response tab → rename to **`Kehadiran`**.)
+- (Optional Form C's response tab → rename to **`Absensi`**.)
 
 The extra `Timestamp` column each form adds is harmless — the app ignores unrecognised columns. **One
 tab per form; no duplicates to maintain.**
@@ -117,7 +117,7 @@ Send yourself one test submission through each form and confirm a row lands in t
 2. Rename `Sheet1` → **`Roster`**. Click cell **A1** and paste (replace `<PRIVATE_SHEET_ID>` — see the
    *Finding IDs* box below):
    ```
-   =QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Master!A1:Q"),"where Col1 is not null",1)
+   =QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Master!A1:R"),"where Col1 is not null",1)
    ```
 3. Press Enter → the cell shows **`#REF!`** with an **Allow access** button → click it **once**
    (this authorises Private→Public forever). Rows should fill in.
@@ -125,10 +125,10 @@ Send yourself one test submission through each form and confirm a row lands in t
    - **`Nilai`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Nilai!A1:Z"),"where Col2 is not null",1)`
    - **`Mapel`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Mapel!A1:B"),"where Col1 is not null",1)`
    - **`Setoran`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Setoran!A1:Z"),"where Col2 is not null",1)`
-   - **`Kehadiran`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Kehadiran!A1:Z"),"where Col2 is not null",1)`
+   - **`Absensi`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Absensi!A1:Z"),"where Col2 is not null",1)`
    Click **Allow access** on each the first time.
 
-> Only need the roster to start? Just do the `Roster` tab; add `Nilai`/`Mapel`/`Setoran`/`Kehadiran`
+> Only need the roster to start? Just do the `Roster` tab; add `Nilai`/`Mapel`/`Setoran`/`Absensi`
 > later. Any tab you skip, the app fills with demo data.
 
 ### Step 6 — Share settings (this is what makes it safe → §4)
@@ -206,11 +206,12 @@ keys (the tracker matches by header):
 | O | `curpg` | **current page** (1–604) on the standard Madinah/Uthmani mushaf. The app derives the current juz, the position within it, and "≈ N pages left to finish the juz". | number | Musyrif/Mudir |
 | P | `kelas` | class level, e.g. `VII` / `VIII` | text | staff |
 | Q | `nis` | **optional, public** — the santri's NIS, shown in the Rapor header. Leave blank to show `—`. | text | staff |
-| R+ | `wali`, `nohp`, `alamat`, `status`, `catatan_musyrif`, `catatan_mudir`, … | **PRIVATE — never mirrored** | any | staff |
+| R | `khd` | **optional, public** — the **Kehadiran score** (0–100), a weighted formula computed from the `Absensi` tab (§2f). Blank → app derives a simple presence %. | number | formula |
+| S+ | `wali`, `nohp`, `alamat`, `status`, `catatan_musyrif`, `catatan_mudir`, … | **PRIVATE — never mirrored** | any | staff |
 
-> ⚠️ **Column Q is reserved for the optional public `nis`.** Start any **private** columns at **R** —
-> the mirror (§3) imports `A:Q`, so anything in Q becomes public.
-> *(Attendance is no longer a Master column — it lives in its own `Kehadiran` tab, §2f.)*
+> ⚠️ **Columns Q–R are reserved for the optional public `nis` / `khd`.** Start any **private** columns
+> at **S** — the mirror (§3) imports `A:R`, so anything in Q–R becomes public.
+> *(Daily absences live in their own `Absensi` tab, §2f; `khd` is just the computed score.)*
 
 > The score columns (G–M) are what the app's **Profil Kemampuan** radar/bars read. Type them
 > directly, **or** compute them from `Setoran` (daily) + `Nilai` (tests) — see **§2e** for the
@@ -235,10 +236,10 @@ keys (the tracker matches by header):
 Example header row + first data row:
 
 ```
-id  name                     nick    kota   prov        hal haf tah mur ilm akh akd bhs juzdone           curpg kelas | nis      | wali
-s1  Ahmad Fauzan Ramadhani   Fauzan  Depok  Jawa Barat  1   88  91  85  85  90  84  86  "1,2,3,4,5,6,7,8" 170   VIII  | 2426001  | Bpk. Ramadhani
+id  name                     nick    kota   prov        hal haf tah mur ilm akh akd bhs juzdone           curpg kelas | nis      khd | wali
+s1  Ahmad Fauzan Ramadhani   Fauzan  Depok  Jawa Barat  1   88  91  85  85  90  84  86  "1,2,3,4,5,6,7,8" 170   VIII  | 2426001  98  | Bpk. Ramadhani
 ```
-(A–P core · Q `nis` optional public · R+ private, e.g. `wali`)
+(A–P core · Q `nis` · R `khd` optional public · S+ private, e.g. `wali`)
 
 ---
 
@@ -372,45 +373,58 @@ M (bhs  → any subject containing "Bahasa"):
    above), then make each visible cell `=IF($<override>="", AA2, $<override>)` — a filled override
    column always wins, otherwise the derived value shows.
 
-Nothing else changes: `Master!A1:Q` still mirrors to the Public `Roster` (§3), and the app reads G–M
+Nothing else changes: `Master!A1:R` still mirrors to the Public `Roster` (§3), and the app reads G–M
 as before — now they *reflect* the daily setoran and the exams instead of being hand-typed.
 
 ---
 
-### 2f. Tab `Kehadiran` (daily attendance) — powers the Rapor Kehadiran table
-One row per santri per day, with a **single `status` column** (default **Hadir**), an optional
-**`jam`** (for a mid-day case), and an optional **`reason`**. Headers in row 1:
+### 2f. Tab `Absensi` (only absences) — powers the Rapor **Kehadiran** score
+**Record only the days a santri is *not* present** (Sakit / Izin / Alpa). Presence is the default, so
+Hadir days are **never** logged. One row per absence:
 
 | id | tanggal | status | jam | reason |
 |----|---------|--------|-----|--------|
-| s3 | 2026-10-03 | Sakit | | Demam, ada surat dokter |
+| s3 | 2026-09-08 | Sakit | | Demam, ada surat dokter |
 | s3 | 2026-10-05 | Izin | 10:30 | Pulang, acara keluarga |
-| s3 | 2026-10-04 | Hadir | | |
+| s1 | 2026-09-14 | Alpa | | Tanpa keterangan |
 
-- `status` is one of **`Hadir` / `Sakit` / `Izin` / `Alpa`** — blank or unrecognised counts as
-  **`Hadir`** (also understood: `S`/`I`/`A`, `ijin`, `alfa`, `bolos`).
+- `status` is **`Sakit` / `Izin` / `Alpa`** (also understood: `S`/`I`/`A`, `ijin`, `alfa`, `bolos`).
 - **`jam`** (optional) — the time the santri left / fell ill, for a **mid-day** case. Blank = whole day.
   Shown next to the date on the Rapor (e.g. `2026-10-05 · 10:30`).
-- **`reason`** (optional) — why the santri was absent (also accepted as `alasan`/`keterangan`/`catatan`).
-  Shown on the Rapor under **"Keterangan Ketidakhadiran"** for each non-Hadir day.
-- The app tallies statuses **per status, within the selected Rapor term** → the **Kehadiran** table on
-  the report card (Hadir / Sakit / Izin / Alpa + Total Hari). If a santri has no rows in the term,
-  the table is hidden.
+- **`reason`** (optional, also `alasan`/`keterangan`/`catatan`) — shown on the Rapor under
+  **"Keterangan Ketidakhadiran"**.
 
-**Fastest way to fill it — the in-app quick-log (admin only).** One admin owns attendance; students
-report to them. On the dashboard the admin taps **Kehadiran** → a slide-over where **everyone is Hadir
-by default** and you only **log the exceptions**: pick santri → Sakit/Izin/Alpa → optional `jam`
-(**Sekarang** button stamps the current time) → reason → **Simpan**. Today's exceptions list below;
-everyone else stays Hadir. No per-mapel, no per-student marking.
-- **To make Simpan write to the sheet**, the app POSTs to a **Kehadiran Google Form** — give its
-  questions the titles `id`, `tanggal`, `status`, `jam`, `reason` (any input type works — Dropdown /
-  Date / Time, same as the other forms), then paste its **pre-filled link** into **Konfigurasi**
-  (see §5, Form C). Until then, entries stay in the session only (a banner tells you). You can always
-  fill the tab by hand / a normal form instead.
-- Mirror to the **PUBLIC** sheet as a tab named exactly `Kehadiran`:
-  `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Kehadiran!A1:Z"), "where Col2 is not null", 1)`
-  (`Col2` = `id` if it's a form response tab with `Timestamp` in A; use `Col1` for a hand-built tab
-  with `id` in A). Until the tab exists, the tracker uses built-in demo attendance.
+**Fill it with the in-app quick-log (admin only).** One admin owns attendance; students report to them.
+On the dashboard the admin taps **Absensi** → a slide-over where **everyone is Hadir by default** and
+you only **log the absentees**: pick santri → Sakit/Izin/Alpa → optional `jam` (**Sekarang** stamps the
+current time) → reason → **Simpan**. Today's absences list below. No per-mapel, no per-student marking.
+- **To make Simpan write to the sheet**, the app POSTs to an **Absensi Google Form** — give its
+  questions the titles `id`, `tanggal`, `status`, `jam`, `reason` (any input type works, same as the
+  other forms), then paste its **pre-filled link** into **Konfigurasi** (see §5, Form C). Until then,
+  entries stay in the session only. You can always fill the tab by hand / a normal form instead.
+- Mirror to the **PUBLIC** sheet as a tab named exactly `Absensi`:
+  `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Absensi!A1:Z"), "where Col2 is not null", 1)`
+  (`Col2` = `id` if it's a form response tab with `Timestamp` in A; use `Col1` for a hand-built tab).
+
+#### The Kehadiran **score** (`khd`) — a weighted formula that lives on the sheet
+The Rapor shows a **Skor Kehadiran** = the `Master` column **`khd`** (§2b). Compute it however you
+like — the point is different absence types **deduct differently** (Alpa hurts most). Put this in
+`Master!` `khd` (row 2, id in `$A2`, fill down) — adjust the **weights** and the term date window:
+
+```
+=MAX(0, 100 - (
+    1 * COUNTIFS(Absensi!$B:$B,$A2, Absensi!$D:$D,"Sakit", Absensi!$C:$C,">=2026-07-01", Absensi!$C:$C,"<=2026-12-31")
+  + 1 * COUNTIFS(Absensi!$B:$B,$A2, Absensi!$D:$D,"Izin",  Absensi!$C:$C,">=2026-07-01", Absensi!$C:$C,"<=2026-12-31")
+  + 3 * COUNTIFS(Absensi!$B:$B,$A2, Absensi!$D:$D,"Alpa",  Absensi!$C:$C,">=2026-07-01", Absensi!$C:$C,"<=2026-12-31")
+))
+```
+
+- Weights here: **Sakit −1, Izin −1, Alpa −3** points per day — tune to your policy.
+- Column letters assume the Absensi **form-response tab** (`Timestamp` A, `id` B, `tanggal` C, `status`
+  D). Adjust to your sheet; the dates bound it to the term (match the `TERMS` window in code).
+- If `khd` is **blank**, the app falls back to a simple presence % = `(hari efektif − jumlah absensi) /
+  hari efektif`, where *hari efektif* is `days` in the `TERMS` array (`tracker/index.html`). So the
+  weighted `khd` is the authoritative score; the fallback just keeps demos/unconfigured sheets sensible.
 
 ---
 
@@ -421,7 +435,7 @@ exactly `Roster`** with a single formula in cell **A1** that mirrors the public 
 
 ```
 =QUERY(
-  IMPORTRANGE("<PRIVATE_SHEET_ID>", "Master!A1:Q"),
+  IMPORTRANGE("<PRIVATE_SHEET_ID>", "Master!A1:R"),
   "where Col1 is not null",
   1
 )
@@ -429,13 +443,13 @@ exactly `Roster`** with a single formula in cell **A1** that mirrors the public 
 
 - Replace `<PRIVATE_SHEET_ID>` with the id from the Private sheet URL:
   `https://docs.google.com/spreadsheets/d/`**`THIS_PART`**`/edit`
-- `Master!A1:Q` imports **only** the public columns (16 core + the optional `nis`) — private columns
-  (R+) are never referenced, so they can never leak. (Use `A1:P` if you're not using `nis` at all.)
+- `Master!A1:R` imports **only** the public columns (16 core + the optional `nis`/`khd`) — private
+  columns (S+) are never referenced, so they can never leak. (Use `A1:P` if you use neither optional column.)
 - `where Col1 is not null` drops blank rows; the trailing `1` keeps the header row.
 - **First run:** the cell shows `#REF!` with an **"Allow access"** button — click it once to
   authorize the Private→Public link. After that it stays in sync automatically.
 
-> Prefer to reorder/rename in the mirror? Use an explicit select (`select Col1, Col2, … Col17 where
+> Prefer to reorder/rename in the mirror? Use an explicit select (`select Col1, Col2, … Col18 where
 > Col1 is not null`). Column order does not matter to the tracker (it matches by header name), but the
 > headers must stay exactly `id, name, nick, …, juzdone, curpg, kelas` (plus `nis` if used).
 
@@ -503,27 +517,27 @@ both ayat fields are blank (whole surah). Question titles can be `ayat_dari`/`ay
 → Link to the **Private** spreadsheet → rename the response tab to **`Nilai`** (§2c). No reshape
 needed — the app reads by header and ignores the `Timestamp` column.
 
-**Form C — Kehadiran** *(optional, attendance; §2f)*. **Nobody ever opens this form** — the admin uses
-the app's own Kehadiran screen; the form is just the invisible **write endpoint** the app POSTs to. The
-app handles Date/Time correctly (splitting them the way Google expects), so use the **same input types
-as Forms A/B** — consistent, and the raw sheet gets clean typed data:
+**Form C — Absensi** *(optional; §2f)*. **Nobody ever opens this form** — the admin uses the app's own
+**Absensi** screen; the form is just the invisible **write endpoint** the app POSTs to. The app handles
+Date/Time correctly (splitting them the way Google expects), so use the **same input types as Forms
+A/B** — consistent, and the raw sheet gets clean typed data:
 
 | Question title | Google Forms type | Required | Notes |
 |----------------|-------------------|----------|-------|
 | `id`      | **Dropdown**        | ✅ | the bare santri ids |
 | `tanggal` | **Date**            | ✅ | date picker |
-| `status`  | **Multiple choice** | ✅ | `Hadir` · `Sakit` · `Izin` · `Alpa` (app sends S/I/A) |
+| `status`  | **Multiple choice** | ✅ | `Sakit` · `Izin` · `Alpa` (only absences are recorded) |
 | `jam`     | **Time**            | ⬜ | mid-day time |
 | `reason`  | **Paragraph**       | ⬜ | why absent |
 
-→ Link to the **Private** spreadsheet → rename the response tab to **`Kehadiran`**.
+→ Link to the **Private** spreadsheet → rename the response tab to **`Absensi`**.
 
 **Wire it to the app (one paste):** in the form, **⋮ → Get pre-filled link**, then fill it with any
 recognisable values — `id` = pick any santri, `tanggal` = pick any date, `status` = pick any status,
 `jam` = pick any time, `reason` = type **`__REASON__`** (or leave blank) — **Get link**, and paste that
-URL into **Konfigurasi → Kehadiran (pre-filled link)**. The app auto-detects each field (the Date field
+URL into **Konfigurasi → Absensi (pre-filled link)**. The app auto-detects each field (the Date field
 by its `_year` part, Time by `_hour`, `status` by its value, `reason` by the sentinel, and `id` = the
-remaining one) — **no per-field IDs to copy**. Konfigurasi shows **✓ Form kehadiran terhubung** when it
+remaining one) — **no per-field IDs to copy**. Konfigurasi shows **✓ Form absensi terhubung** when it
 parsed. *(Prefer Short answer everywhere with `__ID__`/`__TANGGAL__`/… sentinels? That still works too.
 Or just type the tab by hand — the quick-log logs in-session regardless.)*
 
@@ -551,7 +565,7 @@ one and add the other later.
 3. Status flips from *"Data contoh (demo)"* → *"Live · Google Sheet"*.
 
 From that **one** Public Sheet ID the tracker reads five tabs via GViz — **`Roster`** (santri),
-**`Nilai`** (tests), **`Mapel`** (subjects), **`Setoran`** (daily log), **`Kehadiran`** (attendance) — e.g.
+**`Nilai`** (tests), **`Mapel`** (subjects), **`Setoran`** (daily log), **`Absensi`** (absences) — e.g.
 `https://docs.google.com/spreadsheets/d/<PUBLIC_ID>/gviz/tq?tqx=out:json&sheet=Roster`
 Each tab is optional: any that's missing or unreachable falls back to built-in demo data automatically.
 
@@ -561,8 +575,8 @@ Each tab is optional: any that's missing or unreachable falls back to built-in d
 
 - [ ] Private sheet: restricted to staff only.
 - [ ] Public sheet: **Viewer** for anyone with link; **Edit** for staff only.
-- [ ] Public `Roster` imports **only** `Master!A1:Q` — no private columns referenced.
-- [ ] No private fields (wali, phone, address, economic status, internal notes) in columns A–Q — they start at **R**.
+- [ ] Public `Roster` imports **only** `Master!A1:R` — no private columns referenced.
+- [ ] No private fields (wali, phone, address, economic status, internal notes) in columns A–R — they start at **S**.
 - [ ] Tracker points at the **PUBLIC** Sheet ID, never the Private one.
 
 ### Known limitation
