@@ -84,7 +84,7 @@ New to Google Sheets/Forms? Follow these steps top to bottom. Sections §2–§7
 > versions, or you'll end up with duplicates. (Prefer to hand-build `Absensi` instead of a form?
 > Then add it here with row 1 `id  tanggal  status  jam  reason` — §2f.)
 
-### Step 4 — Build the two input Forms (why two → §5)
+### Step 4 — Build the input Forms (→ §5)
 For **each** form: **New → Google Forms** inside the folder.
 
 **Form A — `Setoran Harian`** (daily). Add questions, and **title them exactly**:
@@ -100,12 +100,16 @@ used by the §2e formulas).
   `Ekstrakurikuler`). **`mapel`** Dropdown of the subjects you listed in `Mapel`. **`nilai`** short
   answer (0–100).
 
+**Form C — `Absensi`** *(optional — the admin attendance write-endpoint).* Title the questions
+`id`, `tanggal`, `status`, `jam`, `reason` (types in §5, Form C). Nobody fills it directly — the app
+POSTs to it — so afterwards you **paste its pre-filled link** into Konfigurasi (§5, Form C).
+
 **Link each form to the PRIVATE sheet:** in the form, **Responses** tab → the green **Sheets** icon
 → **Select existing spreadsheet** → pick `RTA Tracker — PRIVATE`. Each link creates **one** new tab —
 rename it to the app's name:
 - Form A's response tab → rename to **`Setoran`**.
 - Form B's response tab → rename to **`Nilai`**.
-- (Optional Form C's response tab → rename to **`Absensi`**.)
+- (Form C's response tab → rename to **`Absensi`**.)
 
 The extra `Timestamp` column each form adds is harmless — the app ignores unrecognised columns. **One
 tab per form; no duplicates to maintain.**
@@ -141,7 +145,8 @@ Send yourself one test submission through each form and confirm a row lands in t
 1. Open `/tracker/` → **Masuk Staff** (log in via Clerk) → on the dashboard, **⚙️ Konfigurasi**.
 2. Paste the **PUBLIC** Sheet ID into **Google Sheet ID** → **Muat Data**. Status flips to
    **Live · Google Sheet**.
-3. Paste the two **Form IDs** into **Form Setoran Harian** and **Form Nilai Ujian/Tes**.
+3. Paste the two **Form IDs** into **Form Setoran Harian** and **Form Nilai Ujian/Tes**, and the
+   **Absensi pre-filled link** into **Absensi** (§5, Form C).
 
 ### Step 8 — Verify
 - Gallery/dashboard show your real santri (not the demo names).
@@ -471,12 +476,20 @@ what lets a public viewer see data derived from a sheet they cannot open.
 
 ---
 
-## 5. Write path — **two** Google Forms (embedded)
+## 5. Write path — **three** input forms
 
-Input has two cadences, so use **two separate forms** — cleaner data, cleaner to maintain, and each
-can have its own responders. Both embed in the tracker (mobile-friendly, native validation); you
-only need each **Form ID** — no field-ID mapping in code. In the tracker, **+ Input** opens a
-slide-over with a **Setoran Harian / Nilai Ujian-Tes** toggle, each showing its own embedded form.
+There are **three** input forms, wired in **Konfigurasi → 📝 Google Form**:
+
+| Form | How the app uses it | Config field |
+|------|---------------------|--------------|
+| **A — Setoran Harian** | **Embedded** (+ Input toggle) — humans fill it | **Form ID** |
+| **B — Nilai Ujian/Tes** | **Embedded** (+ Input toggle) — humans fill it | **Form ID** |
+| **C — Absensi** | **Background write endpoint** — the app POSTs to it from the Absensi screen | **pre-filled link** |
+
+Forms A & B embed in the tracker (mobile-friendly, native validation); you only need each **Form ID**.
+Form C is never opened by a human — the app writes to it — so instead of a Form ID you paste its
+**pre-filled link** (see Form C below). In the tracker, **+ Input** opens a slide-over with a
+**Setoran Harian / Nilai Ujian-Tes** toggle; **Absensi** is its own admin-only button.
 
 > **Title each question exactly like the column key** (`id`, `tanggal`, `nilai`, …) and the form's
 > linked response tab is already app-ready — no reshaping (see the walkthrough's "one trick").
@@ -551,12 +564,14 @@ Or just type the tab by hand — the quick-log logs in-session regardless.)*
 > - Turn on **Required** for `id`, `tanggal`, and the value field (`nilai`/`status`).
 > - Titles are matched case-insensitively, so `Tanggal` also works — but keep them lowercase for clarity.
 
-3. Copy each **Form ID** — the `.../forms/d/e/`**`ID`**`/viewform` part of the URL.
-4. In the tracker: **Dashboard → ⚙️ Konfigurasi → Google Form** → paste both IDs
-   (**Form Setoran Harian** and **Form Nilai Ujian/Tes**).
+**Wire all three in Konfigurasi** — **Dashboard → ⚙️ Konfigurasi → 📝 Google Form:**
+1. **Form Setoran Harian** → paste Form A's **Form ID** (`.../forms/d/e/`**`ID`**`/viewform`).
+2. **Form Nilai Ujian/Tes** → paste Form B's **Form ID**.
+3. **Absensi — pre-filled link** → paste Form C's **pre-filled link** (built as described above). It
+   shows **✓ Form absensi terhubung** once parsed.
 
-Each toggle shows a "belum dikonfigurasi" prompt until its Form ID is set — you can configure just
-one and add the other later.
+Each is independent — configure one now and the rest later. Until set, that input shows a "belum
+dikonfigurasi" prompt (Setoran/Nilai) or logs in-session only (Absensi).
 
 ## 6. Connect the tracker
 
@@ -568,6 +583,9 @@ From that **one** Public Sheet ID the tracker reads five tabs via GViz — **`Ro
 **`Nilai`** (tests), **`Mapel`** (subjects), **`Setoran`** (daily log), **`Absensi`** (absences) — e.g.
 `https://docs.google.com/spreadsheets/d/<PUBLIC_ID>/gviz/tq?tqx=out:json&sheet=Roster`
 Each tab is optional: any that's missing or unreachable falls back to built-in demo data automatically.
+
+4. In the same **Konfigurasi → 📝 Google Form** card, wire the **three input forms** — two **Form IDs**
+   (Setoran, Nilai) + the **Absensi pre-filled link** (§5).
 
 ---
 
