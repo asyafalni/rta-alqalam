@@ -402,10 +402,11 @@ report to them. On the dashboard the admin taps **Kehadiran** → a slide-over w
 by default** and you only **log the exceptions**: pick santri → Sakit/Izin/Alpa → optional `jam`
 (**Sekarang** button stamps the current time) → reason → **Simpan**. Today's exceptions list below;
 everyone else stays Hadir. No per-mapel, no per-student marking.
-- **To make Simpan write to the sheet**, the app POSTs to a **Kehadiran Google Form** — make that
-  form's questions **Short answer** (titles `id`, `tanggal`, `status`, `jam`, `reason`), then paste its
-  **pre-filled link** into **Konfigurasi** (see §5, Form C). Until then, entries stay in the session
-  only (a banner tells you). You can always fill the tab by hand / a normal form instead.
+- **To make Simpan write to the sheet**, the app POSTs to a **Kehadiran Google Form** — give its
+  questions the titles `id`, `tanggal`, `status`, `jam`, `reason` (any input type works — Dropdown /
+  Date / Time, same as the other forms), then paste its **pre-filled link** into **Konfigurasi**
+  (see §5, Form C). Until then, entries stay in the session only (a banner tells you). You can always
+  fill the tab by hand / a normal form instead.
 - Mirror to the **PUBLIC** sheet as a tab named exactly `Kehadiran`:
   `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Kehadiran!A1:Z"), "where Col2 is not null", 1)`
   (`Col2` = `id` if it's a form response tab with `Timestamp` in A; use `Col1` for a hand-built tab
@@ -502,28 +503,29 @@ both ayat fields are blank (whole surah). Question titles can be `ayat_dari`/`ay
 → Link to the **Private** spreadsheet → rename the response tab to **`Nilai`** (§2c). No reshape
 needed — the app reads by header and ignores the `Timestamp` column.
 
-**Form C — Kehadiran** *(optional, attendance; §2f)*. **Unlike Forms A/B, nobody ever opens this
-form** — it's just the invisible **write endpoint** the in-app admin quick-log POSTs to (the admin
-uses the app's own santri dropdown / status buttons / date-picker / time input). Because a
-programmatic POST needs one value per field — and Google splits **Date** into `_year/_month/_day` and
-**Time** into `_hour/_minute` — make every question **Short answer**, not Date/Time/Dropdown:
+**Form C — Kehadiran** *(optional, attendance; §2f)*. **Nobody ever opens this form** — the admin uses
+the app's own Kehadiran screen; the form is just the invisible **write endpoint** the app POSTs to. The
+app handles Date/Time correctly (splitting them the way Google expects), so use the **same input types
+as Forms A/B** — consistent, and the raw sheet gets clean typed data:
 
 | Question title | Google Forms type | Required | Notes |
 |----------------|-------------------|----------|-------|
-| `id`      | **Short answer** | ✅ | santri id (the app sends `s3`) |
-| `tanggal` | **Short answer** | ✅ | date text `YYYY-MM-DD` |
-| `status`  | **Short answer** | ✅ | `Sakit` / `Izin` / `Alpa` |
-| `jam`     | **Short answer** | ⬜ | time `HH:MM` for a mid-day case |
-| `reason`  | **Short answer** | ⬜ | why absent |
+| `id`      | **Dropdown**        | ✅ | the bare santri ids |
+| `tanggal` | **Date**            | ✅ | date picker |
+| `status`  | **Multiple choice** | ✅ | `Hadir` · `Sakit` · `Izin` · `Alpa` (app sends S/I/A) |
+| `jam`     | **Time**            | ⬜ | mid-day time |
+| `reason`  | **Paragraph**       | ⬜ | why absent |
 
 → Link to the **Private** spreadsheet → rename the response tab to **`Kehadiran`**.
 
-**Wire it to the app (one paste):** in the form, **⋮ → Get pre-filled link**, fill each field with the
-exact sentinel — `id` = `__ID__`, `tanggal` = `__TANGGAL__`, `status` = `__STATUS__`, `jam` = `__JAM__`,
-`reason` = `__REASON__` — **Get link**, and paste that URL into **Konfigurasi → Kehadiran (pre-filled
-link)**. The app reads each `entry.####` from it automatically (no per-field IDs to copy). Konfigurasi
-shows **✓ Form kehadiran terhubung** when it parsed. *(You can also just fill/​type the tab by hand;
-the quick-log still works in-session without this.)*
+**Wire it to the app (one paste):** in the form, **⋮ → Get pre-filled link**, then fill it with any
+recognisable values — `id` = pick any santri, `tanggal` = pick any date, `status` = pick any status,
+`jam` = pick any time, `reason` = type **`__REASON__`** (or leave blank) — **Get link**, and paste that
+URL into **Konfigurasi → Kehadiran (pre-filled link)**. The app auto-detects each field (the Date field
+by its `_year` part, Time by `_hour`, `status` by its value, `reason` by the sentinel, and `id` = the
+remaining one) — **no per-field IDs to copy**. Konfigurasi shows **✓ Form kehadiran terhubung** when it
+parsed. *(Prefer Short answer everywhere with `__ID__`/`__TANGGAL__`/… sentinels? That still works too.
+Or just type the tab by hand — the quick-log logs in-session regardless.)*
 
 > **Field-type tips**
 > - **Dropdown vs Multiple choice:** use a **Dropdown** for long lists (`id`, `mapel`); **Multiple

@@ -697,16 +697,29 @@ const KEHADIRAN = [
 // Local date/time (browser) for the attendance quick-log.
 function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function nowHM(){ const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
-// Parse a Kehadiran Google Form "pre-filled link" (built with sentinel values) → POST action + entry map.
+// Parse a Kehadiran Google Form "pre-filled link" → POST action + field map. Works whether the
+// questions are Dropdown/Date/Time or plain Short answer: Date fields are detected by the
+// entry.N_year part, Time by entry.N_hour; status/reason by value or sentinel; whatever single
+// value is left over = id (so any id format works).
 function parseKehLink(link){
   link=String(link||'').trim(); if(!link) return null;
   const fm=link.match(/forms\/d\/e\/([^\/?#]+)/); if(!fm) return null;
-  const action='https://docs.google.com/forms/d/e/'+fm[1]+'/formResponse';
-  const sent={'__ID__':'id','__TANGGAL__':'tanggal','__STATUS__':'status','__JAM__':'jam','__REASON__':'reason'};
-  const map={}; const re=/entry\.(\d+)=([^&#]+)/g; let m;
-  while((m=re.exec(link))){ const val=decodeURIComponent(m[2].replace(/\+/g,' ')); if(sent[val]) map[sent[val]]='entry.'+m[1]; }
-  if(!map.id||!map.tanggal||!map.status) return null;
-  return Object.assign({action}, map);
+  const cfg={action:'https://docs.google.com/forms/d/e/'+fm[1]+'/formResponse', tanggal:null, jam:null, id:null, status:null, reason:null};
+  const STAT={hadir:1,sakit:1,izin:1,alpa:1}; const singles=[];
+  const re=/entry\.(\d+)(_year|_month|_day|_hour|_minute)?=([^&#]*)/g; let m;
+  while((m=re.exec(link))){ const num=m[1], suf=m[2]||'', val=decodeURIComponent((m[3]||'').replace(/\+/g,' '));
+    if(suf==='_year') cfg.tanggal={dateBase:num};
+    else if(suf==='_hour') cfg.jam={timeBase:num};
+    else if(!suf) singles.push({entry:'entry.'+num, val}); }
+  for(const s of singles){ const v=s.val.toLowerCase();
+    if((s.val==='__TANGGAL__')&&!cfg.tanggal){ cfg.tanggal={simple:s.entry}; s.used=1; }
+    else if((s.val==='__JAM__')&&!cfg.jam){ cfg.jam={simple:s.entry}; s.used=1; }
+    else if(s.val==='__STATUS__'||STAT[v]){ cfg.status=s.entry; s.used=1; }
+    else if(s.val==='__REASON__'||s.val==='__ALASAN__'){ cfg.reason=s.entry; s.used=1; }
+    else if(s.val==='__ID__'){ cfg.id=s.entry; s.used=1; } }
+  if(!cfg.id){ const rem=singles.find(s=>!s.used); if(rem) cfg.id=rem.entry; }
+  if(!cfg.id||!cfg.tanggal||!cfg.status) return null;
+  return cfg;
 }
 const PILLARS = [
   {key:'haf', abbr:'HAF', label:'Hafalan', grp:'diniyah'},
@@ -1178,7 +1191,12 @@ class Component extends DCLogic {
         if(!id){ this.setState({kehMsg:'Pilih santri dahulu.'}); return; }
         const rec={id, tanggal:tgl, status:s.kehStatus||'Izin', jam:(s.kehJam||'').trim(), reason:(s.kehReason||'').trim()};
         const cfg=parseKehLink(s.kehLink);
-        if(cfg){ try{ const body=new URLSearchParams(); body.append(cfg.id,rec.id); body.append(cfg.tanggal,rec.tanggal); body.append(cfg.status,rec.status); if(cfg.jam&&rec.jam) body.append(cfg.jam,rec.jam); if(cfg.reason) body.append(cfg.reason,rec.reason); fetch(cfg.action,{method:'POST',mode:'no-cors',body}); }catch(e){ console.error('keh POST failed',e); } }
+        if(cfg){ try{ const b=new URLSearchParams();
+          b.append(cfg.id, rec.id); b.append(cfg.status, rec.status);
+          if(cfg.tanggal.dateBase){ const p=rec.tanggal.split('-'); b.append('entry.'+cfg.tanggal.dateBase+'_year',p[0]); b.append('entry.'+cfg.tanggal.dateBase+'_month',String(+p[1])); b.append('entry.'+cfg.tanggal.dateBase+'_day',String(+p[2])); } else b.append(cfg.tanggal.simple, rec.tanggal);
+          if(rec.jam && cfg.jam){ if(cfg.jam.timeBase){ const t=rec.jam.split(':'); b.append('entry.'+cfg.jam.timeBase+'_hour',String(+t[0])); b.append('entry.'+cfg.jam.timeBase+'_minute',String(+t[1])); } else b.append(cfg.jam.simple, rec.jam); }
+          if(cfg.reason) b.append(cfg.reason, rec.reason);
+          fetch(cfg.action,{method:'POST',mode:'no-cors',body:b}); }catch(e){ console.error('keh POST failed',e); } }
         this.setState({kehPending:[rec].concat(s.kehPending||[]), kehSantri:'', kehJam:'', kehReason:'', kehMsg: cfg?'Tersimpan ✓':'Tercatat sesi ini (form belum dikonfigurasi — belum tersimpan ke sheet).'});
       },
       undoKeh:(i)=>()=>{ const p=(this.state.kehPending||[]).slice(); p.splice(i,1); this.setState({kehPending:p}); },
