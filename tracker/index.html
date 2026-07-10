@@ -143,7 +143,7 @@
               <tr><td style="padding:7px 10px;border:1px solid #e6e1d5">{{ p.label }}</td><td style="text-align:center;font-weight:700;padding:7px 10px;border:1px solid #e6e1d5">{{ p.score }}</td><td style="text-align:center;font-weight:700;color:{{ p.color }};padding:7px 10px;border:1px solid #e6e1d5">{{ p.pname }}</td></tr>
             </sc-for></tbody>
           </table>
-          <div style="font-weight:800;font-size:13px;color:#0a4631;margin-bottom:6px">B. Bidang Akademik</div>
+          <div style="font-weight:800;font-size:13px;color:#0a4631;margin-bottom:6px">B. Bidang Umum</div>
           <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px">
             <thead><tr style="background:#eef4ee"><th style="text-align:left;padding:7px 10px;border:1px solid #d8e3d8">Mata Pelajaran</th><th style="width:64px;padding:7px 10px;border:1px solid #d8e3d8">Nilai</th><th style="width:130px;padding:7px 10px;border:1px solid #d8e3d8">Predikat</th></tr></thead>
             <tbody><sc-for list="{{ raporAkademik }}" as="p" hint-placeholder-count="2">
@@ -694,26 +694,26 @@ function hhmm(v){ v=String(v||'').trim(); if(!v) return ''; const m=v.match(/Dat
 const NILAI = [
   {id:'s1', tanggal:'2026-09-05', bidang:'Diniyah', mapel:'Tahfidz (Ziyadah)', jenis:'Setoran', nilai:90},
   {id:'s1', tanggal:'2026-09-12', bidang:'Diniyah', mapel:'Tahsin & Tajwid', jenis:'Ujian', nilai:88},
-  {id:'s1', tanggal:'2026-09-19', bidang:'Akademik', mapel:'Matematika', jenis:'Tes / Kuis', nilai:84},
-  {id:'s1', tanggal:'2026-09-24', bidang:'Akademik', mapel:'Bahasa Inggris', jenis:'Ujian', nilai:86},
+  {id:'s1', tanggal:'2026-09-19', bidang:'Umum', mapel:'Matematika', jenis:'Tes / Kuis', nilai:84},
+  {id:'s1', tanggal:'2026-09-24', bidang:'Umum', mapel:'Bahasa Inggris', jenis:'Ujian', nilai:86},
   {id:'s3', tanggal:'2026-09-06', bidang:'Diniyah', mapel:'Tahfidz (Ziyadah)', jenis:'Setoran', nilai:95},
   {id:'s3', tanggal:'2026-09-14', bidang:'Diniyah', mapel:'Mutun Ilmiyah', jenis:'Hafalan', nilai:92},
-  {id:'s3', tanggal:'2026-09-20', bidang:'Akademik', mapel:'IPA (Sains)', jenis:'Ujian', nilai:88},
-  {id:'s3', tanggal:'2026-09-25', bidang:'Akademik', mapel:'Matematika', jenis:'Tes / Kuis', nilai:90},
+  {id:'s3', tanggal:'2026-09-20', bidang:'Umum', mapel:'IPA (Sains)', jenis:'Ujian', nilai:88},
+  {id:'s3', tanggal:'2026-09-25', bidang:'Umum', mapel:'Matematika', jenis:'Tes / Kuis', nilai:90},
   {id:'s4', tanggal:'2026-09-10', bidang:'Diniyah', mapel:'Muraja’ah', jenis:'Setoran', nilai:72},
-  {id:'s4', tanggal:'2026-09-18', bidang:'Akademik', mapel:'Matematika', jenis:'Ujian', nilai:76},
+  {id:'s4', tanggal:'2026-09-18', bidang:'Umum', mapel:'Matematika', jenis:'Ujian', nilai:76},
   {id:'s5', tanggal:'2026-09-09', bidang:'Diniyah', mapel:'Tahfidz (Ziyadah)', jenis:'Setoran', nilai:87},
-  {id:'s5', tanggal:'2026-09-22', bidang:'Akademik', mapel:'Bahasa Indonesia', jenis:'Tes / Kuis', nilai:83},
+  {id:'s5', tanggal:'2026-09-22', bidang:'Umum', mapel:'Bahasa Indonesia', jenis:'Tes / Kuis', nilai:83},
   {id:'s2', tanggal:'2026-09-11', bidang:'Diniyah', mapel:'Tahsin & Tajwid', jenis:'Ujian', nilai:84},
-  {id:'s2', tanggal:'2026-09-21', bidang:'Akademik', mapel:'IPS', jenis:'Ujian', nilai:85},
+  {id:'s2', tanggal:'2026-09-21', bidang:'Umum', mapel:'IPS', jenis:'Ujian', nilai:85},
   {id:'s3', tanggal:'2026-09-16', bidang:'Diniyah', mapel:'Tahsin & Tajwid', jenis:'Ujian', nilai:93},
-  {id:'s3', tanggal:'2026-09-28', bidang:'Akademik', mapel:'Bahasa Inggris', jenis:'Ujian', nilai:87},
+  {id:'s3', tanggal:'2026-09-28', bidang:'Umum', mapel:'Bahasa Inggris', jenis:'Ujian', nilai:87},
   {id:'s3', tanggal:'2026-09-30', bidang:'Ekstrakurikuler', mapel:'Teknologi Informasi (IT)', jenis:'Proyek', nilai:90},
   {id:'s3', tanggal:'2026-10-02', bidang:'Ekstrakurikuler', mapel:'Kewirausahaan', jenis:'Praktik', nilai:88},
   {id:'s1', tanggal:'2026-09-30', bidang:'Ekstrakurikuler', mapel:'Teknologi Informasi (IT)', jenis:'Proyek', nilai:85},
   {id:'s11', tanggal:'2026-09-14', bidang:'Diniyah', mapel:'Tahfidz (Ziyadah)', jenis:'Setoran', nilai:97},
   {id:'s11', tanggal:'2026-09-19', bidang:'Diniyah', mapel:'Tahsin & Tajwid', jenis:'Ujian', nilai:95},
-  {id:'s11', tanggal:'2026-09-26', bidang:'Akademik', mapel:'Matematika', jenis:'Ujian', nilai:92},
+  {id:'s11', tanggal:'2026-09-26', bidang:'Umum', mapel:'Matematika', jenis:'Ujian', nilai:92},
   {id:'s11', tanggal:'2026-10-01', bidang:'Ekstrakurikuler', mapel:'Teknologi Informasi (IT)', jenis:'Proyek', nilai:94},
 ];
 // Daily setoran log (Islamic self/staff journal side). Same shape as the public 'Setoran' sheet tab.
@@ -811,17 +811,17 @@ const PILLARS = [
   {key:'mur', abbr:'MUR', label:'Muroja’ah', grp:'diniyah'},
   {key:'ilm', abbr:'ILM', label:'Ilmu & B. Arab', grp:'diniyah'},
   {key:'akh', abbr:'AKH', label:'Akhlak', grp:'diniyah'},
-  {key:'akd', abbr:'AKD', label:'Akademik', grp:'akademik'},
-  {key:'bhs', abbr:'BHS', label:'Bahasa', grp:'akademik'},
+  {key:'akd', abbr:'UMU', label:'Umum', grp:'umum'},
+  {key:'bhs', abbr:'BHS', label:'Bahasa', grp:'umum'},
 ];
 // ---- Rapor bidang: the three groups are FIXED; the subjects (mapel) inside each are
 //      DYNAMIC — the admin defines them in the "Mapel" sheet tab (bidang, mapel).
 const BIDANG = [
   {key:'Diniyah', title:'Tahfidz & Diniyah', head:'Aspek Penilaian'},
-  {key:'Akademik', title:'Akademik', head:'Mata Pelajaran'},
+  {key:'Umum', title:'Umum', head:'Mata Pelajaran'},
   {key:'Ekstrakurikuler', title:'Ekstrakurikuler', head:'Mata Pelajaran'},
 ];
-function normBidang(b){ b=String(b||'').toLowerCase(); if(/ekstra|ekskul/.test(b)) return 'Ekstrakurikuler'; if(/akad/.test(b)) return 'Akademik'; if(/dini|tahfi|diniyah/.test(b)) return 'Diniyah'; return ''; }
+function normBidang(b){ b=String(b||'').toLowerCase(); if(/ekstra|ekskul/.test(b)) return 'Ekstrakurikuler'; if(/akad|umum/.test(b)) return 'Umum'; if(/dini|tahfi|diniyah/.test(b)) return 'Diniyah'; return ''; }
 // Segmented-toggle button styles (active / inactive) for the Input sheet.
 const SEG_ON='flex:1;padding:9px 12px;border-radius:9px;border:none;background:#0a4631;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer';
 const SEG_OFF='flex:1;padding:9px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer';
@@ -835,11 +835,11 @@ const MAPEL = [
   {bidang:'Diniyah', mapel:'Muroja’ah'},
   {bidang:'Diniyah', mapel:'Mutun Ilmiyah'},
   {bidang:'Diniyah', mapel:'Akhlak'},
-  {bidang:'Akademik', mapel:'Matematika'},
-  {bidang:'Akademik', mapel:'IPA (Sains)'},
-  {bidang:'Akademik', mapel:'IPS'},
-  {bidang:'Akademik', mapel:'Bahasa Indonesia'},
-  {bidang:'Akademik', mapel:'Bahasa Inggris'},
+  {bidang:'Umum', mapel:'Matematika'},
+  {bidang:'Umum', mapel:'IPA (Sains)'},
+  {bidang:'Umum', mapel:'IPS'},
+  {bidang:'Umum', mapel:'Bahasa Indonesia'},
+  {bidang:'Umum', mapel:'Bahasa Inggris'},
   {bidang:'Ekstrakurikuler', mapel:'Teknologi Informasi (IT)'},
   {bidang:'Ekstrakurikuler', mapel:'Kewirausahaan'},
 ];
@@ -1251,7 +1251,7 @@ class Component extends DCLogic {
       });
     };
     const diniyahRows = raporRows('Diniyah');
-    const akademikRows = raporRows('Akademik');
+    const akademikRows = raporRows('Umum');
     const ekskulRows = raporRows('Ekstrakurikuler');
 
     // ---- Attendance quick-log (admin) ----
@@ -1272,7 +1272,7 @@ class Component extends DCLogic {
     const sJenisChips=['Ziyadah','Muroja’ah','Tahsin'].map(vv=>{ const active=(st.sJenis||'Ziyadah')===vv, c=sJenisCol[vv]; return {v:vv, style:'flex:1;padding:9px 6px;border-radius:9px;border:1px solid '+(active?c:'#e6e1d5')+';background:'+(active?c:'#fff')+';color:'+(active?'#fff':'#16264d')+';font-weight:700;font-size:12px;cursor:pointer', onPick:()=>this.setState({sJenis:vv})}; });
     const sRating=st.sRating||0;
     const sStars=[1,2,3,4,5].map(n=>({n, star:(n<=sRating?'★':'☆'), col:(n<=sRating?'#e0a92c':'#d8d5cc'), onPick:()=>this.setState({sRating:n})}));
-    const nBidangChips=['Diniyah','Akademik','Ekstrakurikuler'].map(vv=>{ const active=(st.nBidang||'Diniyah')===vv, c='#0a4631'; return {v:vv, style:'flex:1;padding:9px 5px;border-radius:9px;border:1px solid '+(active?c:'#e6e1d5')+';background:'+(active?c:'#fff')+';color:'+(active?'#fff':'#16264d')+';font-weight:700;font-size:11px;cursor:pointer', onPick:()=>this.setState({nBidang:vv, nMapel:''})}; });
+    const nBidangChips=['Diniyah','Umum','Ekstrakurikuler'].map(vv=>{ const active=(st.nBidang||'Diniyah')===vv, c='#0a4631'; return {v:vv, style:'flex:1;padding:9px 5px;border-radius:9px;border:1px solid '+(active?c:'#e6e1d5')+';background:'+(active?c:'#fff')+';color:'+(active?'#fff':'#16264d')+';font-weight:700;font-size:11px;cursor:pointer', onPick:()=>this.setState({nBidang:vv, nMapel:''})}; });
     const nMapelOpts=activeMapel.filter(d=>normBidang(d.bidang)===(st.nBidang||'Diniyah')).map(d=>({v:d.mapel, label:d.mapel}));
     const setoranReady=!!parseFormLink(st.setoranFormId, SETORAN_KEYS), nilaiReady=!!parseFormLink(st.nilaiFormId, NILAI_KEYS);
 

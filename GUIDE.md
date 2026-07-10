@@ -21,7 +21,7 @@ academics, reporting).
  │  PRIVATE sheet  (source truth)│   restricted access — staff only
  │  ├─ tab: Setoran (Form resp.) │   raw per-event submissions
  │  ├─ tab: Master               │   one row per santri (public A–R · private S+)
- │  ├─ tab: Nilai                │   one row per test (Diniyah/Akademik/Ekstrakurikuler)
+ │  ├─ tab: Nilai                │   one row per test (Diniyah/Umum/Ekstrakurikuler)
  │  ├─ tab: Mapel                │   subject definitions per group (bidang, mapel)
  │  ├─ tab: Halaqah              │   circle names + musyrif (hal, nama, musyrif)
  │  └─ tab: Absensi              │   one row per absence (id, tanggal, status, …)
@@ -100,7 +100,7 @@ used by the §2e formulas).
 
 **Form B — `Nilai Ujian/Tes`** (exams). Title the questions exactly:
 `id`, `tanggal`, `bidang`, `mapel`, `jenis`, `nilai`.
-- **`id`** Dropdown (same santri ids). **`bidang`** Dropdown (`Diniyah` / `Akademik` /
+- **`id`** Dropdown (same santri ids). **`bidang`** Dropdown (`Diniyah` / `Umum` /
   `Ekstrakurikuler`). **`mapel`** Dropdown of the subjects you listed in `Mapel`. **`nilai`** short
   answer (0–100).
 
@@ -210,7 +210,7 @@ keys (the tracker matches by header):
 | I | `mur`  | Muroja'ah (0–100) | number | Musyrif/Mudir |
 | J | `ilm`  | Ilmu & Bahasa Arab — mutun+mufrodat (0–100) | number | Musyrif/Mudir |
 | K | `akh`  | Akhlak (0–100) | number | Musyrif/Mudir |
-| L | `akd`  | Akademik — math/IPA/… (0–100) | number | **Admin** |
+| L | `akd`  | Umum — math/IPA/… (0–100) | number | **Admin** |
 | M | `bhs`  | Bahasa — Indonesia/Inggris (0–100) | number | **Admin** |
 | N | `juzdone` | which juz are memorized — a list in any order, e.g. `1,2,3,28,29,30` (juz count & progress derive from it) | text | Musyrif/Mudir |
 | O | `curpg` | **current page** (1–604) on the standard Madinah/Uthmani mushaf. The app derives the current juz, the position within it, and "≈ N pages left to finish the juz". | number | Musyrif/Mudir |
@@ -259,10 +259,10 @@ Headers in row 1:
 
 | id | tanggal | bidang | mapel | jenis | nilai |
 |----|---------|--------|-------|-------|-------|
-| s1 | 2026-09-19 | Akademik | Matematika | Ujian | 84 |
+| s1 | 2026-09-19 | Umum | Matematika | Ujian | 84 |
 | s1 | 2026-09-12 | Diniyah | Tahsin & Tajwid | Setoran | 88 |
 
-- `id` matches the santri id in `Master`. `bidang` = **`Diniyah`**, **`Akademik`**, or
+- `id` matches the santri id in `Master`. `bidang` = **`Diniyah`**, **`Umum`**, or
   **`Ekstrakurikuler`** (one of the three fixed groups — see §2d). `mapel` must match a subject you
   defined in the `Mapel` tab. `nilai` is 0–100.
 - **Where these rows come from:** this tab is Form B's linked response tab (walkthrough Step 4), so
@@ -284,7 +284,7 @@ Headers in row 1:
 ---
 
 ### 2d. Tab `Mapel` (subject definitions) — **what subjects the Rapor tracks**
-The **three groups are fixed in the app** — `Tahfidz & Diniyah`, `Akademik`, `Ekstrakurikuler` — but
+The **three groups are fixed in the app** — `Tahfidz & Diniyah`, `Umum`, `Ekstrakurikuler` — but
 **you decide which subjects live inside each group.** Define them here, one row per subject:
 
 | bidang | mapel |
@@ -292,13 +292,13 @@ The **three groups are fixed in the app** — `Tahfidz & Diniyah`, `Akademik`, `
 | Diniyah | Tahfidz (Ziyadah) |
 | Diniyah | Tahsin & Tajwid |
 | Diniyah | Akhlak |
-| Akademik | Matematika |
-| Akademik | IPA (Sains) |
+| Umum | Matematika |
+| Umum | IPA (Sains) |
 | Ekstrakurikuler | Teknologi Informasi (IT) |
 | Ekstrakurikuler | Kewirausahaan |
 
-- `bidang` **must be one of** `Diniyah` / `Akademik` / `Ekstrakurikuler` (case-insensitive; `Tahfidz`,
-  `Ekskul` also accepted). Any other value is ignored.
+- `bidang` **must be one of** `Diniyah` / `Umum` / `Ekstrakurikuler` (case-insensitive; `Tahfidz`,
+  `Ekskul`, and the legacy `Akademik` → `Umum` also accepted). Any other value is ignored.
 - `mapel` is the subject name shown on the Rapor — spell it **exactly** as you'll type it in the
   `Nilai` tab (the tracker matches subject to score by this text).
 - The Rapor lists **every** defined subject per group; a subject with no `Nilai` record yet shows
@@ -313,7 +313,7 @@ The **three groups are fixed in the app** — `Tahfidz & Diniyah`, `Akademik`, `
 
 ### 2e. Deriving `Profil Kemampuan` (Master G–M) from the two input streams
 
-The 7 bars/radar the app shows (**Hafalan, Tahsin, Muroja'ah, Ilmu & B. Arab, Akhlak, Akademik,
+The 7 bars/radar the app shows (**Hafalan, Tahsin, Muroja'ah, Ilmu & B. Arab, Akhlak, Umum,
 Bahasa**) read the `Master` columns **G–M** *directly*. They do **not** auto-update from the forms —
 you either **type** them, or **compute** them from `Setoran` (daily) + `Nilai` (tests) with the
 formulas below. This is deliberate: the musyrif *decides* the semester score, informed by the data —
@@ -344,7 +344,7 @@ letters instead, map to a number first: `=IFS(G2="Mumtaz",95,G2="Jayyid Jiddan",
 |---|---|---|---|
 | **G** `haf` | Hafalan | daily Ziyadah | `=IFERROR(ROUND(20*AVERAGEIFS(Setoran!$F:$F,Setoran!$A:$A,$A2,Setoran!$C:$C,"Ziyadah")),"")` |
 | **I** `mur` | Muroja'ah | daily Muroja'ah | `=IFERROR(ROUND(20*AVERAGEIFS(Setoran!$F:$F,Setoran!$A:$A,$A2,Setoran!$C:$C,"Muroja'ah")),"")` |
-| **L** `akd` | Akademik | all Akademik tests | `=IFERROR(ROUND(AVERAGEIFS(Nilai!$F:$F,Nilai!$A:$A,$A2,Nilai!$C:$C,"Akademik")),"")` |
+| **L** `akd` | Umum | all Umum tests | `=IFERROR(ROUND(AVERAGEIFS(Nilai!$F:$F,Nilai!$A:$A,$A2,Nilai!$C:$C,"Umum")),"")` |
 | **K** `akh` | Akhlak | — | *type manually — it's a credit, not a test* |
 
 **H `tah` (Tahsin) — blend daily + test.** 40 % daily Tahsin setoran + 60 % the "Tahsin & Tajwid"
@@ -549,7 +549,7 @@ both ayat fields are blank (whole surah). Question titles can be `ayat_dari`/`ay
 
 → Link to the **Private** spreadsheet → rename the response tab to **`Setoran`** (§2a).
 
-**Form B — Nilai Ujian/Tes** (periodic; Mudir for Diniyah, guru for Akademik). Titles = keys:
+**Form B — Nilai Ujian/Tes** (periodic; Mudir for Diniyah, guru for Umum). Titles = keys:
 
 | Question title | Type (any) | Pre-fill value |
 |----------------|------------|----------------|
