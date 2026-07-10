@@ -721,13 +721,15 @@ function parseKehLink(link){
     if(suf==='_year') cfg.tanggal={dateBase:num};
     else if(suf==='_hour') cfg.jam={timeBase:num};
     else if(!suf) singles.push({entry:'entry.'+num, val}); }
+  // Identify each field by sentinel OR the pattern of a real example value (date/time/status/id).
   for(const s of singles){ const v=s.val.toLowerCase();
-    if((s.val==='__TANGGAL__')&&!cfg.tanggal){ cfg.tanggal={simple:s.entry}; s.used=1; }
-    else if((s.val==='__JAM__')&&!cfg.jam){ cfg.jam={simple:s.entry}; s.used=1; }
+    if((s.val==='__TANGGAL__'||/^\d{4}-\d{1,2}-\d{1,2}$/.test(s.val))&&!cfg.tanggal){ cfg.tanggal={simple:s.entry}; s.used=1; }
+    else if((s.val==='__JAM__'||/^\d{1,2}:\d{2}$/.test(s.val))&&!cfg.jam){ cfg.jam={simple:s.entry}; s.used=1; }
     else if(s.val==='__STATUS__'||STAT[v]){ cfg.status=s.entry; s.used=1; }
-    else if(s.val==='__REASON__'||s.val==='__ALASAN__'){ cfg.reason=s.entry; s.used=1; }
-    else if(s.val==='__ID__'){ cfg.id=s.entry; s.used=1; } }
-  if(!cfg.id){ const rem=singles.find(s=>!s.used); if(rem) cfg.id=rem.entry; }
+    else if(s.val==='__ID__'||/^s\d+$/i.test(s.val)){ cfg.id=s.entry; s.used=1; }
+    else if(s.val==='__REASON__'||s.val==='__ALASAN__'){ cfg.reason=s.entry; s.used=1; } }
+  if(!cfg.id){ const rem=singles.find(s=>!s.used); if(rem){ cfg.id=rem.entry; rem.used=1; } }
+  if(!cfg.reason){ const rem=singles.find(s=>!s.used); if(rem) cfg.reason=rem.entry; }
   if(!cfg.id||!cfg.tanggal||!cfg.status) return null;
   return cfg;
 }
