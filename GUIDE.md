@@ -517,10 +517,11 @@ question type works — nobody fills it by hand), link it to the Private sheet a
 tab, then paste its **pre-filled link** into the matching row of the **`Config`** tab (§6).
 
 > **Building the pre-fill (the app reads the entry IDs from it):** in the form, **⋮ → Get pre-filled
-> link**, and fill each field with the **`__KEY__` sentinel** matching its title — `id` → `__ID__`,
-> `tanggal` → `__TANGGAL__`, `juz` → `__JUZ__`, `nilai` → `__NILAI__`, etc. — then **Get link** and
-> copy the URL. (A `Date` question can't hold a sentinel — the app detects it by its `_year` part, so
-> just pick any date there. Same for `Time`/`_hour`.) The app maps `entry.### → field` automatically.
+> link**, fill **every** field with any example value **in the order listed below** (`id`=`s1`,
+> `tanggal`=`2026-07-10`, `jenis`=`Ziyadah`, `juz`=`1`, …), then **Get link** and copy the URL. The
+> app maps each `entry.### → field` **by position**, so **keep your form questions in this order**.
+> *(Order-independent alternative: put a `__KEY__` sentinel in a field — `__JUZ__`, `__NILAI__`, … — and
+> that field is matched by name regardless of position.)* Only **`id`** and **`tanggal`** are required.
 
 **Form A — Setoran Harian** (daily; Musyrif & Mudir). Question titles = the keys:
 
