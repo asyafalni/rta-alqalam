@@ -63,14 +63,14 @@
   @media(min-width:480px){.juz-map{grid-template-columns:repeat(10,1fr)}}
   @media(min-width:720px){.juz-map{grid-template-columns:repeat(15,1fr)}}
   .roster-head{display:none}
-  @media(min-width:760px){.roster-head{display:grid;grid-template-columns:1.7fr 1.5fr 60px 84px;gap:12px}}
+  @media(min-width:760px){.roster-head{display:grid;grid-template-columns:1.15fr 1.7fr 60px 116px;gap:12px}}
   .roster-row{display:grid;gap:9px 10px;align-items:center;grid-template-columns:1fr auto auto;grid-template-areas:'santri grade act' 'prog prog prog'}
   .roster-row>.r-tier{grid-area:tier}
   .roster-row>.r-santri{grid-area:santri;min-width:0}
   .roster-row>.r-prog{grid-area:prog}
   .roster-row>.r-grade{grid-area:grade}
   .roster-row>.r-act{grid-area:act}
-  @media(min-width:760px){.roster-row{grid-template-columns:1.7fr 1.5fr 60px 84px;grid-template-areas:'santri prog grade act'}}
+  @media(min-width:760px){.roster-row{grid-template-columns:1.15fr 1.7fr 60px 116px;grid-template-areas:'santri prog grade act'}}
 </style>
 </helmet>
 
@@ -470,7 +470,7 @@
           <div class="roster-row" style="padding:12px 18px;border-bottom:1px solid #f0ede4">
             <div class="r-santri" style="display:flex;align-items:center;gap:10px;min-width:0">
               <span title="{{ s.tier }}" style="width:34px;height:34px;border-radius:50%;background:{{ s.tierColor }};color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.12)">{{ s.initials }}</span>
-              <div style="min-width:0"><div style="display:flex;align-items:center;gap:6px;min-width:0"><span style="font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.nick }}</span><span style="flex:none;font-size:9.5px;font-weight:800;color:#8a6d1e;background:#f5ecd3;border:1px solid #e6d3a0;padding:1px 6px;border-radius:6px">{{ s.kelas }}</span></div><div style="font-size:11px;color:#9aa1ad">{{ s.subLine }}</div></div>
+              <div style="min-width:0"><div style="display:flex;align-items:center;gap:6px;min-width:0"><span style="font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.nick }}</span><span style="flex:none;font-size:9.5px;font-weight:800;color:#8a6d1e;background:#f5ecd3;border:1px solid #e6d3a0;padding:1px 6px;border-radius:6px">{{ s.kelas }}</span></div><div style="font-size:11px;color:#9aa1ad">{{ s.halaqahLabel }}</div></div>
             </div>
             <div class="r-prog">
               <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:4px"><span>{{ s.juz }}/15 Juz</span><span>{{ s.juzPct }}%</span></div>
@@ -484,6 +484,11 @@
               <button onClick="{{ s.onEntry }}" title="Input nilai" style="width:32px;height:32px;border-radius:8px;border:none;background:#2f8f3a;color:#fff;cursor:pointer;display:grid;place-items:center;padding:0">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
               </button>
+              <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ s.onAbsen }}" title="Absensi" style="width:32px;height:32px;border-radius:8px;border:1px solid #e6d3a0;background:#fff;color:#a5791f;cursor:pointer;display:grid;place-items:center;padding:0">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="m9 16 2 2 4-4"/></svg>
+                </button>
+              </sc-if>
             </div>
           </div>
         </sc-for>
@@ -614,7 +619,7 @@
         <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:16px;margin-bottom:16px">
           <div style="font-weight:800;font-size:13px;margin-bottom:12px;color:#0a4631">Catat Ketidakhadiran</div>
           <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Santri
-            <select value="{{ kehSantri }}" onChange="{{ setKehSantri }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d">
+            <select value="{{ kehSantri }}" onChange="{{ setKehSantri }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #16264d;background:#16264d;font-size:13px;font-weight:700;color:#fff">
               <option value="">— pilih santri —</option>
               <sc-for list="{{ kehSantriOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o.v }}">{{ o.label }}</option></sc-for>
             </select>
@@ -1137,7 +1142,6 @@ class Component extends DCLogic {
       juz:juzCount, curJuz, juzDone,
       curpg:pg, hasPage:!!pInfo, pgInJuz:pInfo?pInfo.inJuz:0, pgLenJuz:pInfo?pInfo.lenJuz:0, pgPctJuz:pInfo?pInfo.pctJuz:0, pgLeft:pInfo?pInfo.leftInJuz:0, pgNextJuz:pInfo?pInfo.nextJuz:0,
       juzPct:hafPct, barBase, barOver, overTarget, hafPctColor:(overTarget?'#a07d1e':'#2f8f3a'), halaqahLabel:hd.label, halaqahName:hd.nama, musyrif:hd.musyrif, mudir:MUDIR, kelas:r.kelas||'—',
-      subLine:([hd.label!=='—'?hd.label:'', String(r.kota||'').trim()].filter(Boolean).join(' · ')||'—'),
       curArab:String(curJuz).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d)),
       pillars:scores.map(s=>({abbr:s.abbr, label:s.label, score:(s.score==null?'—':s.score), pct:(s.score==null?0:s.score), letter:s.g.l, color:s.g.c, grp:s.grp, pname:s.g.name, tag:(s.score==null?'N/A':(s.g.l+' · '+s.score))})),
       overallScore:(overall==null?'—':overall), noScores,
@@ -1148,6 +1152,7 @@ class Component extends DCLogic {
       barTrack:{background:theme==='minimal'?'#eef0f4':'rgba(255,255,255,.14)'},
       onOpen:()=>this.setState({selectedId:r.id, view:'detail'}),
       onEntry:()=>this.setState({entryOpen:true, sSantri:r.id, nSantri:r.id}),
+      onAbsen:()=>this.setState({kehOpen:true, kehSantri:r.id, kehDate:this.state.kehDate||todayStr(), kehMsg:''}),
     };
   }
 
