@@ -268,14 +268,23 @@
       </sc-if>
       <div class="book-grid">
         <sc-for list="{{ gallery }}" as="s" hint-placeholder-count="8">
-          <div onClick="{{ s.onOpen }}" style="background:#fffdf7;border:1px solid #ece3cf;border-radius:18px;padding:15px 14px 17px;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 6px 20px rgba(120,95,30,.08);position:relative;display:flex;flex-direction:column;align-items:center;text-align:center" style-hover="transform:translateY(-5px);box-shadow:0 16px 32px rgba(120,95,30,.17)">
-            <img src="../assets/quran-icon.png" alt="Al-Qur'an" style="width:106px;height:auto;margin:2px auto 0;display:block" />
-            <div class="disp" style="font-size:19px;color:#0a4631;line-height:1.15;margin-top:8px">{{ s.nick }}</div>
+          <div onClick="{{ s.onOpen }}" style="background:#fffdf7;border:1px solid #ece3cf;border-top:4px solid {{ s.hafAccent }};border-radius:18px;padding:16px 14px 18px;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 6px 20px rgba(120,95,30,.08);position:relative;display:flex;flex-direction:column;align-items:center;text-align:center" style-hover="transform:translateY(-5px);box-shadow:0 16px 32px rgba(120,95,30,.17)">
+            <sc-if value="{{ s.isMumtaz }}" hint-placeholder-val="{{ false }}">
+              <div title="Mumtaz" style="position:absolute;top:11px;right:11px;display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:800;color:#8a6d1e;background:#f5ecd3;border:1px solid #e6d3a0;padding:2px 7px;border-radius:999px">★ Mumtaz</div>
+            </sc-if>
+            <img src="../assets/quran-icon.png" alt="Al-Qur'an" style="width:74px;height:auto;margin:2px auto 0;display:block" />
+            <div style="position:relative;width:92px;height:92px;margin-top:10px;border-radius:50%;background:{{ s.ringStyle }};display:grid;place-items:center">
+              <div style="width:72px;height:72px;border-radius:50%;background:#fbf7ea;border:1px solid #ecdcae;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1">
+                <span style="font-size:8.5px;font-weight:700;letter-spacing:.08em;color:#b7a77f;text-transform:uppercase">Juz</span>
+                <span class="arb" dir="rtl" style="font-size:23px;font-weight:700;color:#0a4631">{{ s.ringNum }}</span>
+              </div>
+            </div>
+            <div class="disp" style="font-size:19px;color:#0a4631;line-height:1.15;margin-top:11px">{{ s.nick }}</div>
             <div style="font-size:11.5px;color:#9a8c6a;margin-top:3px">{{ s.kota }} · Kelas {{ s.kelas }}</div>
-            <div class="arb" style="margin-top:9px;font-size:15px;font-weight:700;color:#0a4631;background:#f5ecd3;border:1px solid #e6d3a0;padding:3px 15px;border-radius:999px" dir="rtl">جُزْء {{ s.curArab }}</div>
-            <div style="width:100%;margin-top:12px">
-              <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;color:#b7a77f;text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px"><span>Hafalan</span><span style="color:{{ s.hafPctColor }}">{{ s.juzPct }}%</span></div>
-              <div style="position:relative;height:7px;border-radius:6px;background:#e7ece6;overflow:hidden"><div style="height:100%;width:{{ s.barBase }}%;background:linear-gradient(90deg,#2f8f3a,#57b45f);border-radius:6px"></div><div style="position:absolute;top:0;left:0;height:100%;width:{{ s.barOver }}%;background:linear-gradient(90deg,#cfa02c,#e8bd57);border-radius:6px"></div></div>
+            <div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#8a7f66;margin-top:5px"><span style="width:7px;height:7px;border-radius:50%;background:{{ s.halDot }};flex:none"></span>{{ s.halaqahShow }}</div>
+            <div style="width:100%;margin-top:13px;display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #f0e8d4;padding-top:11px">
+              <span style="font-size:12.5px;font-weight:700;color:#0a4631">{{ s.juzLine }}</span>
+              <span style="font-size:13px;font-weight:800;color:{{ s.hafPctColor }}">{{ s.hafPctText }}</span>
             </div>
           </div>
         </sc-for>
@@ -1138,11 +1147,27 @@ class Component extends DCLogic {
     const noScores = avail.length===0;
     const og=grade(overall), tier=tierOf(overall==null?0:overall), v=this.cardVisual(theme,tier);
     const initials=r.nick.slice(0,2).toUpperCase();
+    // ---- Gallery card visuals: progress ring, tier accent, halaqah dot, juz line ----
+    const curArab=String(curJuz).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d));
+    const started=juzCount>0 || !!pInfo;                     // has any memorization or a current page
+    const ringPct=Math.min(100, hafPct);
+    const ringStyle=overTarget
+      ? 'conic-gradient(#e0a92c 0deg 360deg)'                 // over target → full gold ring
+      : 'conic-gradient(#2f8f3a 0% '+ringPct+'%, #e7ece6 '+ringPct+'% 100%)';
+    // card top-accent by hafalan progress (meaningful even before Profil scores exist)
+    const hafAccent=(overTarget||hafPct>=100)?'#cfa02c':hafPct>=50?'#2f8f3a':hafPct>0?'#7bbf83':'#ece3cf';
+    // per-halaqah colour dot so identical cards read as individuals
+    const HAL_PALETTE=['#2f8f3a','#cfa02c','#3f6fa8','#a05ec2','#c2643f','#3fa39a'];
+    let hh=0; for(let i=0;i<hname.length;i++) hh=(hh*31+hname.charCodeAt(i))>>>0;
+    const halDot=hname?HAL_PALETTE[hh%HAL_PALETTE.length]:'#cbb98a';
     return {...r, initials, overall, gLetter:og.l, gName:og.name, gColor:og.c, tier, tierColor:TIER_ACCENT[tier],
+      started, ringStyle, hafAccent, halDot, isMumtaz:(og.l==='A'),
+      ringNum:(started?curArab:'—'), juzLine:(started?(juzCount+' / '+TARGET_JUZ+' Juz'):'Belum mulai'),
+      hafPctText:(started?(hafPct+'%'):''), halaqahShow:(hd.label!=='—'?hd.label:''),
       juz:juzCount, curJuz, juzDone,
       curpg:pg, hasPage:!!pInfo, pgInJuz:pInfo?pInfo.inJuz:0, pgLenJuz:pInfo?pInfo.lenJuz:0, pgPctJuz:pInfo?pInfo.pctJuz:0, pgLeft:pInfo?pInfo.leftInJuz:0, pgNextJuz:pInfo?pInfo.nextJuz:0,
       juzPct:hafPct, barBase, barOver, overTarget, hafPctColor:(overTarget?'#a07d1e':'#2f8f3a'), halaqahLabel:hd.label, halaqahName:hd.nama, musyrif:hd.musyrif, mudir:MUDIR, kelas:r.kelas||'—',
-      curArab:String(curJuz).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d)),
+      curArab,
       pillars:scores.map(s=>({abbr:s.abbr, label:s.label, score:(s.score==null?'—':s.score), pct:(s.score==null?0:s.score), letter:s.g.l, color:s.g.c, grp:s.grp, pname:s.g.name, tag:(s.score==null?'N/A':(s.g.l+' · '+s.score))})),
       overallScore:(overall==null?'—':overall), noScores,
       cardStyle:v.card, nameStyle:v.name, subStyle:v.sub, ratingStyle:v.rating, ratingSubStyle:v.ratingSub,
