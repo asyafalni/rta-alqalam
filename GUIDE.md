@@ -477,7 +477,7 @@ slide-over with a **Setoran Harian / Nilai Ujian-Tes** toggle, each showing its 
 | `tanggal` | **Date**            | ✅ | date picker |
 | `bidang`  | **Multiple choice** | ✅ | `Diniyah` · `Akademik` · `Ekstrakurikuler` |
 | `mapel`   | **Dropdown**        | ✅ | the subjects you listed in the `Mapel` tab (§2d) |
-| `jenis`   | **Multiple choice** | ✅ | `Ulangan Harian` · `UTS` · `UAS` · `Praktik` · … |
+| `jenis`   | **Multiple choice** | ✅ | `Tes / Kuis` · `UTS` · `UAS` · `Praktik` · … |
 | `nilai`   | **Short answer**    | ✅ | Response validation → **Number → Between 0 and 100** |
 
 → Link to the **Private** spreadsheet → rename the response tab to **`Nilai`** (§2c). No reshape
