@@ -168,7 +168,8 @@ into the `Nilai` tab — see §2c and §5.)
 
 **Show the daily log in-app (optional):** the tracker renders a **Riwayat Setoran Harian** card on
 each student's detail (10 most recent) if it finds a **public** tab named exactly `Setoran` with
-these headers: `id, tanggal, jenis, juz, halaman, catatan`. If you titled Form A's questions with the
+these headers: `id, tanggal, jenis, juz, halaman, catatan` (plus optional `surah, ayat_dari, ayat_ke`
+and the daily `nilai` ★ rating). If you titled Form A's questions with the
 exact keys and used an **`id` dropdown** (walkthrough Step 4), the linked `Setoran` tab is already
 app-ready — mirror it whole:
 `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Setoran!A1:Z"), "where Col2 is not null", 1)`
@@ -177,8 +178,9 @@ the santri **name**, add a reshape that maps `name → id` and selects the neede
 `jenis` colours by keyword (Ziyadah = green, Muroja'ah = gold, Tahsin/other = blue). Until the tab
 exists, the tracker uses built-in demo setoran. Keep it parent-safe — no private notes here.
 
-> Add a **`nilai`** column (daily quality 0–100) to Form A too — the app card ignores it, but the
-> §2e formulas use it to compute the Hafalan / Muroja'ah / Tahsin pillars.
+> The **`nilai`** column is Form A's **★ 1–5 Rating** field (daily quality). The app shows it as
+> stars on the Riwayat Setoran card; §2e can also use it to compute the Hafalan/Muroja'ah/Tahsin
+> pillars — **scale it ×20** there to reach the 0–100 pillar range (5★ = 100).
 
 ### 2b. Tab `Master` (one row per santri) — **this is what gets mirrored**
 Put the **public columns first** — 16 core (A–P) plus the optional `nis` (Q) — then any
@@ -314,22 +316,23 @@ into a local helper tab with `IMPORTRANGE`, then reference that tab — don't ne
 
 **Assumed columns** (adjust letters to your sheet):
 `Nilai` → A=`id` B=`tanggal` C=`bidang` D=`mapel` E=`jenis` **F=`nilai`**.
-`Setoran` → A=`id` … C=`jenis` … **F=`nilai`** (daily quality 0–100; add this column to Form A. The
-app's Riwayat card ignores it — it's only for these formulas). If daily uses *taqdir* letters instead
-of a number, add a numeric column: `=IFS(G2="Mumtaz",95,G2="Jayyid Jiddan",85,G2="Jayyid",75,G2="Maqbul",65,TRUE,"")`.
+`Setoran` → A=`id` … C=`jenis` … **F=`nilai`** = Form A's **★ 1–5 Rating**. The formulas below
+**multiply it by 20** to reach the 0–100 pillar scale (5★ = 100, 4★ = 80…). If you rate with *taqdir*
+letters instead, map to a number first: `=IFS(G2="Mumtaz",95,G2="Jayyid Jiddan",85,G2="Jayyid",75,G2="Maqbul",65,TRUE,"")` (and drop the ×20).
 
-> ⚠️ **Using the linked form-response tabs?** They put `Timestamp` in column **A**, so every letter
-> above shifts by one: `Nilai` → id = **B**, bidang = **D**, mapel = **E**, nilai = **G**; `Setoran`
-> → id = **B**, jenis = **D**, nilai = **H**. Adjust the formula column letters to match your tab (or
-> copy just the needed columns into a clean helper tab first). `$A2` still refers to **Master** col A.
+> ⚠️ **These column letters are illustrative — verify each field's real column in your sheet.** The
+> linked form-response tabs put `Timestamp` in **A** (shift +1), and any *optional* Setoran columns you
+> added (`surah`, `ayat_dari`, `ayat_ke`) push `nilai`/`catatan` further right. Open the tab, note the
+> actual letter of `id`, `jenis`, `nilai`, `mapel`, etc., and adjust the formulas — or copy just the
+> needed columns into a clean helper tab first. `$A2` always refers to **Master** col A.
 
 **Put each formula in `Master` row 2 (first santri, id in `$A2`) and fill down.** Each returns blank
 (`""`) when a santri has no matching records yet, so empty stays empty.
 
 | Master col | Bar | Source | Formula (paste in the cell, fill down) |
 |---|---|---|---|
-| **G** `haf` | Hafalan | daily Ziyadah | `=IFERROR(ROUND(AVERAGEIFS(Setoran!$F:$F,Setoran!$A:$A,$A2,Setoran!$C:$C,"Ziyadah")),"")` |
-| **I** `mur` | Muroja'ah | daily Muroja'ah | `=IFERROR(ROUND(AVERAGEIFS(Setoran!$F:$F,Setoran!$A:$A,$A2,Setoran!$C:$C,"Muroja'ah")),"")` |
+| **G** `haf` | Hafalan | daily Ziyadah | `=IFERROR(ROUND(20*AVERAGEIFS(Setoran!$F:$F,Setoran!$A:$A,$A2,Setoran!$C:$C,"Ziyadah")),"")` |
+| **I** `mur` | Muroja'ah | daily Muroja'ah | `=IFERROR(ROUND(20*AVERAGEIFS(Setoran!$F:$F,Setoran!$A:$A,$A2,Setoran!$C:$C,"Muroja'ah")),"")` |
 | **L** `akd` | Akademik | all Akademik tests | `=IFERROR(ROUND(AVERAGEIFS(Nilai!$F:$F,Nilai!$A:$A,$A2,Nilai!$C:$C,"Akademik")),"")` |
 | **K** `akh` | Akhlak | — | *type manually — it's a credit, not a test* |
 
@@ -338,7 +341,7 @@ exam (weights are yours). `LET` keeps it readable and handles either side being 
 
 ```
 =LET(
-  d, IFERROR(AVERAGEIFS(Setoran!$F:$F, Setoran!$A:$A, $A2, Setoran!$C:$C, "Tahsin"), ""),
+  d, IFERROR(20*AVERAGEIFS(Setoran!$F:$F, Setoran!$A:$A, $A2, Setoran!$C:$C, "Tahsin"), ""),
   t, IFERROR(AVERAGEIFS(Nilai!$F:$F,   Nilai!$A:$A,   $A2, Nilai!$D:$D, "Tahsin & Tajwid"), ""),
   IF(AND(d="",t=""), "", ROUND(IF(d="", t, IF(t="", d, 0.4*d + 0.6*t))))
 )
@@ -463,9 +466,17 @@ slide-over with a **Setoran Harian / Nilai Ujian-Tes** toggle, each showing its 
 | `tanggal` | **Date**            | ✅ | date picker (leave *Include time* off) |
 | `jenis`   | **Multiple choice** | ✅ | `Ziyadah` · `Muroja'ah` · `Tahsin` |
 | `juz`     | **Short answer**    | ✅ | Response validation → **Number → Between 1 and 30** |
-| `halaman` | **Short answer**    | ⬜ | free text, e.g. `hal. 3–4` or `205` |
-| `nilai`   | **Short answer**    | ⬜ | Response validation → **Number → Between 0 and 100** (daily quality; used by §2e) |
+| `halaman` | **Short answer**    | ✅ | e.g. `hal. 3–4` or `205` |
+| `surah`   | **Short answer**    | ⬜ | *optional* — surah no.; Response validation → **Number → Between 1 and 114** |
+| `ayat_dari` | **Short answer**  | ⬜ | *optional* — first ayat (**Number**) |
+| `ayat_ke` | **Short answer**    | ⬜ | *optional* — last ayat (**Number**); a single ayat → same value as `ayat_dari` |
+| `nilai`   | **Rating** (★ 1–5)  | ✅ | daily quality, 1–5 stars — shown as ★ on the Riwayat Setoran card (scale ×20 for §2e) |
 | `catatan` | **Paragraph**       | ⬜ | free note |
+
+The app shows surah + ayat on the Riwayat Setoran card as **`QS 11:6–24`** (range), **`QS 11:41`**
+(single ayat → set `ayat_dari` = `ayat_ke`), or **`QS 11 · 1 surah penuh`** when `surah` is filled but
+both ayat fields are blank (whole surah). Question titles can be `ayat_dari`/`ayat_ke` or the friendlier
+`Ayat Dari`/`Ayat Ke` and `No. Surah` — the app accepts both.
 
 → Link to the **Private** spreadsheet → rename the response tab to **`Setoran`** (§2a).
 

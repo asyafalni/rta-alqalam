@@ -366,7 +366,7 @@
                 <sc-for list="{{ selSetoran }}" as="r" hint-placeholder-count="4">
                   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid #f0ede4">
                     <span style="flex:none;font-size:9.5px;font-weight:800;color:#fff;background:{{ r.jcolor }};padding:2px 8px;border-radius:6px">{{ r.jenis }}</span>
-                    <div style="flex:1;min-width:130px"><div style="font-weight:700;font-size:13px;color:#16264d">Juz {{ r.juz }} · {{ r.halaman }}</div><div style="font-size:11px;color:#9aa1ad">{{ r.tgl }}</div></div>
+                    <div style="flex:1;min-width:130px"><div style="font-weight:700;font-size:13px;color:#16264d">Juz {{ r.juz }} · {{ r.halaman }}{{ r.ayahRef }}</div><div style="font-size:11px;color:#9aa1ad">{{ r.tgl }} <span style="color:#e0a92c;letter-spacing:1px;font-size:12px">{{ r.stars }}</span></div></div>
                     <div style="flex:1;min-width:120px;font-size:11.5px;color:#6b7280;text-align:right">{{ r.catatan }}</div>
                   </div>
                 </sc-for>
@@ -603,15 +603,17 @@ const NILAI = [
 ];
 // Daily setoran log (Islamic self/staff journal side). Same shape as the public 'Setoran' sheet tab.
 const SETORAN = [
-  {id:'s3', tanggal:'2026-10-06', jenis:'Ziyadah', juz:11, halaman:'hal. 3–4', catatan:'Lancar, tajwid baik'},
-  {id:'s3', tanggal:'2026-10-05', jenis:'Muroja’ah', juz:10, halaman:'1 juz', catatan:'Tersendat di ayat panjang'},
-  {id:'s3', tanggal:'2026-10-04', jenis:'Ziyadah', juz:11, halaman:'hal. 1–2', catatan:'Baik'},
-  {id:'s3', tanggal:'2026-10-02', jenis:'Tahsin', juz:11, halaman:'—', catatan:'Perbaikan makhraj huruf ظ'},
-  {id:'s1', tanggal:'2026-10-06', jenis:'Ziyadah', juz:9, halaman:'hal. 5', catatan:'Lancar'},
-  {id:'s1', tanggal:'2026-10-05', jenis:'Muroja’ah', juz:8, halaman:'½ juz', catatan:'Baik'},
-  {id:'s11', tanggal:'2026-10-06', jenis:'Ziyadah', juz:14, halaman:'hal. 7', catatan:'Mumtaz, sangat lancar'},
-  {id:'s11', tanggal:'2026-10-05', jenis:'Muroja’ah', juz:12, halaman:'1 juz', catatan:'Kuat'},
+  {id:'s3', tanggal:'2026-10-06', jenis:'Ziyadah', juz:11, halaman:'hal. 3–4', surah:11, ayatDari:6, ayatKe:24, nilai:5, catatan:'Lancar, tajwid baik'},
+  {id:'s3', tanggal:'2026-10-05', jenis:'Muroja’ah', juz:10, halaman:'1 juz', nilai:4, catatan:'Tersendat di ayat panjang'},
+  {id:'s3', tanggal:'2026-10-04', jenis:'Ziyadah', juz:11, halaman:'hal. 1–2', surah:11, ayatDari:1, ayatKe:5, nilai:4, catatan:'Baik'},
+  {id:'s3', tanggal:'2026-10-02', jenis:'Tahsin', juz:11, halaman:'—', surah:11, ayatDari:41, ayatKe:41, nilai:4, catatan:'Perbaikan makhraj huruf ظ'},
+  {id:'s1', tanggal:'2026-10-06', jenis:'Ziyadah', juz:9, halaman:'hal. 5', surah:8, ayatDari:40, ayatKe:48, nilai:5, catatan:'Lancar'},
+  {id:'s1', tanggal:'2026-10-05', jenis:'Muroja’ah', juz:8, halaman:'½ juz', nilai:4, catatan:'Baik'},
+  {id:'s11', tanggal:'2026-10-06', jenis:'Ziyadah', juz:14, halaman:'hal. 7', surah:15, ayatDari:1, ayatKe:15, nilai:5, catatan:'Mumtaz, sangat lancar'},
+  {id:'s11', tanggal:'2026-10-05', jenis:'Muroja’ah', juz:12, halaman:'1 juz', nilai:5, catatan:'Kuat'},
 ];
+// Star string for a 1–5 daily rating (Google Forms Rating field). 0/blank → no stars.
+function starStr(n){ n=Math.max(0,Math.min(5,Math.round(Number(n)||0))); return n? '★★★★★'.slice(0,n)+'☆☆☆☆☆'.slice(0,5-n) : ''; }
 // Category of a setoran by jenis: 'zi' ziyadah (new hafalan), 'mu' muroja'ah (review), 'ta' tahsin/other.
 function setoranCat(j){ j=String(j||''); if(/ziyad|ziya|tambah|hafal/i.test(j)) return 'zi'; if(/muroj|muraj|ulang|review/i.test(j)) return 'mu'; return 'ta'; }
 // Color a setoran by its jenis (ziyadah = green, muroja'ah = gold, tahsin/other = blue).
@@ -773,7 +775,11 @@ class Component extends DCLogic {
       const text=await (await fetch(url)).text();
       const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
       const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
-      const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); return {id:String(o.id!=null?o.id:''), tanggal:o.tanggal!=null?String(o.tanggal):'', jenis:o.jenis||'', juz:o.juz!=null?o.juz:'', halaman:o.halaman!=null?String(o.halaman):'', catatan:o.catatan!=null?String(o.catatan):''}; }).filter(x=>x.id&&x.jenis);
+      const num=x=>{ const n=Number(x); return isFinite(n)?n:0; };
+      const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); const g=(...ks)=>{ for(const k of ks){ if(o[k]!=null&&o[k]!=='') return o[k]; } return null; };
+        return {id:String(o.id!=null?o.id:''), tanggal:o.tanggal!=null?String(o.tanggal):'', jenis:o.jenis||'', juz:o.juz!=null?o.juz:'', halaman:o.halaman!=null?String(o.halaman):'',
+          surah:num(g('surah','no surah','no. surah','nosurah')), ayatDari:num(g('ayat_dari','ayat dari','ayatdari','dari','ayat_awal','ayat awal')), ayatKe:num(g('ayat_ke','ayat ke','ayatke','sampai','ke','ayat_akhir','ayat akhir')),
+          nilai:num(o.nilai!=null?o.nilai:o.rating), catatan:o.catatan!=null?String(o.catatan):''}; }).filter(x=>x.id&&x.jenis);
       this.setState({setoran:rows.length?rows:null});
     }catch(e){ console.error('loadSetoran failed', e); this.setState({setoran:null}); }
   }
@@ -986,7 +992,7 @@ class Component extends DCLogic {
     const selNilaiRows = sel ? activeNilai.filter(n=>n.id===sel.id).slice().sort((a,b)=>(b.tanggal||'').localeCompare(a.tanggal||'')).map(n=>{ const g=grade(n.nilai); return {...n, pred:g.name, pcolor:g.c}; }) : [];
     const activeSetoran = (st.setoran&&st.setoran.length)?st.setoran:SETORAN;
     const selSetoranAll = sel ? activeSetoran.filter(r=>r.id===sel.id) : [];
-    const selSetoranRows = selSetoranAll.map(r=>({...r, tgl:ymd(r.tanggal), jcolor:setoranColor(r.jenis)})).sort((a,b)=>(b.tgl||'').localeCompare(a.tgl||'')).slice(0,10);
+    const selSetoranRows = selSetoranAll.map(r=>{ const su=Number(r.surah)||0, ad=Number(r.ayatDari)||0, ak=Number(r.ayatKe)||0; const ayahRef = su ? (' · QS '+su+(ad?(':'+ad+(ak&&ak>ad?'–'+ak:'')):' · 1 surah penuh')) : ''; return {...r, tgl:ymd(r.tanggal), jcolor:setoranColor(r.jenis), stars:starStr(r.nilai), ayahRef}; }).sort((a,b)=>(b.tgl||'').localeCompare(a.tgl||'')).slice(0,10);
     const setoranStat = { zi:0, mu:0, ta:0 };
     selSetoranAll.forEach(r=>{ setoranStat[setoranCat(r.jenis)]++; });
     // Rapor tables: subjects are DYNAMIC (defined in the "Mapel" sheet, falling back to the demo MAPEL);
