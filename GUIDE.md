@@ -21,9 +21,9 @@ academics, reporting).
  │  PRIVATE sheet  (source truth)│   restricted access — staff only
  │  ├─ tab: Setoran (Form resp.) │   raw per-event submissions
  │  ├─ tab: Master               │   one row per santri (public A–R · private S+)
- │  ├─ tab: Nilai                │   one row per test (Diniyah/Umum/Ekstrakurikuler)
- │  ├─ tab: Mapel                │   subject definitions per group (bidang, mapel)
- │  ├─ tab: Halaqah              │   circle names + musyrif (hal, nama, musyrif)
+ │  ├─ tab: Nilai                │   one row per test (id, tanggal, mapel-id, jenis, nilai)
+ │  ├─ tab: Mapel                │   subject definitions per group (id, bidang, mapel, alias)
+ │  ├─ tab: Halaqah              │   circle musyrif (nama, musyrif) · name lives in Master.hal
  │  └─ tab: Absensi              │   one row per absence (id, tanggal, status, …)
  └───────────────┬───────────────┘
                  │  IMPORTRANGE (one-way, authorized once)
@@ -32,8 +32,8 @@ academics, reporting).
  │  PUBLIC sheet   (reference)   │   "Anyone with link → Viewer"
  │  ├─ tab: Roster               │   public columns A–R only, mirrored live
  │  ├─ tab: Nilai                │   per-test scores, mirrored live
- │  ├─ tab: Mapel                │   subject definitions, mirrored live
- │  ├─ tab: Halaqah              │   circle names + musyrif, mirrored live
+ │  ├─ tab: Mapel                │   subject definitions (id,bidang,mapel,alias), mirrored live
+ │  ├─ tab: Halaqah              │   circle musyrif (nama,musyrif), mirrored live
  │  ├─ tab: Setoran              │   daily log (id,tanggal,jenis,juz,…), mirrored live
  │  └─ tab: Absensi              │   only absences (id,tanggal,status,…), mirrored live
  └───────────────┬───────────────┘
@@ -78,10 +78,13 @@ New to Google Sheets/Forms? Follow these steps top to bottom. Sections §2–§7
    **from column R onward** (see the ⚠️ in §2b).
 
 ### Step 3 — Add the `Mapel` and `Halaqah` tabs
-1. Bottom-left **＋** to add a tab → name it **`Mapel`**. Row 1: `bidang` , `mapel`. List your
-   subjects, one per row (which `bidang` values are allowed → **§2d**).
-2. Add another tab → **`Halaqah`**. Row 1: `hal  nama  musyrif` — one row per circle, e.g.
-   `1 · Umar bin Khattab · Ustadz Salman Al-Farisi` (§2g). `hal` matches the `hal` column in `Master`.
+1. Bottom-left **＋** to add a tab → name it **`Mapel`**. Row 1: `id  bidang  mapel  alias`. List your
+   subjects, one per row, giving each a stable **`id`** (e.g. `P1`, `P2`, …). `alias` is optional (a
+   longer/alternative name). Which `bidang` values are allowed → **§2d**. The `id` is what the `Nilai`
+   tab stores, so you can freely rename or reorder subjects later without breaking past scores.
+2. Add another tab → **`Halaqah`**. Row 1: `nama  musyrif` — one row per circle, e.g.
+   `As-Shiddiq · Ustadz Salman Al-Farisi` (§2g). `nama` matches the **`hal`** column in `Master`
+   (the halaqah name is written directly in `Master`; this tab just adds each circle's musyrif).
 
 > **Those are the only tabs you create by hand.** The `Setoran`, `Nilai`, and (optional) `Absensi`
 > tabs are **created automatically** when you link their forms in Step 4 — do **not** pre-create empty
@@ -99,10 +102,12 @@ used by the §2e formulas).
 - Make **`tanggal`** a **Date** question; **`jenis`** a Dropdown (`Ziyadah` / `Muroja'ah` / `Tahsin`).
 
 **Form B — `Nilai Ujian/Tes`** (exams). Title the questions exactly:
-`id`, `tanggal`, `bidang`, `mapel`, `jenis`, `nilai`.
-- **`id`** Dropdown (same santri ids). **`bidang`** Dropdown (`Diniyah` / `Umum` /
-  `Ekstrakurikuler`). **`mapel`** Dropdown of the subjects you listed in `Mapel`. **`nilai`** short
-  answer (0–100).
+`id`, `tanggal`, `mapel`, `jenis`, `nilai`.
+- **`id`** Dropdown (same santri ids). **`mapel`** **Short answer** — it receives the Mapel **`id`**
+  (`P1`, `P2`, …); the subject's name **and** its bidang both derive from that id, so there is no
+  separate `bidang` or subject-name field to keep in sync (and no dropdown of codes to maintain).
+  **`nilai`** short answer (0–100).
+  *(In-app, teachers pick bidang → subject from friendly names; the form only ever stores the id.)*
 
 **Form C — `Absensi`** *(optional — the admin attendance write-endpoint).* Title the questions
 `id`, `tanggal`, `status`, `jam`, `reason` (types in §5, Form C). Nobody fills it directly — the app
@@ -131,8 +136,8 @@ Send yourself one test submission through each form and confirm a row lands in t
    (this authorises Private→Public forever). Rows should fill in.
 4. Add more tabs and paste one formula in A1 of each (details/variants in **§2c/§2d/§2g/§2a**):
    - **`Nilai`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Nilai!A1:Z"),"where Col2 is not null",1)`
-   - **`Mapel`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Mapel!A1:B"),"where Col1 is not null",1)`
-   - **`Halaqah`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Halaqah!A1:C"),"where Col1 is not null",1)`
+   - **`Mapel`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Mapel!A1:D"),"where Col1 is not null",1)`
+   - **`Halaqah`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Halaqah!A1:B"),"where Col1 is not null",1)`
    - **`Setoran`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Setoran!A1:Z"),"where Col2 is not null",1)`
    - **`Absensi`** → `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Absensi!A1:Z"),"where Col2 is not null",1)`
    Click **Allow access** on each the first time.
@@ -204,7 +209,7 @@ keys (the tracker matches by header):
 | C | `nick` | nickname / panggilan | text | staff |
 | D | `kota` | city | text | staff |
 | E | `prov` | province | text | staff |
-| F | `hal`  | halaqah key — a number/id that links the santri to the **`Halaqah`** tab (§2g) for the circle's name + musyrif | number | staff |
+| F | `hal`  | **halaqah name** — the circle's name written directly, e.g. `As-Shiddiq`. The **`Halaqah`** tab (§2g) maps this name → the circle's musyrif. | text | staff |
 | G | `haf`  | Hafalan (0–100) | number | Musyrif/Mudir |
 | H | `tah`  | Tahsin — tajwid+kelancaran (0–100) | number | Musyrif/Mudir |
 | I | `mur`  | Muroja'ah (0–100) | number | Musyrif/Mudir |
@@ -257,20 +262,22 @@ s1  Ahmad Fauzan Ramadhani   Fauzan  Depok  Jawa Barat  1   88  91  85  85  90  
 Fed by the **Nilai Ujian/Tes** form (Form B, §5). One row per test/exam, Islamic **or** secular.
 Headers in row 1:
 
-| id | tanggal | bidang | mapel | jenis | nilai |
-|----|---------|--------|-------|-------|-------|
-| s1 | 2026-09-19 | Umum | Matematika | Ujian | 84 |
-| s1 | 2026-09-12 | Diniyah | Tahsin & Tajwid | Setoran | 88 |
+| id | tanggal | mapel | jenis | nilai |
+|----|---------|-------|-------|-------|
+| s1 | 2026-09-19 | P7 | Ujian | 84 |
+| s1 | 2026-09-12 | P2 | Setoran | 88 |
 
-- `id` matches the santri id in `Master`. `bidang` = **`Diniyah`**, **`Umum`**, or
-  **`Ekstrakurikuler`** (one of the three fixed groups — see §2d). `mapel` must match a subject you
-  defined in the `Mapel` tab. `nilai` is 0–100.
+- `id` matches the santri id in `Master`. **`mapel` is the Mapel `id`** (`P1`, `P2`, … — §2d), **not**
+  the subject name. The subject's name **and** its bidang both come from that id, so there is no
+  separate `bidang` or subject-name column to keep in sync (rename/reorder subjects freely). `nilai`
+  is 0–100. *(Legacy rows that stored the subject **name** in `mapel` still resolve — the tracker
+  matches by id first, then by name/alias — but new rows should use the id.)*
 - **Where these rows come from:** this tab is Form B's linked response tab (walkthrough Step 4), so
   column **A is `Timestamp`** and the keys follow — that's fine, the app ignores unknown columns.
 - Mirror it to the **PUBLIC** sheet as a tab named exactly `Nilai`:
   `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Nilai!A1:Z"), "where Col2 is not null", 1)`
   (`Col2` = `id`). If you instead keep a hand-built clean tab with `id` in column A, use
-  `Nilai!A1:F` with `where Col1 is not null`.
+  `Nilai!A1:E` with `where Col1 is not null`.
 - The tracker reads it automatically (same Sheet ID) → shown on each student’s detail as
   **Riwayat Nilai**, and used by the **Rapor** (report card, Admin only) together with the roster
   scores. Until the tab exists, the tracker uses built-in demo records.
@@ -287,26 +294,29 @@ Headers in row 1:
 The **three groups are fixed in the app** — `Tahfidz & Diniyah`, `Umum`, `Ekstrakurikuler` — but
 **you decide which subjects live inside each group.** Define them here, one row per subject:
 
-| bidang | mapel |
-|--------|-------|
-| Diniyah | Tahfidz (Ziyadah) |
-| Diniyah | Tahsin & Tajwid |
-| Diniyah | Akhlak |
-| Umum | Matematika |
-| Umum | IPA (Sains) |
-| Ekstrakurikuler | Teknologi Informasi (IT) |
-| Ekstrakurikuler | Kewirausahaan |
+| id | bidang | mapel | alias |
+|----|--------|-------|-------|
+| P1 | Diniyah | Al Qur'an | |
+| P2 | Diniyah | Hadis | |
+| P5 | Diniyah | Akhlak & Adab | |
+| P7 | Umum | Matematika | |
+| P9 | Umum | IPA | Sains |
+| P13 | Ekstrakurikuler | PJOK | Pendidikan Jasmani, Olahraga, dan Kesehatan |
+| P15 | Ekstrakurikuler | Kewirausahaan | |
 
+- **`id`** is a short, **stable** code you assign (`P1`, `P2`, … — any unique text works). This is
+  what the `Nilai` tab stores (§2c), so you can **rename or reorder** subjects any time without
+  breaking past scores. Keep it once assigned; don't reuse a retired id for a different subject.
 - `bidang` **must be one of** `Diniyah` / `Umum` / `Ekstrakurikuler` (case-insensitive; `Tahfidz`,
   `Ekskul`, and the legacy `Akademik` → `Umum` also accepted). Any other value is ignored.
-- `mapel` is the subject name shown on the Rapor — spell it **exactly** as you'll type it in the
-  `Nilai` tab (the tracker matches subject to score by this text).
+- `mapel` is the subject name shown on the Rapor. `alias` (optional) is a longer/alternative name;
+  the tracker also accepts it when matching a `Nilai` row that stored the alias instead of the id.
 - The Rapor lists **every** defined subject per group; a subject with no `Nilai` record yet shows
-  `—` / *Belum dinilai*. **`Akhlak`** is special — define it under `Diniyah` and it takes its score
-  from the `akh` column in `Master` (it's a character credit, not a test).
+  `—` / *Belum dinilai*. **Akhlak** is special — define it under `Diniyah` (name contains "Akhlak")
+  and it takes its score from the `akh` column in `Master` (a character credit, not a test).
 - `Ekstrakurikuler` is optional: if you define no ekskul subjects, section **C** is omitted from the Rapor.
 - Mirror to the **PUBLIC** sheet as a tab named exactly `Mapel`:
-  `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Mapel!A1:B"), "where Col1 is not null", 1)`
+  `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Mapel!A1:D"), "where Col1 is not null", 1)`
 - Until the tab exists, the tracker uses a built-in demo subject list.
 
 ---
@@ -326,16 +336,29 @@ into a local helper tab with `IMPORTRANGE`, then reference that tab — don't ne
 `AVERAGEIFS`.
 
 **Assumed columns** (adjust letters to your sheet):
-`Nilai` → A=`id` B=`tanggal` C=`bidang` D=`mapel` E=`jenis` **F=`nilai`**.
+`Nilai` → A=`id` B=`tanggal` C=`mapel` (the **Mapel id**, §2c) D=`jenis` **E=`nilai`**.
 `Setoran` → A=`id` … C=`jenis` … **F=`nilai`** = Form A's **★ 1–5 Rating**. The formulas below
 **multiply it by 20** to reach the 0–100 pillar scale (5★ = 100, 4★ = 80…). If you rate with *taqdir*
 letters instead, map to a number first: `=IFS(G2="Mumtaz",95,G2="Jayyid Jiddan",85,G2="Jayyid",75,G2="Maqbul",65,TRUE,"")` (and drop the ×20).
 
+**Resolve the mapel id → bidang + subject name (helper columns).** Because `Nilai.mapel` now stores an
+**id** (`P7`) rather than the bidang/name, add two helper columns to the `Nilai` tab so the formulas
+can still filter by group or by subject. In the first two free columns (shown here as **G** and **H**),
+row 2, fill down:
+```
+G (bidang):  =IF($C2="","",IFERROR(VLOOKUP($C2, Mapel!$A:$B, 2, FALSE),""))
+H (subject): =IF($C2="","",IFERROR(VLOOKUP($C2, Mapel!$A:$C, 3, FALSE),""))
+```
+Now `Nilai!$G:$G` = the row's **bidang** and `Nilai!$H:$H` = its **subject name** — the formulas below
+filter on those. *(Prefer matching the id directly? Use `Nilai!$C:$C,"P7"` for a single subject — but
+the helper columns keep the group-level and keyword formulas working.)*
+
 > ⚠️ **These column letters are illustrative — verify each field's real column in your sheet.** The
-> linked form-response tabs put `Timestamp` in **A** (shift +1), and any *optional* Setoran columns you
-> added (`surah`, `ayat_dari`, `ayat_ke`) push `nilai`/`catatan` further right. Open the tab, note the
-> actual letter of `id`, `jenis`, `nilai`, `mapel`, etc., and adjust the formulas — or copy just the
-> needed columns into a clean helper tab first. `$A2` always refers to **Master** col A.
+> linked form-response tabs put `Timestamp` in **A** (shift +1), so on the raw `Nilai` response tab
+> `nilai` is usually **F** and `mapel` is **D**; put the `G`/`H` helpers in the first columns after your
+> data. Any *optional* Setoran columns you added (`surah`, `ayat_dari`, `ayat_ke`) push `nilai`/`catatan`
+> further right too. Open each tab, note the actual letter of `id`, `jenis`, `nilai`, `mapel`, and adjust.
+> `$A2` always refers to **Master** col A.
 
 **Put each formula in `Master` row 2 (first santri, id in `$A2`) and fill down.** Each returns blank
 (`""`) when a santri has no matching records yet, so empty stays empty.
@@ -344,37 +367,41 @@ letters instead, map to a number first: `=IFS(G2="Mumtaz",95,G2="Jayyid Jiddan",
 |---|---|---|---|
 | **G** `haf` | Hafalan | daily Ziyadah | `=IFERROR(ROUND(20*AVERAGEIFS(Setoran!$F:$F,Setoran!$A:$A,$A2,Setoran!$C:$C,"Ziyadah")),"")` |
 | **I** `mur` | Muroja'ah | daily Muroja'ah | `=IFERROR(ROUND(20*AVERAGEIFS(Setoran!$F:$F,Setoran!$A:$A,$A2,Setoran!$C:$C,"Muroja'ah")),"")` |
-| **L** `akd` | Umum | all Umum tests | `=IFERROR(ROUND(AVERAGEIFS(Nilai!$F:$F,Nilai!$A:$A,$A2,Nilai!$C:$C,"Umum")),"")` |
+| **L** `akd` | Umum | all Umum tests | `=IFERROR(ROUND(AVERAGEIFS(Nilai!$E:$E,Nilai!$A:$A,$A2,Nilai!$G:$G,"Umum")),"")` |
 | **K** `akh` | Akhlak | — | *type manually — it's a credit, not a test* |
 
-**H `tah` (Tahsin) — blend daily + test.** 40 % daily Tahsin setoran + 60 % the "Tahsin & Tajwid"
-exam (weights are yours). `LET` keeps it readable and handles either side being empty:
+(`Nilai!$E:$E` = `nilai`; `Nilai!$G:$G` = the resolved **bidang** helper.)
+
+**H `tah` (Tahsin) — blend daily + test.** 40 % daily Tahsin setoran + 60 % the Tahsin/Tajwid exam
+(weights are yours; match your own subject name in `Nilai!$H`). `LET` keeps it readable and handles
+either side being empty:
 
 ```
 =LET(
   d, IFERROR(20*AVERAGEIFS(Setoran!$F:$F, Setoran!$A:$A, $A2, Setoran!$C:$C, "Tahsin"), ""),
-  t, IFERROR(AVERAGEIFS(Nilai!$F:$F,   Nilai!$A:$A,   $A2, Nilai!$D:$D, "Tahsin & Tajwid"), ""),
+  t, IFERROR(AVERAGEIFS(Nilai!$E:$E,   Nilai!$A:$A,   $A2, Nilai!$H:$H, "Tahsin & Tajwid"), ""),
   IF(AND(d="",t=""), "", ROUND(IF(d="", t, IF(t="", d, 0.4*d + 0.6*t))))
 )
 ```
 
-**J `ilm` and M `bhs` — average tests whose `mapel` matches keywords.** Use this reusable
-"average-where-mapel-matches" pattern (regex, so one formula covers several subjects):
+**J `ilm` and M `bhs` — average tests whose subject matches keywords.** Use this reusable
+"average-where-subject-matches" pattern against the **`H` helper** (regex, so one formula covers several
+subjects):
 
 ```
 J (ilm  → Mutun / Bahasa Arab / Ilmu):
 =IFERROR(ROUND(
-  SUMPRODUCT((Nilai!$A$2:$A=$A2)*REGEXMATCH(Nilai!$D$2:$D,"Mutun|Arab|Ilmu")*Nilai!$F$2:$F)
-  /SUMPRODUCT((Nilai!$A$2:$A=$A2)*REGEXMATCH(Nilai!$D$2:$D,"Mutun|Arab|Ilmu"))),"")
+  SUMPRODUCT((Nilai!$A$2:$A=$A2)*REGEXMATCH(Nilai!$H$2:$H,"Mutun|Arab|Ilmu")*Nilai!$E$2:$E)
+  /SUMPRODUCT((Nilai!$A$2:$A=$A2)*REGEXMATCH(Nilai!$H$2:$H,"Mutun|Arab|Ilmu"))),"")
 
 M (bhs  → any subject containing "Bahasa"):
 =IFERROR(ROUND(
-  SUMPRODUCT((Nilai!$A$2:$A=$A2)*REGEXMATCH(Nilai!$D$2:$D,"Bahasa")*Nilai!$F$2:$F)
-  /SUMPRODUCT((Nilai!$A$2:$A=$A2)*REGEXMATCH(Nilai!$D$2:$D,"Bahasa"))),"")
+  SUMPRODUCT((Nilai!$A$2:$A=$A2)*REGEXMATCH(Nilai!$H$2:$H,"Bahasa")*Nilai!$E$2:$E)
+  /SUMPRODUCT((Nilai!$A$2:$A=$A2)*REGEXMATCH(Nilai!$H$2:$H,"Bahasa"))),"")
 ```
 
 > Tune the regex to your `Mapel` names (§2d). `REGEXMATCH` needs same-length ranges — use bounded
-> ranges (`$D$2:$D`, `$F$2:$F`), not whole columns, inside `SUMPRODUCT`.
+> ranges (`$H$2:$H`, `$E$2:$E`), not whole columns, inside `SUMPRODUCT`.
 
 **Keeping the staff override.** A typed number and a formula can't share one cell. Two options:
 1. **Simple:** leave the formula in G–M; to override, just type over that cell (its formula is
@@ -438,20 +465,21 @@ like — the point is different absence types **deduct differently** (Alpa hurts
 
 ---
 
-### 2g. Tab `Halaqah` (circle definitions) — free-text names + one musyrif each
-Give each halaqah a **name** and a **single musyrif**. One row per circle:
+### 2g. Tab `Halaqah` (circle → musyrif) — the halaqah name lives in `Master`
+The halaqah **name** is written directly in the `Master` **`hal`** column (§2b), e.g. `As-Shiddiq`. This
+tab only maps each name → its **single musyrif**. One row per circle:
 
-| hal | nama | musyrif |
-|-----|------|---------|
-| 1 | Umar bin Khattab | Ustadz Salman Al-Farisi |
-| 2 | Abu Bakar Ash-Shiddiq | Ustadz Hamzah Abdurrahman |
+| nama | musyrif |
+|------|---------|
+| As-Shiddiq | Ustadz Salman Al-Farisi |
+| Al-Khattab | Ustadz Hamzah Abdurrahman |
 
-- `hal` matches the **`hal`** value in `Master` (the santri's halaqah). `nama` is the circle's name —
-  the app shows **"Halaqah {nama}"** (e.g. *Halaqah Umar bin Khattab*), so type the name only. `musyrif`
-  is the one teacher for that circle.
-- Used on each santri's detail + Rapor, and the **Halaqah filter** shows these names.
+- `nama` **must match** the `hal` value in `Master` exactly (that's the join key). `musyrif` is the one
+  teacher for that circle. The app shows **"Halaqah {nama}"** (e.g. *Halaqah As-Shiddiq*) on the santri
+  card/detail/Rapor, and the **Halaqah filter** lists these names.
+- A santri whose `hal` has no matching row here still shows the halaqah name — just with musyrif `—`.
 - Mirror to the **PUBLIC** sheet as a tab named exactly `Halaqah`:
-  `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Halaqah!A1:C"), "where Col1 is not null", 1)`
+  `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Halaqah!A1:B"), "where Col1 is not null", 1)`
 - Until the tab exists, the tracker uses a built-in demo. Add a row whenever you open a new circle or
   hire a musyrif — no code change.
 
@@ -555,13 +583,14 @@ both ayat fields are blank (whole surah). Question titles can be `ayat_dari`/`ay
 |----------------|------------|----------------|
 | `id`      | Short answer / Dropdown | `__ID__` |
 | `tanggal` | Short answer / Date | `__TANGGAL__` |
-| `bidang`  | Short answer / Multiple choice | `__BIDANG__` |
-| `mapel`   | Short answer / Dropdown | `__MAPEL__` |
+| `mapel`   | **Short answer** *(holds the Mapel id, e.g. `P7`)* | `__MAPEL__` |
 | `jenis`   | Short answer | `__JENIS__` |
 | `nilai`   | Short answer | `__NILAI__` |
 
-The app's Nilai form gives a **bidang selector** and a **mapel dropdown** filled from your `Mapel` tab
-(§2d). → Link to the Private sheet → rename its response tab to **`Nilai`** (§2c).
+No `bidang` field — the **`mapel`** value is the Mapel **id** (`P1`, `P2`, …, §2c/§2d), and both the
+subject name and its bidang derive from it. In the app's Nilai form, teachers pick **bidang → subject**
+from friendly names (filled from your `Mapel` tab), and it submits the id. → Link to the Private sheet →
+rename its response tab to **`Nilai`** (§2c).
 
 **Form C — Absensi** *(§2f)*. Titles = keys: `id`, `tanggal`, `status`, `jam`, `reason`. → Link →
 rename response tab to **`Absensi`**. For the pre-fill, Absensi is extra-forgiving — you can use the
