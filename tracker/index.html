@@ -343,11 +343,11 @@
             <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin-bottom:14px"><span style="font-weight:800;font-size:14px;margin-right:auto">Peta Hafalan — 30 Juz</span><span style="font-size:12px;color:#6b7280">{{ sel.juz }}/15 juz target · {{ sel.juzPct }}%</span><sc-if value="{{ sel.overTarget }}" hint-placeholder-val="{{ true }}"><span style="font-size:10px;font-weight:800;color:#8a6d1e;background:#fbf5e4;border:1px solid #ecdcae;padding:1px 7px;border-radius:999px">Melampaui target</span></sc-if></div>
             <sc-if value="{{ sel.hasPage }}" hint-placeholder-val="{{ true }}">
               <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-bottom:14px;padding:11px 13px;background:#f7f6f2;border:1px solid #ece3cf;border-radius:11px;font-size:12px;color:#16264d">
+                <span style="font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9aa1ad">Posisi saat ini</span>
+                <span style="color:#c9cdd4">·</span>
                 <span style="font-weight:800;color:#0a4631">Halaman {{ sel.curpg }}<span style="color:#9aa1ad;font-weight:600">/604</span></span>
                 <span style="color:#c9cdd4">·</span>
-                <span>Juz {{ sel.curJuz }} — hlm {{ sel.pgInJuz }}/{{ sel.pgLenJuz }} ({{ sel.pgPctJuz }}%)</span>
-                <span style="color:#c9cdd4">·</span>
-                <span style="font-weight:700;color:#8a6d1e">± {{ sel.pgLeft }} hlm lagi ke Juz {{ sel.pgNextJuz }}</span>
+                <span>Sedang di Juz {{ sel.curJuz }}</span>
               </div>
             </sc-if>
             <div class="juz-map">
@@ -686,20 +686,20 @@ const NAVY='#16264d', NAVY2='#0f1c3a', GREEN='#2f8f3a', GOLD='#cfa02c', CREAM='#
 const CONFIG_ID = '1SnffTFvWwICjyskkoW2L66puVSpcuwNF2RplRqUQt44';
 
 // Score keys: haf/tah/mur/ilm/akh = diniyah (musyrif/mudir) · akd/bhs = akademik (admin)
-// juzdone = which specific juz are memorized (list, any order) → juz count &
-// progress derive from it. curpg = current page (1-604) → derives the current juz.
+// juzct = how many juz are completed (a count) → ring fill / % derive from it; the roadmap
+// order (PROGRAM_FULL) says which juz those are. curpg = current page (1-604) → current juz/surah/ayah.
 const RAW = [
-  {id:'s1', name:'Ahmad Fauzan Ramadhani', nick:'Fauzan', kelas:'VIII', kota:'Depok', prov:'Jawa Barat', hal:'As-Shiddiq', haf:88,tah:91,mur:85,ilm:85,akh:90,akd:84,bhs:86, juzdone:'1,2,3,4,5,6,7,8', curpg:170, nis:'2426001'},
-  {id:'s2', name:'Muhammad Rifki Hakim', nick:'Rifki', kelas:'VII', kota:'Bogor', prov:'Jawa Barat', hal:'As-Shiddiq', haf:82,tah:83,mur:78,ilm:80,akh:86,akd:88,bhs:84, juzdone:'25,26,27,28,29,30', curpg:470, nis:'2426002'},
-  {id:'s3', name:'Zaid Abdullah Faris', nick:'Zaid', kelas:'VII', kota:'Bekasi', prov:'Jawa Barat', hal:'As-Shiddiq', haf:94,tah:94,mur:90,ilm:92,akh:93,akd:88,bhs:90, juzdone:'1,2,3,4,5,6,7,8,9,10', curpg:210, nis:'2426003'},
-  {id:'s4', name:'Yusuf Ar-Ramadhan', nick:'Yusuf', kelas:'VIII', kota:'Subang', prov:'Jawa Barat', hal:'As-Shiddiq', haf:70,tah:73,mur:68,ilm:70,akh:78,akd:76,bhs:72, juzdone:'27,28,29,30', curpg:510, nis:'2426004'},
-  {id:'s5', name:'Hafizh Anwar Syafiq', nick:'Hafizh', kelas:'VII', kota:'Bandung', prov:'Jawa Barat', hal:'As-Shiddiq', haf:86,tah:87,mur:82,ilm:84,akh:88,akd:80,bhs:83, juzdone:'1,2,3,4,5,6,7', curpg:150, nis:'2426005'},
-  {id:'s6', name:'Ibrahim Malik Ibrahim', nick:'Ibrahim', kelas:'VIII', kota:'Cirebon', prov:'Jawa Barat', hal:'Al-Khattab', haf:78,tah:78,mur:74,ilm:77,akh:82,akd:82,bhs:79, juzdone:'1,2,28,29,30', curpg:528, nis:'2426006'},
-  {id:'s7', name:'Umar Hidayatullah', nick:'Umar', kelas:'VII', kota:'Sukabumi', prov:'Jawa Barat', hal:'Al-Khattab', haf:64,tah:68,mur:62,ilm:66,akh:74,akd:72,bhs:68, juzdone:'1,2,3', curpg:70, nis:'2426007'},
-  {id:'s8', name:'Bilal Saputra Nugroho', nick:'Bilal', kelas:'VII', kota:'Depok', prov:'Jawa Barat', hal:'Al-Khattab', haf:80,tah:83,mur:79,ilm:80,akh:85,akd:78,bhs:81, juzdone:'25,26,27,28,29,30', curpg:468, nis:'2426008'},
-  {id:'s9', name:'Fathan Nasution', nick:'Fathan', kelas:'VIII', kota:'Asahan', prov:'Sumatera Utara', hal:'Al-Khattab', haf:90,tah:89,mur:86,ilm:88,akh:90,akd:85,bhs:87, juzdone:'1,2,3,4,5,6,7,8,9', curpg:190, nis:'2426009'},
-  {id:'s10',name:'Rasyid Pratama Wijaya', nick:'Rasyid', kelas:'VII', kota:'Sungailiat', prov:'Kep. Bangka Belitung', hal:'Al-Khattab', haf:74,tah:77,mur:72,ilm:75,akh:80,akd:80,bhs:76, juzdone:'1,2,3,29,30', curpg:550, nis:'2426010'},
-  {id:'s11',name:'Abdullah Hafizhan', nick:'Abdullah', kelas:'VIII', kota:'Garut', prov:'Jawa Barat', hal:'As-Shiddiq', haf:97,tah:95,mur:94,ilm:95,akh:96,akd:91,bhs:93, juzdone:'26,27,28,29,30,1,2,3,4,5,6,7,8,9,10,11,12,13', curpg:268, nis:'2426011'},
+  {id:'s1', name:'Ahmad Fauzan Ramadhani', nick:'Fauzan', kelas:'VIII', kota:'Depok', prov:'Jawa Barat', hal:'As-Shiddiq', haf:88,tah:91,mur:85,ilm:85,akh:90,akd:84,bhs:86, juzct:8, curpg:170, nis:'2426001'},
+  {id:'s2', name:'Muhammad Rifki Hakim', nick:'Rifki', kelas:'VII', kota:'Bogor', prov:'Jawa Barat', hal:'As-Shiddiq', haf:82,tah:83,mur:78,ilm:80,akh:86,akd:88,bhs:84, juzct:6, curpg:470, nis:'2426002'},
+  {id:'s3', name:'Zaid Abdullah Faris', nick:'Zaid', kelas:'VII', kota:'Bekasi', prov:'Jawa Barat', hal:'As-Shiddiq', haf:94,tah:94,mur:90,ilm:92,akh:93,akd:88,bhs:90, juzct:10, curpg:210, nis:'2426003'},
+  {id:'s4', name:'Yusuf Ar-Ramadhan', nick:'Yusuf', kelas:'VIII', kota:'Subang', prov:'Jawa Barat', hal:'As-Shiddiq', haf:70,tah:73,mur:68,ilm:70,akh:78,akd:76,bhs:72, juzct:4, curpg:510, nis:'2426004'},
+  {id:'s5', name:'Hafizh Anwar Syafiq', nick:'Hafizh', kelas:'VII', kota:'Bandung', prov:'Jawa Barat', hal:'As-Shiddiq', haf:86,tah:87,mur:82,ilm:84,akh:88,akd:80,bhs:83, juzct:7, curpg:150, nis:'2426005'},
+  {id:'s6', name:'Ibrahim Malik Ibrahim', nick:'Ibrahim', kelas:'VIII', kota:'Cirebon', prov:'Jawa Barat', hal:'Al-Khattab', haf:78,tah:78,mur:74,ilm:77,akh:82,akd:82,bhs:79, juzct:5, curpg:528, nis:'2426006'},
+  {id:'s7', name:'Umar Hidayatullah', nick:'Umar', kelas:'VII', kota:'Sukabumi', prov:'Jawa Barat', hal:'Al-Khattab', haf:64,tah:68,mur:62,ilm:66,akh:74,akd:72,bhs:68, juzct:3, curpg:70, nis:'2426007'},
+  {id:'s8', name:'Bilal Saputra Nugroho', nick:'Bilal', kelas:'VII', kota:'Depok', prov:'Jawa Barat', hal:'Al-Khattab', haf:80,tah:83,mur:79,ilm:80,akh:85,akd:78,bhs:81, juzct:6, curpg:468, nis:'2426008'},
+  {id:'s9', name:'Fathan Nasution', nick:'Fathan', kelas:'VIII', kota:'Asahan', prov:'Sumatera Utara', hal:'Al-Khattab', haf:90,tah:89,mur:86,ilm:88,akh:90,akd:85,bhs:87, juzct:9, curpg:190, nis:'2426009'},
+  {id:'s10',name:'Rasyid Pratama Wijaya', nick:'Rasyid', kelas:'VII', kota:'Sungailiat', prov:'Kep. Bangka Belitung', hal:'Al-Khattab', haf:74,tah:77,mur:72,ilm:75,akh:80,akd:80,bhs:76, juzct:5, curpg:550, nis:'2426010'},
+  {id:'s11',name:'Abdullah Hafizhan', nick:'Abdullah', kelas:'VIII', kota:'Garut', prov:'Jawa Barat', hal:'As-Shiddiq', haf:97,tah:95,mur:94,ilm:95,akh:96,akd:91,bhs:93, juzct:18, curpg:268, nis:'2426011'},
 ];
 // Halaqah = a named memorization circle with a single musyrif. The NAME lives in Master's HAL
 // column (e.g. "As-Shiddiq"); the "Halaqah" sheet tab maps that name → musyrif. Demo fallback:
@@ -1076,7 +1076,8 @@ class Component extends DCLogic {
     const sc=x=>{ if(x==null||String(x).trim()==='') return null; const n=Number(x); return isFinite(n)?n:null; };
     return { id:String(o.id!=null?o.id:''), name:o.name||o.nama||'',
       nick:o.nick||o.panggilan||(o.name?String(o.name).split(' ')[0]:''),
-      kota:o.kota||'', prov:o.prov||o.provinsi||'', kelas:o.kelas!=null?String(o.kelas):'', hal:(o.hal!=null?String(o.hal):'').trim(), juz:num(o.juz), curpg:num(o.curpg), juzdone:o.juzdone!=null?String(o.juzdone):'',
+      kota:o.kota||'', prov:o.prov||o.provinsi||'', kelas:o.kelas!=null?String(o.kelas):'', hal:(o.hal!=null?String(o.hal):'').trim(), curpg:num(o.curpg),
+      juzct:( (o.juzct!=null&&String(o.juzct).trim()!=='')?num(o.juzct) : (o.juzdone!=null&&String(o.juzdone).trim()!=='')?String(o.juzdone).split(/[^0-9]+/).filter(x=>x!=='').length : num(o.juz) ),
       haf:sc(o.haf), tah:sc(o.tah), mur:sc(o.mur), ilm:sc(o.ilm), akh:sc(o.akh), akd:sc(o.akd), bhs:sc(o.bhs),
       nis:o.nis!=null?String(o.nis):'',
       khd:(o.khd!=null&&String(o.khd).trim()!=='')?num(o.khd):null };
@@ -1129,12 +1130,12 @@ class Component extends DCLogic {
     const hd={ nama:hname||'—', musyrif:(hdef&&hdef.musyrif)?hdef.musyrif:'—' };
     hd.label=hname?('Halaqah '+hname):'—';
     // which specific juz are memorized (any order); count & progress derive from it
-    const juzDone=(r.juzdone!=null&&String(r.juzdone).length)
-      ? String(r.juzdone).split(/[^0-9]+/).map(Number).filter(n=>n>=1&&n<=30)
-      : (r.juz>0 ? Array.from({length:Math.min(30,r.juz)},(_,i)=>i+1) : []);
-    const juzCount=juzDone.length;
+    // juzct = how many juz are done (a count). The roadmap order (PROGRAM_FULL: 30,29,…,26,1,…,10,
+    // then bonus 11,…,25) tells us WHICH juz those are — the first `juzct` of the program.
+    const juzCount=Math.max(0, Math.min(30, Math.round(r.juzct||0)));
+    const juzDone=PROGRAM_FULL.slice(0, juzCount);
     const doneSet=new Set(juzDone);
-    // Completion vs the 15-juz TARGET; over-achievers (juz 11..25) can reach 200%.
+    // Completion vs the 15-juz TARGET; over-achievers (bonus juz 11..25) can reach 200%.
     const hafPct=Math.min(200, Math.round(juzCount/TARGET_JUZ*100));
     const barBase=Math.min(100, hafPct), barOver=Math.max(0, hafPct-100), overTarget=hafPct>100;
     // Prefer a current page (curpg) on the standard mushaf → derive juz + within-juz progress.
@@ -1299,6 +1300,7 @@ class Component extends DCLogic {
     const activeNilai = (st.nilai&&st.nilai.length)?st.nilai:(demoMode?NILAI:[]);
     // Match/resolve a Nilai row's `mapel` value against Mapel definitions — by id first
     // (stable across renames/reorders), then by name/alias (legacy sheets stored the name).
+    const activeMapel = (st.mapelDef&&st.mapelDef.length)?st.mapelDef:(demoMode?MAPEL:[]);
     const nmz=(s)=>String(s||'').trim().toLowerCase();
     const mapelMatch=(nmapel, def)=>{ const v=nmz(nmapel); return !!v && (v===nmz(def.id) || v===nmz(def.mapel) || (def.alias && v===nmz(def.alias))); };
     const mapelName=(nmapel)=>{ const d=activeMapel.find(def=>mapelMatch(nmapel, def)); return d?d.mapel:String(nmapel||''); };
@@ -1311,8 +1313,7 @@ class Component extends DCLogic {
     // Rapor tables: subjects are DYNAMIC (defined in the "Mapel" sheet, falling back to the demo MAPEL);
     // the three bidang groups are FIXED. Each subject's score is the average of that santri's Nilai
     // records for it; Akhlak (a credit, not a test) falls back to the roster aggregate.
-    const activeMapel = (st.mapelDef&&st.mapelDef.length)?st.mapelDef:(demoMode?MAPEL:[]);
-    const raporHafalanNote = sel ? (sel.juz+' dari 15 juz ('+sel.juzPct+'%) · sedang menghafal Juz '+sel.curJuz + (sel.hasPage?(' · halaman '+sel.curpg+'/'+MUSHAF_PAGES+', ± '+sel.pgLeft+' hlm lagi menuju Juz '+sel.pgNextJuz):'') + (sel.overTarget?' · melampaui target':'')) : '';
+    const raporHafalanNote = sel ? (sel.juz+' dari 15 juz ('+sel.juzPct+'%) · sedang menghafal Juz '+sel.curJuz + (sel.hasPage?(' · halaman '+sel.curpg+'/'+MUSHAF_PAGES):'') + (sel.overTarget?' · melampaui target':'')) : '';
     const entryKind = st.entryKind||'setoran';
     const activeFormId = extractFormId(entryKind==='nilai' ? (st.nilaiFormId||'') : (st.setoranFormId||''));
     const formConfigured = !!activeFormId && activeFormId.indexOf('SAMPLE')<0;

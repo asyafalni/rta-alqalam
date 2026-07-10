@@ -70,9 +70,9 @@ New to Google Sheets/Forms? Follow these steps top to bottom. Sections §2–§7
 2. Double-click the bottom tab `Sheet1` → rename it **`Master`**.
 3. In **row 1**, type the headers exactly (lower-case), left to right — the 16 core columns then the
    optional ones (full list & meaning in **§2b**):
-   `id  name  nick  kota  prov  hal  haf  tah  mur  ilm  akh  akd  bhs  juzdone  curpg  kelas`
-   then optionally `nis`. *(`curpg` = current page 1–604 on the standard mushaf; the app derives the
-   juz, within-juz progress, and pages-left — §2b.)*
+   `id  name  nick  kota  prov  hal  haf  tah  mur  ilm  akh  akd  bhs  juzct  curpg  kelas`
+   then optionally `nis`. *(`juzct` = how many juz completed → drives progress; `curpg` = optional
+   current page 1–604, just shows where he's working now — §2b.)*
 4. Fill one row per santri from row 2. Give each a **short unique `id`** (`s1`, `s2`, …) — this id is
    how every other tab links to the student, so keep it stable. Put private data (wali, phone, …)
    **from column R onward** (see the ⚠️ in §2b).
@@ -217,8 +217,8 @@ keys (the tracker matches by header):
 | K | `akh`  | Akhlak (0–100) | number | Musyrif/Mudir |
 | L | `akd`  | Umum — math/IPA/… (0–100) | number | **Admin** |
 | M | `bhs`  | Bahasa — Indonesia/Inggris (0–100) | number | **Admin** |
-| N | `juzdone` | which juz are memorized — a list in any order, e.g. `1,2,3,28,29,30` (juz count & progress derive from it) | text | Musyrif/Mudir |
-| O | `curpg` | **current page** (1–604) on the standard Madinah/Uthmani mushaf. The app derives the current juz, the position within it, and "≈ N pages left to finish the juz". | number | Musyrif/Mudir |
+| N | `juzct` | **how many juz are completed** — a **count**, e.g. `1` (finished his first juz), `18` (over-achiever). This drives the ring fill / %. The roadmap order tells the app *which* juz those are (see below). | number | Musyrif/Mudir |
+| O | `curpg` | **optional** — current page (1–604) on the standard mushaf. Shows *where he's working now* (juz he's on). It does **not** measure progress — leave blank and the app shows the next roadmap juz from `juzct`. | number | Musyrif/Mudir |
 | P | `kelas` | class level, e.g. `VII` / `VIII` | text | staff |
 | Q | `nis` | **optional, public** — the santri's NIS, shown in the Rapor header. Leave blank to show `—`. | text | staff |
 | R | `khd` | **optional, public** — the **Kehadiran score** (0–100), a weighted formula computed from the `Absensi` tab (§2f). Blank → app derives a simple presence %. | number | formula |
@@ -241,22 +241,25 @@ keys (the tracker matches by header):
 > name and a single musyrif, keyed by `hal`. Only the **Mudir** stays a code constant (`MUDIR`, one
 > per school) near the top of `tracker/index.html`’s `<script>`.
 >
-> **Tracking by page (`curpg`):** the app assumes the standard 604-page Madinah/Uthmani mushaf
-> (Juz 1 = pages 1–21, then 20 pages/juz). Enter the page a santri is currently on and it computes
-> the current juz, the position within that juz, and how many pages remain to finish it — a far
-> better signal than a juz number alone.
+> **Progress & completion (`juzct`):** the 3-year target is **15 juz**, memorized in the fixed manhaj
+> order **30, 29, 28, 27, 26 → 1, 2, … 10** — all 15 = **100%**. Over-achievers continue **11 … 25** (the
+> bonus lap), so completion can reach **200%**; the ring fills **green** to 100% then turns **gold** for
+> the bonus. `juzct` (col N) is a simple **count** of completed juz — because the order is fixed, the app
+> knows *which* juz those are (the first `juzct` in the program) and greens them on the Peta Hafalan.
+> So `juzct: 1` means "finished his first juz" (juz 30), **not** "30 juz done". The program order is a
+> code constant (`PROGRAM_FULL` in `tracker/index.html`).
 >
-> **Program & completion (`juzdone`):** the 3-year target is **15 juz**, memorized in the manhaj order
-> **30, 29, 28, 27, 26 → 1, 2, … 10** — all 15 = **100%**. Over-achievers continue **11 … 25** (a
-> second lap), so completion can reach **200%**; the progress bar fills **green** to 100% then overlays
-> **gold** for the bonus. `juzdone` (col N) is the source — list the juz a santri has memorized; the
-> count and % derive from it. The program order is a code constant (`PROGRAM` in `tracker/index.html`).
+> **Current position (`curpg`, optional):** page number doesn't track progress here — the roadmap runs
+> 30→26 then 1→10, so a low page can be *further* along than a high one. `curpg` is only a **snapshot of
+> where he's working now**; the app maps it to the current juz (and highlights it on the Peta Hafalan).
+> Leave it blank and the app shows the **next** roadmap juz derived from `juzct`. Standard 604-page
+> Madinah/Uthmani mushaf (Juz 1 = pages 1–21, then 20 pages/juz).
 
 Example header row + first data row:
 
 ```
-id  name                     nick    kota   prov        hal haf tah mur ilm akh akd bhs juzdone           curpg kelas | nis      khd | wali
-s1  Ahmad Fauzan Ramadhani   Fauzan  Depok  Jawa Barat  1   88  91  85  85  90  84  86  "1,2,3,4,5,6,7,8" 170   VIII  | 2426001  98  | Bpk. Ramadhani
+id  name                     nick    kota   prov        hal         haf tah mur ilm akh akd bhs juzct curpg kelas | nis      khd | wali
+s1  Ahmad Fauzan Ramadhani   Fauzan  Depok  Jawa Barat  As-Shiddiq  88  91  85  85  90  84  86  8     170   VIII  | 2426001  98  | Bpk. Ramadhani
 ```
 (A–P core · Q `nis` · R `khd` optional public · S+ private, e.g. `wali`)
 
@@ -417,6 +420,25 @@ M (bhs  → any subject containing "Bahasa"):
 Nothing else changes: `Master!A1:R` still mirrors to the Public `Roster` (§3), and the app reads G–M
 as before — now they *reflect* the daily setoran and the exams instead of being hand-typed.
 
+#### Auto-advance `juzct` (hafalan progress) from `Setoran` — optional
+`juzct` (col N) is *how many juz are completed*. You can type it (the musyrif decides when a juz is
+done), **or** derive it as the count of distinct juz the santri has done **Ziyadah** on. On the linked
+`Setoran` response tab the columns are `A=Timestamp B=id C=tanggal D=jenis E=juz` — put this in
+`Master!` col **N**, row 2 (`$A2` = santri id), fill down:
+
+```
+=IFERROR(COUNTA(UNIQUE(FILTER(Setoran!$E:$E,(Setoran!$B:$B=$A2)*(Setoran!$D:$D="Ziyadah")*(Setoran!$E:$E<>"")))),0)
+```
+
+- Counts only **Ziyadah** (new memorization); Muroja'ah/Tahsin don't add juz. Adjust the column letters
+  to your sheet.
+- ⚠️ **Caveat:** this marks a juz as done as soon as **any** Ziyadah touches it — so a juz still in
+  progress is counted. For a manhaj where each juz is finished before the next, that's a fine proxy. To
+  count only **fully-completed** juz, submit a distinct `jenis` like `Ziyadah (Selesai)` when a juz is
+  done and change `"Ziyadah"` to `"Ziyadah (Selesai)"` above.
+- `curpg` (col O) is optional and separate — set it from the latest setoran page if you want the
+  "currently on Juz X / Halaman Y" detail; leave blank to show the next roadmap juz from `juzct`.
+
 ---
 
 ### 2f. Tab `Absensi` (only absences) — powers the Rapor **Kehadiran** score
@@ -512,7 +534,7 @@ exactly `Roster`** with a single formula in cell **A1** that mirrors the public 
 
 > Prefer to reorder/rename in the mirror? Use an explicit select (`select Col1, Col2, … Col18 where
 > Col1 is not null`). Column order does not matter to the tracker (it matches by header name), but the
-> headers must stay exactly `id, name, nick, …, juzdone, curpg, kelas` (plus `nis` if used).
+> headers must stay exactly `id, name, nick, …, juzct, curpg, kelas` (plus `nis` if used).
 
 ---
 
