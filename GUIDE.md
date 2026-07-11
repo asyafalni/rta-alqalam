@@ -218,7 +218,7 @@ keys (the tracker matches by header):
 | L | `akd`  | Umum — math/IPA/… (0–100) | number | **Admin** |
 | M | `bhs`  | Bahasa — Indonesia/Inggris (0–100) | number | **Admin** |
 | N | `juzct` | **how many juz are completed** — a **count**, e.g. `1` (finished his first juz), `18` (over-achiever). This drives the ring fill / %. The roadmap order tells the app *which* juz those are (see below). | number | Musyrif/Mudir |
-| O | `curpg` | **optional** — current page (1–604) on the standard mushaf. Shows *where he's working now* (juz he's on). It does **not** measure progress — leave blank and the app shows the next roadmap juz from `juzct`. | number | Musyrif/Mudir |
+| O | `curpg` | **optional** — current page (1–604). When it sits inside the juz being memorized, the app adds **partial (front-to-back) credit** to the progress ring and shows the current juz/surah. Leave blank → whole-juz progress only (ring shows the next roadmap juz from `juzct`). | number | Musyrif/Mudir |
 | P | `kelas` | class level, e.g. `VII` / `VIII` | text | staff |
 | Q | `nis` | **optional, public** — the santri's NIS, shown in the Rapor header. Leave blank to show `—`. | text | staff |
 | R | `khd` | **optional, public** — the **Kehadiran score** (0–100), a weighted formula computed from the `Absensi` tab (§2f). Blank → app derives a simple presence %. | number | formula |
@@ -249,11 +249,13 @@ keys (the tracker matches by header):
 > So `juzct: 1` means "finished his first juz" (juz 30), **not** "30 juz done". The program order is a
 > code constant (`PROGRAM_FULL` in `tracker/index.html`).
 >
-> **Current position (`curpg`, optional):** page number doesn't track progress here — the roadmap runs
-> 30→26 then 1→10, so a low page can be *further* along than a high one. `curpg` is only a **snapshot of
-> where he's working now**; the app maps it to the current juz (and highlights it on the Peta Hafalan).
-> Leave it blank and the app shows the **next** roadmap juz derived from `juzct`. Standard 604-page
-> Madinah/Uthmani mushaf (Juz 1 = pages 1–21, then 20 pages/juz).
+> **Current position + partial credit (`curpg`, optional):** *across* juz, page number isn't monotonic
+> — the roadmap runs 30→26 then 1→10, so a low page can be *further* along than a high one; that's why
+> `juzct` (not the page) drives whole-juz progress. But *within* the juz being memorized the manhaj goes
+> **front-to-back**, so `curpg`'s position in that juz is a linear fraction. The ring therefore shows a
+> **continuous** value: `(juzct + fraction-into-the-current-juz) / 15`. Partial credit only applies when
+> `curpg` is inside the frontier juz (the next roadmap juz after the completed ones). Leave `curpg` blank
+> → whole-juz steps only. Standard 604-page Madinah/Uthmani mushaf (Juz 1 = pages 1–21, then 20 pages/juz).
 
 Example header row + first data row:
 
