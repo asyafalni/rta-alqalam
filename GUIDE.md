@@ -526,17 +526,22 @@ Muroja'ah is additive. Google's engine recomputes on every new row; the app just
 **Cell meaning** (per mushaf page): **blank** = not memorized · **0** = memorized (Ziyadah), 0 muraja'ah ·
 **N** = reviewed N times. So *coverage* = non-blank pages, *strength* = the numbers.
 
-#### (1) `Quran` reference tab — juz ↔ page ranges (30 rows, one-time)
-Headers `juz  hal_awal  hal_akhir`, then:
+#### (1) `Quran` reference tab — juz ↔ page ranges (auto-generated, one-time)
+Add a tab **`Quran`**, row-1 headers `juz  hal_awal  hal_akhir`. Don't type 30 rows — generate them with
+three formulas (standard 604-page Madinah mushaf: Juz 1 = 21 pages, Juz 2–29 = 20 each, Juz 30 = 23):
 ```
-1,1,21    7,122,141   13,242,261  19,362,381  25,482,501
-2,22,41   8,142,161   14,262,281  20,382,401  26,502,521
-3,42,61   9,162,181   15,282,301  21,402,421  27,522,541
-4,62,81   10,182,201  16,302,321  22,422,441  28,542,561
-5,82,101  11,202,221  17,322,341  23,442,461  29,562,581
-6,102,121 12,222,241  18,342,361  24,462,481  30,582,604
+A2  =SEQUENCE(30)                                    ← juz 1..30
+B2  =ARRAYFORMULA(IF(A2:A31=1, 1, 20*A2:A31-18))     ← hal_awal (1, 22, 42, …, 582)
+C2  =ARRAYFORMULA(IF(A2:A31=30, 604, 20*A2:A31+1))   ← hal_akhir (21, 41, …, 604)
 ```
-(Standard 604-page Madinah mushaf: 20 pages/juz, Juz 30 = 23 pages. `hal_awal` in B, `hal_akhir` in C.)
+
+**Juz + % from a page** (`P` = any page cell, e.g. `curpg` or `hal_ke`):
+```
+juz    =MATCH(P, Quran!$B$2:$B$31, 1)                                    → 1..30 (Juz 30 correct too)
+%-juz  =LET(j, MATCH(P, Quran!$B$2:$B$31, 1), a, INDEX(Quran!$B$2:$B$31, j),
+            b, INDEX(Quran!$C$2:$C$31, j), ROUND((P-a+1)/(b-a+1)*100))   → front-to-back position
+```
+(e.g. `P=268` → juz **14**, % = (268−262+1)/(281−262+1) = **35%**.)
 
 #### (2) Per-student **`Grid`** tab (604 rows) — the overlap-proof page mastery
 Assume this student's setoran is in a local **`Log`** tab (pulled via `=QUERY(IMPORTRANGE(<central log>,
