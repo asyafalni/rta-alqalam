@@ -606,6 +606,10 @@
           </sc-for>
         </div>
         <div style="font-size:12px;color:#6b7280;margin-bottom:14px">Status data: <span style="font-weight:800;color:#0a4631">{{ dataStatus }}</span></div>
+        <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;margin-bottom:14px;background:{{ demoBg }};border:1px solid {{ demoBd }};border-radius:11px;cursor:pointer">
+          <input type="checkbox" checked="{{ forceDemo }}" onChange="{{ toggleDemo }}" style="width:17px;height:17px;margin-top:1px;accent-color:#0a4631;cursor:pointer" />
+          <span style="flex:1"><span style="display:block;font-size:12.5px;font-weight:800;color:#16264d">Gunakan data contoh (demo)</span><span style="font-size:11px;color:#6b7280;line-height:1.5">Tampilkan 11 santri contoh untuk pratinjau tampilan — mengabaikan data live. Tersimpan di browser ini.</span></span>
+        </label>
         <button onClick="{{ reloadConfig }}" style="width:100%;padding:11px;border-radius:10px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:13px;cursor:pointer">↻ Muat Ulang dari Config Sheet</button>
       </div>
     </div>
@@ -913,6 +917,7 @@ class Component extends DCLogic {
     sortKey:'juz', sortDir:'desc',
     setoranFormId:'', nilaiFormId:'', entryKind:'setoran',
     sheetId:'', sheetTab:'Roster', students:null, loadState:'demo', cfgFound:false,
+    forceDemo:(typeof window!=='undefined' && window.localStorage && localStorage.getItem('rtaDemo')==='1'),
     clerkReady:false, userName:'', entryOpen:false, configOpen:false,
     nilai:null, setoran:null, kehadiran:null, mapelDef:null, halaqahDef:null, raporOpen:false, termId:'2026g', groupFilter:'all', filterOpen:false,
     // Admin attendance quick-log
@@ -1124,7 +1129,8 @@ class Component extends DCLogic {
   enrich(r){
     const theme=this.state.theme;
     // Halaqah: named circle + single musyrif, from the "Halaqah" sheet (fallback: HALAQAH constant).
-    const halMap=(this.state.halaqahDef&&Object.keys(this.state.halaqahDef).length)?this.state.halaqahDef:(this.state.loadState==='demo'?HALAQAH:{});
+    const _demo=this.state.loadState==='demo'||this.state.forceDemo;
+    const halMap=(!_demo&&this.state.halaqahDef&&Object.keys(this.state.halaqahDef).length)?this.state.halaqahDef:(_demo?HALAQAH:{});
     const hname=String(r.hal||'').trim();
     const hdef=halMap[hname]||null;
     const hd={ nama:hname||'—', musyrif:(hdef&&hdef.musyrif)?hdef.musyrif:'—' };
@@ -1234,10 +1240,11 @@ class Component extends DCLogic {
     const st=this.state, v=st.view;
     // Demo data ONLY when genuinely unconfigured (loadState 'demo'). Once a sheet is configured
     // (loading/live/empty/error), never fall back to demo — show live data or a placeholder.
-    const demoMode = st.loadState==='demo';
-    const source=(st.students&&st.students.length)?st.students:(demoMode?RAW:[]);
+    const demoMode = st.loadState==='demo' || !!st.forceDemo;
+    const source=demoMode?RAW:((st.students&&st.students.length)?st.students:[]);
     const all=source.map(r=>this.enrich(r));
-    const dataStatus = st.loadState==='live'?'Live · Google Sheet'
+    const dataStatus = st.forceDemo?'Data contoh (demo) · mode preview aktif'
+      : st.loadState==='live'?'Live · Google Sheet'
       : st.loadState==='loading'?'Memuat data…'
       : st.loadState==='empty'?'Terhubung · tab Roster masih kosong (belum ada baris santri)'
       : st.loadState==='error'?'Gagal muat · cek sharing (Anyone with link → Viewer) & tab "Roster"'
@@ -1279,7 +1286,7 @@ class Component extends DCLogic {
     // Rapor extras: ranking within the same Kelas, and attendance tallied from the Kehadiran log (term-scoped).
     let selRank=0, selRankTotal=0;
     if(sel){ const peers=all.filter(s=>String(s.kelas)===String(sel.kelas)).slice().sort((a,b)=>b.overall-a.overall); selRankTotal=peers.length; selRank=peers.findIndex(s=>s.id===sel.id)+1; }
-    const activeKehadiran = (st.kehadiran&&st.kehadiran.length)?st.kehadiran:(demoMode?KEHADIRAN:[]);
+    const activeKehadiran = demoMode?KEHADIRAN:((st.kehadiran&&st.kehadiran.length)?st.kehadiran:[]);
     // Only absences are recorded → count S/I/A; Hadir & the Kehadiran score derive from hari efektif.
     const selAtt = sel ? activeKehadiran.filter(r=>r.id===sel.id && inTerm(r.tanggal, term) && attStatus(r.status)!=='hadir') : [];
     const att = {sakit:0, izin:0, alpa:0};
@@ -1297,15 +1304,15 @@ class Component extends DCLogic {
     const hasAttNotes = attNotes.length>0;
 
     const roleLabel = st.role==='admin'?'Admin':st.role==='mudir'?'Mudir':st.role==='musyrif'?'Musyrif':'Publik';
-    const activeNilai = (st.nilai&&st.nilai.length)?st.nilai:(demoMode?NILAI:[]);
+    const activeNilai = demoMode?NILAI:((st.nilai&&st.nilai.length)?st.nilai:[]);
     // Match/resolve a Nilai row's `mapel` value against Mapel definitions — by id first
     // (stable across renames/reorders), then by name/alias (legacy sheets stored the name).
-    const activeMapel = (st.mapelDef&&st.mapelDef.length)?st.mapelDef:(demoMode?MAPEL:[]);
+    const activeMapel = demoMode?MAPEL:((st.mapelDef&&st.mapelDef.length)?st.mapelDef:[]);
     const nmz=(s)=>String(s||'').trim().toLowerCase();
     const mapelMatch=(nmapel, def)=>{ const v=nmz(nmapel); return !!v && (v===nmz(def.id) || v===nmz(def.mapel) || (def.alias && v===nmz(def.alias))); };
     const mapelName=(nmapel)=>{ const d=activeMapel.find(def=>mapelMatch(nmapel, def)); return d?d.mapel:String(nmapel||''); };
     const selNilaiRows = sel ? activeNilai.filter(n=>n.id===sel.id).slice().sort((a,b)=>(b.tanggal||'').localeCompare(a.tanggal||'')).map(n=>{ const g=grade(n.nilai); return {...n, mapel:mapelName(n.mapel), tgl:fmtTgl(n.tanggal), pred:g.name, pcolor:g.c}; }) : [];
-    const activeSetoran = (st.setoran&&st.setoran.length)?st.setoran:(demoMode?SETORAN:[]);
+    const activeSetoran = demoMode?SETORAN:((st.setoran&&st.setoran.length)?st.setoran:[]);
     const selSetoranAll = sel ? activeSetoran.filter(r=>r.id===sel.id) : [];
     const selSetoranRows = selSetoranAll.map(r=>{ const su=Number(r.surah)||0, ad=Number(r.ayatDari)||0, ak=Number(r.ayatKe)||0; const ayahRef = su ? (' · QS '+su+(ad?(':'+ad+(ak&&ak>ad?'–'+ak:'')):' · 1 surah penuh')) : ''; return {...r, ymd:ymd(r.tanggal), tgl:fmtTgl(r.tanggal), jcolor:setoranColor(r.jenis), stars:starStr(r.nilai), ayahRef}; }).sort((a,b)=>(b.ymd||'').localeCompare(a.ymd||'')).slice(0,10);
     const setoranStat = { zi:0, mu:0, ta:0 };
@@ -1471,6 +1478,8 @@ class Component extends DCLogic {
         this.setState({ nMapel:'', nNilai:'', nMsg: ok?'Nilai tersimpan ✓':'Belum tersimpan — form Nilai perlu pre-filled link (Konfigurasi, GUIDE §5).' }); },
       setoranFormId:st.setoranFormId, nilaiFormId:st.nilaiFormId,
       dataStatus, sheetId:st.sheetId,
+      forceDemo:!!st.forceDemo, demoBg:(st.forceDemo?'#eef4ee':'#f7f6f2'), demoBd:(st.forceDemo?'#0a4631':'#e6e1d5'),
+      toggleDemo:()=>{ const nv=!this.state.forceDemo; try{ if(window.localStorage){ nv?localStorage.setItem('rtaDemo','1'):localStorage.removeItem('rtaDemo'); } }catch(e){} this.setState({forceDemo:nv}); },
       setSheetId:(ev)=>this.setState({sheetId:ev.target.value}),
       // Config sheet (read-only display)
       cfgSheetUrl:'https://docs.google.com/spreadsheets/d/'+CONFIG_ID+'/edit',

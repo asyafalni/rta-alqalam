@@ -662,8 +662,14 @@ what's active — to change anything, you edit the sheet and press **↻ Muat Ul
 From the resolved **data** Sheet ID the tracker reads six tabs via GViz — **`Roster`** (santri),
 **`Nilai`** (tests), **`Mapel`** (subjects), **`Halaqah`** (circles), **`Setoran`** (daily log),
 **`Absensi`** (absences) — e.g. `…/gviz/tq?tqx=out:json&headers=1&sheet=Roster`. Each tab is optional;
-any missing/unreachable one falls back to demo data. If the **`Config` tab** itself is missing, the app
-still reads the data tabs straight from `CONFIG_ID` (forms just show "belum diisi").
+a missing/unreachable one shows an **empty/loading state** (it does **not** silently fall back to demo
+once a sheet is configured). If the **`Config` tab** itself is missing, the app still reads the data
+tabs straight from `CONFIG_ID` (forms just show "belum diisi").
+
+> **Preview with demo data.** ⚙️ **Konfigurasi** has a **"Gunakan data contoh (demo)"** checkbox — tick
+> it to render the 11 built-in sample santri (ignoring live data) so you can eyeball the UI without
+> touching the sheet. It's saved in **that browser only** (localStorage), never in the Config sheet, and
+> the status line reads *"Data contoh (demo) · mode preview aktif"* while it's on. Untick to return to live.
 
 ---
 
