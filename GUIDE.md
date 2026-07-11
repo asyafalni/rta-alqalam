@@ -527,6 +527,11 @@ Muroja'ah is additive. Google's engine recomputes on every new row; the app just
 **N** = reviewed N times. So *coverage* = non-blank pages, *strength* = the numbers.
 
 #### (1) `Quran` reference tab — juz ↔ page ranges (auto-generated, one-time)
+**Where it lives:** on the **PRIVATE / computation side** — in the *same file* that runs the `Grid` +
+`Ringkasan` formulas. It's pure reference (no santri data) and the app never reads it, so it does **not**
+go in the PUBLIC mirror. Because it's just three formulas, **recreate it locally** in each computation
+file rather than `IMPORTRANGE`-ing it (same-file refs are faster, no cross-file dependency).
+
 Add a tab **`Quran`**, row-1 headers `juz  hal_awal  hal_akhir`. Don't type 30 rows — generate them with
 three formulas (standard 604-page Madinah mushaf: Juz 1 = 21 pages, Juz 2–29 = 20 each, Juz 30 = 23):
 ```
