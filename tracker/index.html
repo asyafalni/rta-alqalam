@@ -408,7 +408,7 @@
                 <sc-for list="{{ selSetoran }}" as="r" hint-placeholder-count="4">
                   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid #f0ede4">
                     <span style="flex:none;font-size:9.5px;font-weight:800;color:#fff;background:{{ r.jcolor }};padding:2px 8px;border-radius:6px">{{ r.jenis }}</span>
-                    <div style="flex:1;min-width:130px"><div style="font-weight:700;font-size:13px;color:#16264d">Juz {{ r.juz }} · {{ r.halaman }}{{ r.ayahRef }}</div><div style="font-size:11px;color:#9aa1ad">{{ r.tgl }} <span style="color:#e0a92c;letter-spacing:1px;font-size:12px">{{ r.stars }}</span></div></div>
+                    <div style="flex:1;min-width:130px"><div style="font-weight:700;font-size:13px;color:#16264d">Juz {{ r.juz }} · {{ r.halRef }}{{ r.ayahRef }}</div><div style="font-size:11px;color:#9aa1ad">{{ r.tgl }} <span style="color:#e0a92c;letter-spacing:1px;font-size:12px">{{ r.stars }}</span></div></div>
                     <div style="flex:1;min-width:120px;font-size:11.5px;color:#6b7280;text-align:right">{{ r.catatan }}</div>
                   </div>
                 </sc-for>
@@ -558,10 +558,12 @@
           </label>
           <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">Jenis setoran</div>
           <div style="display:flex;gap:8px;margin-bottom:12px"><sc-for list="{{ sJenisChips }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.onPick }}" style="{{ c.style }}">{{ c.v }}</button></sc-for></div>
+          <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">Halaman mushaf <span style="color:#9aa1ad">(1–604 · wajib benar — penggerak progres)</span></div>
           <div style="display:flex;gap:10px;margin-bottom:12px">
-            <label style="flex:1;font-size:11.5px;color:#6b7280">Juz<input value="{{ sJuz }}" onInput="{{ setSJuz }}" placeholder="11" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
-            <label style="flex:2;font-size:11.5px;color:#6b7280">Halaman<input value="{{ sHalaman }}" onInput="{{ setSHalaman }}" placeholder="hal. 3–4" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+            <label style="flex:1;font-size:11.5px;color:#6b7280">Halaman dari<input value="{{ sHalDari }}" onInput="{{ setSHalDari }}" inputmode="numeric" placeholder="mis. 204" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+            <label style="flex:1;font-size:11.5px;color:#6b7280">Halaman ke<input value="{{ sHalKe }}" onInput="{{ setSHalKe }}" inputmode="numeric" placeholder="mis. 205" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
           </div>
+          <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">Surah &amp; ayat <span style="color:#9aa1ad">(opsional — pertajam % bila mulai/berhenti di tengah halaman)</span></div>
           <div style="display:flex;gap:8px;margin-bottom:12px">
             <label style="flex:1;font-size:11.5px;color:#6b7280">No. Surah<input value="{{ sSurah }}" onInput="{{ setSSurah }}" placeholder="opsional" style="width:100%;margin-top:6px;padding:10px 10px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
             <label style="flex:1;font-size:11.5px;color:#6b7280">Ayat dari<input value="{{ sAyatDari }}" onInput="{{ setSAyatDari }}" placeholder="—" style="width:100%;margin-top:6px;padding:10px 10px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
@@ -776,15 +778,16 @@ const NILAI = [
   {id:'s11', tanggal:'2026-10-01', bidang:'Ekstrakurikuler', mapel:'P11', jenis:'Proyek', nilai:94},
 ];
 // Daily setoran log (Islamic self/staff journal side). Same shape as the public 'Setoran' sheet tab.
+// halDari/halKe = absolute mushaf page (1-604). Juz derives from the page (juzOfPage).
 const SETORAN = [
-  {id:'s3', tanggal:'2026-10-06', jenis:'Ziyadah', juz:11, halaman:'hal. 3–4', surah:11, ayatDari:6, ayatKe:24, nilai:5, catatan:'Lancar, tajwid baik'},
-  {id:'s3', tanggal:'2026-10-05', jenis:'Muroja’ah', juz:10, halaman:'1 juz', nilai:4, catatan:'Tersendat di ayat panjang'},
-  {id:'s3', tanggal:'2026-10-04', jenis:'Ziyadah', juz:11, halaman:'hal. 1–2', surah:11, ayatDari:1, ayatKe:5, nilai:4, catatan:'Baik'},
-  {id:'s3', tanggal:'2026-10-02', jenis:'Tahsin', juz:11, halaman:'—', surah:11, ayatDari:41, ayatKe:41, nilai:4, catatan:'Perbaikan makhraj huruf ظ'},
-  {id:'s1', tanggal:'2026-10-06', jenis:'Ziyadah', juz:9, halaman:'hal. 5', surah:8, ayatDari:40, ayatKe:48, nilai:5, catatan:'Lancar'},
-  {id:'s1', tanggal:'2026-10-05', jenis:'Muroja’ah', juz:8, halaman:'½ juz', nilai:4, catatan:'Baik'},
-  {id:'s11', tanggal:'2026-10-06', jenis:'Ziyadah', juz:14, halaman:'hal. 7', surah:15, ayatDari:1, ayatKe:15, nilai:5, catatan:'Mumtaz, sangat lancar'},
-  {id:'s11', tanggal:'2026-10-05', jenis:'Muroja’ah', juz:12, halaman:'1 juz', nilai:5, catatan:'Kuat'},
+  {id:'s3', tanggal:'2026-10-06', jenis:'Ziyadah', halDari:204, halKe:205, surah:11, ayatDari:6, ayatKe:24, nilai:5, catatan:'Lancar, tajwid baik'},
+  {id:'s3', tanggal:'2026-10-05', jenis:'Muroja’ah', halDari:182, halKe:201, nilai:4, catatan:'Tersendat di ayat panjang'},
+  {id:'s3', tanggal:'2026-10-04', jenis:'Ziyadah', halDari:202, halKe:203, surah:11, ayatDari:1, ayatKe:5, nilai:4, catatan:'Baik'},
+  {id:'s3', tanggal:'2026-10-02', jenis:'Tahsin', halDari:210, halKe:210, surah:11, ayatDari:41, ayatKe:41, nilai:4, catatan:'Perbaikan makhraj huruf ظ'},
+  {id:'s1', tanggal:'2026-10-06', jenis:'Ziyadah', halDari:166, halKe:166, surah:8, ayatDari:40, ayatKe:48, nilai:5, catatan:'Lancar'},
+  {id:'s1', tanggal:'2026-10-05', jenis:'Muroja’ah', halDari:142, halKe:151, nilai:4, catatan:'Baik'},
+  {id:'s11', tanggal:'2026-10-06', jenis:'Ziyadah', halDari:268, halKe:268, surah:15, ayatDari:1, ayatKe:15, nilai:5, catatan:'Mumtaz, sangat lancar'},
+  {id:'s11', tanggal:'2026-10-05', jenis:'Muroja’ah', halDari:222, halKe:241, nilai:5, catatan:'Kuat'},
 ];
 // Star string for a 1–5 daily rating (Google Forms Rating field). 0/blank → no stars.
 function starStr(n){ n=Math.max(0,Math.min(5,Math.round(Number(n)||0))); return n? '★★★★★'.slice(0,n)+'☆☆☆☆☆'.slice(0,5-n) : ''; }
@@ -836,7 +839,7 @@ function parseKehLink(link){
   return cfg;
 }
 // Field order for the Setoran / Nilai forms (used for order-based pre-fill mapping).
-const SETORAN_KEYS=['id','tanggal','jenis','juz','halaman','surah','ayat_dari','ayat_ke','nilai','catatan'];
+const SETORAN_KEYS=['id','tanggal','jenis','hal_dari','hal_ke','surah','ayat_dari','ayat_ke','nilai','catatan']; // hal_dari/ke = absolute mushaf page 1-604 (juz derived from it); surah/ayat optional
 const NILAI_KEYS=['id','tanggal','mapel','jenis','nilai']; // mapel = the Mapel `id` (P1..) — bidang & name derive from it
 // Pre-filled-link parser for the Setoran/Nilai custom forms. Maps each entry to a field by POSITION
 // (fill the pre-fill with real example values in field order), and a __KEY__ sentinel value overrides
@@ -948,7 +951,7 @@ class Component extends DCLogic {
     // Admin attendance quick-log
     kehOpen:false, kehDate:'', kehSantri:'', kehStatus:'Izin', kehJam:'', kehReason:'', kehPending:[], kehLink:'', kehMsg:'',
     // Custom Setoran / Nilai input forms
-    sSantri:'', sDate:'', sJenis:'Ziyadah', sJuz:'', sHalaman:'', sSurah:'', sAyatDari:'', sAyatKe:'', sRating:0, sCatatan:'', sMsg:'',
+    sSantri:'', sDate:'', sJenis:'Ziyadah', sHalDari:'', sHalKe:'', sSurah:'', sAyatDari:'', sAyatKe:'', sRating:0, sCatatan:'', sMsg:'',
     nSantri:'', nDate:'', nBidang:'Diniyah', nMapel:'', nJenis:'Tes / Kuis', nNilai:'', nMsg:'',
   };
 
@@ -1053,7 +1056,8 @@ class Component extends DCLogic {
       const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
       const num=x=>{ const n=Number(x); return isFinite(n)?n:0; };
       const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); const g=(...ks)=>{ for(const k of ks){ if(o[k]!=null&&o[k]!=='') return o[k]; } return null; };
-        return {id:String(o.id!=null?o.id:''), tanggal:o.tanggal!=null?String(o.tanggal):'', jenis:o.jenis||'', juz:o.juz!=null?o.juz:'', halaman:o.halaman!=null?String(o.halaman):'',
+        const hd=num(g('hal_dari','halaman_dari','hal dari','halaman dari','haldari','hal_awal')), hk=num(g('hal_ke','halaman_ke','hal ke','halaman ke','halke','hal_akhir'));
+        return {id:String(o.id!=null?o.id:''), tanggal:o.tanggal!=null?String(o.tanggal):'', jenis:o.jenis||'', halDari:hd, halKe:(hk||hd),
           surah:num(g('surah','no surah','no. surah','nosurah')), ayatDari:num(g('ayat_dari','ayat dari','ayatdari','dari','ayat_awal','ayat awal')), ayatKe:num(g('ayat_ke','ayat ke','ayatke','sampai','ke','ayat_akhir','ayat akhir')),
           nilai:num(o.nilai!=null?o.nilai:o.rating), catatan:o.catatan!=null?String(o.catatan):''}; }).filter(x=>x.id&&x.jenis);
       this.setState({setoran:rows.length?rows:null});
@@ -1349,7 +1353,7 @@ class Component extends DCLogic {
     const selNilaiRows = sel ? activeNilai.filter(n=>n.id===sel.id).slice().sort((a,b)=>(b.tanggal||'').localeCompare(a.tanggal||'')).map(n=>{ const g=grade(n.nilai); return {...n, mapel:mapelName(n.mapel), tgl:fmtTgl(n.tanggal), pred:g.name, pcolor:g.c}; }) : [];
     const activeSetoran = demoMode?SETORAN:((st.setoran&&st.setoran.length)?st.setoran:[]);
     const selSetoranAll = sel ? activeSetoran.filter(r=>r.id===sel.id) : [];
-    const selSetoranRows = selSetoranAll.map(r=>{ const su=Number(r.surah)||0, ad=Number(r.ayatDari)||0, ak=Number(r.ayatKe)||0; const ayahRef = su ? (' · QS '+su+(ad?(':'+ad+(ak&&ak>ad?'–'+ak:'')):' · 1 surah penuh')) : ''; return {...r, ymd:ymd(r.tanggal), tgl:fmtTgl(r.tanggal), jcolor:setoranColor(r.jenis), stars:starStr(r.nilai), ayahRef}; }).sort((a,b)=>(b.ymd||'').localeCompare(a.ymd||'')).slice(0,10);
+    const selSetoranRows = selSetoranAll.map(r=>{ const su=Number(r.surah)||0, ad=Number(r.ayatDari)||0, ak=Number(r.ayatKe)||0; const ayahRef = su ? (' · QS '+su+(ad?(':'+ad+(ak&&ak>ad?'–'+ak:'')):' · 1 surah penuh')) : ''; const hd=Number(r.halDari)||0, hk=Number(r.halKe)||hd; const halRef = hd ? ('hal. '+hd+(hk>hd?('–'+hk):'')) : '—'; const juz = hd ? juzOfPage(hd) : ''; return {...r, juz, halRef, ymd:ymd(r.tanggal), tgl:fmtTgl(r.tanggal), jcolor:setoranColor(r.jenis), stars:starStr(r.nilai), ayahRef}; }).sort((a,b)=>(b.ymd||'').localeCompare(a.ymd||'')).slice(0,10);
     const setoranStat = { zi:0, mu:0, ta:0 };
     selSetoranAll.forEach(r=>{ setoranStat[setoranCat(r.jenis)]++; });
     // Rapor tables: subjects are DYNAMIC (defined in the "Mapel" sheet, falling back to the demo MAPEL);
@@ -1497,15 +1501,17 @@ class Component extends DCLogic {
       showNilai:()=>this.setState({entryKind:'nilai'}),
       santriOpts,
       // Setoran form
-      sSantri:st.sSantri, sDate:st.sDate||todayStr(), sJenisChips, sJuz:st.sJuz, sHalaman:st.sHalaman, sSurah:st.sSurah, sAyatDari:st.sAyatDari, sAyatKe:st.sAyatKe, sStars, sCatatan:st.sCatatan, sMsg:st.sMsg, setoranReady, setoranNotReady:!setoranReady,
+      sSantri:st.sSantri, sDate:st.sDate||todayStr(), sJenisChips, sHalDari:st.sHalDari, sHalKe:st.sHalKe, sSurah:st.sSurah, sAyatDari:st.sAyatDari, sAyatKe:st.sAyatKe, sStars, sCatatan:st.sCatatan, sMsg:st.sMsg, setoranReady, setoranNotReady:!setoranReady,
       setSSantri:(e)=>this.setState({sSantri:e.target.value}), setSDate:(e)=>this.setState({sDate:e.target.value}),
-      setSJuz:(e)=>this.setState({sJuz:e.target.value}), setSHalaman:(e)=>this.setState({sHalaman:e.target.value}),
+      setSHalDari:(e)=>this.setState({sHalDari:e.target.value}), setSHalKe:(e)=>this.setState({sHalKe:e.target.value}),
       setSSurah:(e)=>this.setState({sSurah:e.target.value}), setSAyatDari:(e)=>this.setState({sAyatDari:e.target.value}), setSAyatKe:(e)=>this.setState({sAyatKe:e.target.value}),
       setSCatatan:(e)=>this.setState({sCatatan:e.target.value}),
       saveSetoran:()=>{ const s=this.state; const id=(s.sSantri||'').trim(); if(!id){ this.setState({sMsg:'Pilih santri dahulu.'}); return; }
-        const rec={ id, tanggal:(s.sDate||todayStr()), jenis:s.sJenis||'Ziyadah', juz:String(s.sJuz||'').trim(), halaman:String(s.sHalaman||'').trim(), surah:String(s.sSurah||'').trim(), ayat_dari:String(s.sAyatDari||'').trim(), ayat_ke:String(s.sAyatKe||'').trim(), nilai:(s.sRating?String(s.sRating):''), catatan:String(s.sCatatan||'').trim() };
+        if(!String(s.sHalDari||'').trim()){ this.setState({sMsg:'Isi halaman (dari) dahulu.'}); return; }
+        const hd=String(s.sHalDari||'').trim(), hk=String(s.sHalKe||'').trim()||hd;   // ke kosong → satu halaman
+        const rec={ id, tanggal:(s.sDate||todayStr()), jenis:s.sJenis||'Ziyadah', hal_dari:hd, hal_ke:hk, surah:String(s.sSurah||'').trim(), ayat_dari:String(s.sAyatDari||'').trim(), ayat_ke:String(s.sAyatKe||'').trim(), nilai:(s.sRating?String(s.sRating):''), catatan:String(s.sCatatan||'').trim() };
         const ok=postForm(parseFormLink(s.setoranFormId, SETORAN_KEYS), rec);
-        this.setState({ sJuz:'', sHalaman:'', sSurah:'', sAyatDari:'', sAyatKe:'', sRating:0, sCatatan:'', sMsg: ok?'Setoran tersimpan ✓':'Belum tersimpan — form Setoran perlu pre-filled link (Konfigurasi, GUIDE §5).' }); },
+        this.setState({ sHalDari:'', sHalKe:'', sSurah:'', sAyatDari:'', sAyatKe:'', sRating:0, sCatatan:'', sMsg: ok?'Setoran tersimpan ✓':'Belum tersimpan — form Setoran perlu pre-filled link (Konfigurasi, GUIDE §5).' }); },
       // Nilai form
       nSantri:st.nSantri, nDate:st.nDate||todayStr(), nBidangChips, nMapel:st.nMapel, nMapelOpts, nJenis:st.nJenis, nNilai:st.nNilai, nMsg:st.nMsg, nilaiReady, nilaiNotReady:!nilaiReady,
       setNSantri:(e)=>this.setState({nSantri:e.target.value}), setNDate:(e)=>this.setState({nDate:e.target.value}),

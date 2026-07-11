@@ -34,7 +34,7 @@ academics, reporting).
  │  ├─ tab: Nilai                │   per-test scores, mirrored live
  │  ├─ tab: Mapel                │   subject definitions (id,bidang,mapel,alias), mirrored live
  │  ├─ tab: Halaqah              │   circle musyrif (nama,musyrif), mirrored live
- │  ├─ tab: Setoran              │   daily log (id,tanggal,jenis,juz,…), mirrored live
+ │  ├─ tab: Setoran              │   daily log (id,tanggal,jenis,hal_dari,hal_ke,…), mirrored live
  │  └─ tab: Absensi              │   only absences (id,tanggal,status,…), mirrored live
  └───────────────┬───────────────┘
                  │  GViz JSON (no API key)
@@ -95,8 +95,9 @@ New to Google Sheets/Forms? Follow these steps top to bottom. Sections §2–§7
 For **each** form: **New → Google Forms** inside the folder.
 
 **Form A — `Setoran Harian`** (daily). Add questions, and **title them exactly**:
-`id`, `tanggal`, `jenis`, `juz`, `halaman`, `catatan`, and optionally `nilai` (daily quality 0–100,
-used by the §2e formulas).
+`id`, `tanggal`, `jenis`, `hal_dari`, `hal_ke`, `catatan`, and optionally `surah`, `ayat_dari`,
+`ayat_ke`, `nilai` (★1–5 rating). `hal_dari`/`hal_ke` = **absolute mushaf page 1–604** — the progress
+driver (§2h); there is **no `juz` field** (derived from the page).
 - Make **`id`** a **Dropdown** question whose options are your santri ids (`s1`, `s2`, …) — this
   prevents typos and keeps the link to `Master` exact.
 - Make **`tanggal`** a **Date** question; **`jenis`** a Dropdown (`Ziyadah` / `Muroja'ah` / `Tahsin`).
@@ -177,14 +178,16 @@ staff (Admin / Mudir / Musyrif). This is where the Google Form delivers response
 
 ### 2a. Tab `Setoran` (raw daily-form responses)
 Auto-created when you link the **Setoran Harian** form (Form A, §5). Leave it as-is — it logs every
-daily submission (timestamp, santri, tanggal, jenis, juz, halaman, taqdir, catatan, …). Use it to
-keep the `Master` hafalan/juz columns current. (Periodic exam scores go through a *separate* form
-into the `Nilai` tab — see §2c and §5.)
+daily submission. The key columns are **`hal_dari` / `hal_ke`** = the **absolute mushaf page (1–604)**
+the santri memorized/reviewed that day (page range; `hal_ke` blank = one page). These pages are the
+**primary progress signal** — the juz and % derive from them (§2h). Optional **`surah`, `ayat_dari`,
+`ayat_ke`** only *sharpen* the % when a session starts/stops mid-page. There is **no `juz` field** — the
+juz is computed from the page. (Periodic exam scores go through a *separate* form into `Nilai` — §2c/§5.)
 
 **Show the daily log in-app (optional):** the tracker renders a **Riwayat Setoran Harian** card on
 each student's detail (10 most recent) if it finds a **public** tab named exactly `Setoran` with
-these headers: `id, tanggal, jenis, juz, halaman, catatan` (plus optional `surah, ayat_dari, ayat_ke`
-and the daily `nilai` ★ rating). If you titled Form A's questions with the
+these headers: `id, tanggal, jenis, hal_dari, hal_ke, catatan` (plus optional `surah, ayat_dari,
+ayat_ke` and the daily `nilai` ★ rating). If you titled Form A's questions with the
 exact keys and used an **`id` dropdown** (walkthrough Step 4), the linked `Setoran` tab is already
 app-ready — mirror it whole:
 `=QUERY(IMPORTRANGE("<PRIVATE_SHEET_ID>","Setoran!A1:Z"), "where Col2 is not null", 1)`
@@ -513,6 +516,62 @@ tab only maps each name → its **single musyrif**. One row per circle:
 
 ---
 
+### 2h. Auto-progress from `Setoran` pages — `Quran` reference + page grid (formula pipeline)
+
+**Goal:** every Setoran auto-updates a santri's `juzct` + `curpg` (§2b) with **no manual editing** and
+**no double-counting when inputs overlap** (two musyrif logging overlapping pages). The trick: each page
+gets its own formula cell, so overlapping Ziyadah is idempotent (a page is "memorized" once) while
+Muroja'ah is additive. Google's engine recomputes on every new row; the app just reads the result.
+
+**Cell meaning** (per mushaf page): **blank** = not memorized · **0** = memorized (Ziyadah), 0 muraja'ah ·
+**N** = reviewed N times. So *coverage* = non-blank pages, *strength* = the numbers.
+
+#### (1) `Quran` reference tab — juz ↔ page ranges (30 rows, one-time)
+Headers `juz  hal_awal  hal_akhir`, then:
+```
+1,1,21    7,122,141   13,242,261  19,362,381  25,482,501
+2,22,41   8,142,161   14,262,281  20,382,401  26,502,521
+3,42,61   9,162,181   15,282,301  21,402,421  27,522,541
+4,62,81   10,182,201  16,302,321  22,422,441  28,542,561
+5,82,101  11,202,221  17,322,341  23,442,461  29,562,581
+6,102,121 12,222,241  18,342,361  24,462,481  30,582,604
+```
+(Standard 604-page Madinah mushaf: 20 pages/juz, Juz 30 = 23 pages. `hal_awal` in B, `hal_akhir` in C.)
+
+#### (2) Per-student **`Grid`** tab (604 rows) — the overlap-proof page mastery
+Assume this student's setoran is in a local **`Log`** tab (pulled via `=QUERY(IMPORTRANGE(<central log>,
+"Setoran!A:J"),"where Col1='sX'")`), columns **C=`jenis` D=`hal_dari` E=`hal_ke`** (adjust to yours).
+In `Grid`: **A2** `=SEQUENCE(604)` (fills pages 1–604). **B2**, filled down to row 605:
+```
+=IF(COUNTIFS(Log!$C:$C,"Ziyadah",Log!$D:$D,"<="&$A2,Log!$E:$E,">="&$A2)=0,"",
+    COUNTIFS(Log!$C:$C,"Muroja'ah",Log!$D:$D,"<="&$A2,Log!$E:$E,">="&$A2))
+```
+A page is covered by a row when `hal_dari ≤ page ≤ hal_ke`. Overlapping Ziyadah → still one "memorized";
+Muroja'ah counts stack. *(Optional accuracy: if `surah`/`ayat` are filled, you can refine a partial page —
+but pages alone already drive progress; keep this as a later enhancement.)*
+
+#### (3) `Ringkasan` tab — roll up to `juzct` + `curpg`
+Build a 30-row helper in **program order** (`PROGRAM_FULL`: 30,29,…,26,1,…,10,11,…,25). For each juz look
+up its range from `Quran`, then:
+- **memo** (pages memorized in the juz) — note `>=0` catches memorized incl. the "0" cells, blanks are `""`:
+  `=COUNTIFS(Grid!$A:$A,">="&hal_awal, Grid!$A:$A,"<="&hal_akhir, Grid!$B:$B,">=0")`
+- **full?** `=memo >= (hal_akhir-hal_awal+1)`
+- **`juzct`** = leading run of full juz: `=IFERROR(MATCH(FALSE, full_range, 0)-1, 30)`
+- **`curpg`** = furthest memorized page in the frontier juz (first not-full). With `fawal/fakhir` = that
+  juz's range: `=IFERROR(MAXIFS(Grid!$A:$A, Grid!$A:$A,">="&fawal, Grid!$A:$A,"<="&fakhir, Grid!$B:$B,">=0"), "")`
+
+#### (4) Feed `Master`
+Point `Master!` `juzct` (col N) and `curpg` (col O) at the `Ringkasan` values for each santri (one
+`Ringkasan` row per student, mirrored via `IMPORTRANGE`, or `juzct`/`curpg` computed straight into
+`Master` if you keep everything in one file). The app reads `juzct`/`curpg` → the ring, %, "N/15 Juz",
+and roadmap juz all update automatically. No `PROGRAM_FULL` logic to maintain in the sheet beyond the
+program-order list — the app already owns the ring math.
+
+> **Scale:** ~30 santri → keep the 604-cell `Grid` in a **per-student file** so each recomputes
+> independently (fast, parallel). One giant file with 30×604 cells recalcs as a single unit.
+
+---
+
 ## 3. PUBLIC sheet — the reference (mirror)
 
 Create a **second** spreadsheet (e.g. **"RTA Tracker — PUBLIC"**). It contains **one tab named
@@ -576,7 +635,7 @@ tab, then paste its **pre-filled link** into the matching row of the **`Config`*
 > link**, fill **every** field with any example value **in the order listed below** (`id`=`s1`,
 > `tanggal`=`2026-07-10`, `jenis`=`Ziyadah`, `juz`=`1`, …), then **Get link** and copy the URL. The
 > app maps each `entry.### → field` **by position**, so **keep your form questions in this order**.
-> *(Order-independent alternative: put a `__KEY__` sentinel in a field — `__JUZ__`, `__NILAI__`, … — and
+> *(Order-independent alternative: put a `__KEY__` sentinel in a field — `__HAL_DARI__`, `__NILAI__`, … — and
 > that field is matched by name regardless of position.)* Only **`id`** and **`tanggal`** are required.
 
 **Form A — Setoran Harian** (daily; Musyrif & Mudir). Question titles = the keys:
@@ -586,13 +645,16 @@ tab, then paste its **pre-filled link** into the matching row of the **`Config`*
 | `id`      | Short answer / Dropdown | `__ID__` |
 | `tanggal` | Short answer / Date | `__TANGGAL__` (or any date if Date type) |
 | `jenis`   | Short answer / Multiple choice | `__JENIS__` |
-| `juz`     | Short answer | `__JUZ__` |
-| `halaman` | Short answer | `__HALAMAN__` |
-| `surah`   | Short answer *(optional)* | `__SURAH__` |
+| `hal_dari` | Short answer *(absolute page 1–604 — **required**)* | `__HAL_DARI__` |
+| `hal_ke`  | Short answer *(absolute page; blank = one page)* | `__HAL_KE__` |
+| `surah`   | Short answer *(optional — sharpens %)* | `__SURAH__` |
 | `ayat_dari` | Short answer *(optional)* | `__AYAT_DARI__` |
 | `ayat_ke` | Short answer *(optional)* | `__AYAT_KE__` |
 | `nilai`   | Short answer *(the app sends the ★1–5 rating as a number)* | `__NILAI__` |
 | `catatan` | Short answer *(optional)* | `__CATATAN__` |
+
+No `juz` field — the juz derives from `hal_dari`. `hal_dari`/`hal_ke` are the **absolute mushaf page**
+(1–604), the primary progress driver (see §2h). Surah/ayat are optional accuracy only.
 
 The app's Setoran form has a **★1–5 rating picker** for `nilai`, a jenis selector, and the surah/ayat
 fields — shown on the Riwayat Setoran card as **`QS 11:6–24`** / **`QS 11:41`** / **`QS 11 · 1 surah
