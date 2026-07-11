@@ -582,6 +582,171 @@ program-order list — the app already owns the ring math.
 
 ---
 
+### 2i. Ayah-level accuracy — `Surah` reference (optional, sharpens the %)
+
+A page is coarse — a santri can start/stop **mid-page**, so page-only % rounds to whole pages. If a
+setoran carries **`surah` + `ayat_ke`**, we can pin the position to the exact ayah. The trick avoids the
+giant 6,236-row layout: give every ayah a **global index 1…6236** (running count across the whole
+Qur'an), then `surah:ayah` → one number → its juz and its position within that juz. Only **two small
+tables** — all lives on the **PRIVATE / computation side** (§2h), never PUBLIC.
+
+#### (A) `Surah` tab (114 rows) — ayah counts + global start index
+Headers `no  nama  jml_ayah  idx_awal`. **A2** `=SEQUENCE(114)`. Paste the `nama,jml_ayah` block below
+into **B2** then *Data → Split text to columns → comma*. **D2** (fill down) `=SUM($C$2:C2)-C2+1` — the
+global index of that surah's ayah 1 (Surah 1 → 1, Surah 2 → 8, …).
+```
+Al-Fatihah,7
+Al-Baqarah,286
+Ali 'Imran,200
+An-Nisa,176
+Al-Ma'idah,120
+Al-An'am,165
+Al-A'raf,206
+Al-Anfal,75
+At-Tawbah,129
+Yunus,109
+Hud,123
+Yusuf,111
+Ar-Ra'd,43
+Ibrahim,52
+Al-Hijr,99
+An-Nahl,128
+Al-Isra,111
+Al-Kahf,110
+Maryam,98
+Ta-Ha,135
+Al-Anbiya,112
+Al-Hajj,78
+Al-Mu'minun,118
+An-Nur,64
+Al-Furqan,77
+Ash-Shu'ara,227
+An-Naml,93
+Al-Qasas,88
+Al-'Ankabut,69
+Ar-Rum,60
+Luqman,34
+As-Sajdah,30
+Al-Ahzab,73
+Saba,54
+Fatir,45
+Ya-Sin,83
+As-Saffat,182
+Sad,88
+Az-Zumar,75
+Ghafir,85
+Fussilat,54
+Ash-Shura,53
+Az-Zukhruf,89
+Ad-Dukhan,59
+Al-Jathiyah,37
+Al-Ahqaf,35
+Muhammad,38
+Al-Fath,29
+Al-Hujurat,18
+Qaf,45
+Adh-Dhariyat,60
+At-Tur,49
+An-Najm,62
+Al-Qamar,55
+Ar-Rahman,78
+Al-Waqi'ah,96
+Al-Hadid,29
+Al-Mujadila,22
+Al-Hashr,24
+Al-Mumtahanah,13
+As-Saff,14
+Al-Jumu'ah,11
+Al-Munafiqun,11
+At-Taghabun,18
+At-Talaq,12
+At-Tahrim,12
+Al-Mulk,30
+Al-Qalam,52
+Al-Haqqah,52
+Al-Ma'arij,44
+Nuh,28
+Al-Jinn,28
+Al-Muzzammil,20
+Al-Muddaththir,56
+Al-Qiyamah,40
+Al-Insan,31
+Al-Mursalat,50
+An-Naba,40
+An-Nazi'at,46
+'Abasa,42
+At-Takwir,29
+Al-Infitar,19
+Al-Mutaffifin,36
+Al-Inshiqaq,25
+Al-Buruj,22
+At-Tariq,17
+Al-A'la,19
+Al-Ghashiyah,26
+Al-Fajr,30
+Al-Balad,20
+Ash-Shams,15
+Al-Layl,21
+Ad-Duha,11
+Ash-Sharh,8
+At-Tin,8
+Al-'Alaq,19
+Al-Qadr,5
+Al-Bayyinah,8
+Az-Zalzalah,8
+Al-'Adiyat,11
+Al-Qari'ah,11
+At-Takathur,8
+Al-'Asr,3
+Al-Humazah,9
+Al-Fil,5
+Quraysh,4
+Al-Ma'un,7
+Al-Kawthar,3
+Al-Kafirun,6
+An-Nasr,3
+Al-Masad,5
+Al-Ikhlas,4
+Al-Falaq,5
+An-Nas,6
+```
+(The `jml_ayah` column sums to **6236** — a quick `=SUM(C2:C115)` check.)
+
+#### (B) Extend the `Quran` juz tab with ayah boundaries (30 rows)
+Add three columns to `Quran` (§2h): `juz_surah  juz_ayat  idx_juz`. Paste the `surah,ayat` block into
+**D2:E31**, then **F2** (fill down) `=VLOOKUP(D2, Surah!$A:$D, 4, FALSE) + E2 - 1` — the global index of
+each juz's first ayah.
+```
+1,1      7,5,82    13,12,53  19,25,21  25,41,47
+2,142    8,6,111   14,15,1   20,27,56  26,46,1
+2,253    9,7,88    15,17,1   21,29,46  27,51,31
+3,93     10,8,41   16,18,75  22,33,31  28,58,1
+4,24     11,9,93   17,21,1   23,36,28  29,67,1
+4,148    12,11,6   18,23,1   24,39,32  30,78,1
+```
+*(Read top-to-bottom, left-to-right = juz 1…30. Each entry is `surah,ayat` — e.g. juz 12 = `11,6` = Hud:6.)*
+
+> ⚠️ **Verify these 30 boundaries against your mushaf.** The ayah-counts (A) are certain, but a single
+> off-by-one juz boundary misplaces the %. Ideally cross-check with a trusted Qur'an metadata source.
+
+#### (C) Formulas — `surah:ayah` → juz + sharp %
+```
+global index of (surah S, ayat A):  =VLOOKUP(S, Surah!$A:$D, 4, FALSE) + A - 1
+juz:                                =MATCH(gIdx, Quran!$F$2:$F$31, 1)
+% of juz (ayah-precise):            =LET(g, gIdx, j, MATCH(g, Quran!$F$2:$F$31,1),
+                                          a, INDEX(Quran!$F$2:$F$31, j),
+                                          b, IF(j=30, 6237, INDEX(Quran!$F$2:$F$31, j+1)),
+                                          ROUND((g-a+1)/(b-a)*100))
+```
+
+#### (D) Plug into progress
+In `Ringkasan` (§2h), when a setoran's frontier row has `surah`+`ayat_ke`, use the **ayah-precise %**
+above for the current-juz fraction; otherwise fall back to the **page %** from the `Quran` juz table.
+`juzct` (whole juz done) still comes from the page `Grid` — the ayah refinement only sharpens the
+*fraction of the juz currently in progress*, which is exactly where mid-page precision matters.
+
+---
+
 ## 3. PUBLIC sheet — the reference (mirror)
 
 Create a **second** spreadsheet (e.g. **"RTA Tracker — PUBLIC"**). It contains **one tab named
