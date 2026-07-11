@@ -258,6 +258,23 @@
         </sc-if>
       </div>
 
+      <div style="background:linear-gradient(135deg,#fbfaf6,#f3f7f2);border:1px solid #e6e1d5;border-radius:14px;padding:15px 18px 16px;margin-bottom:22px">
+        <div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;margin-bottom:13px">
+          <span style="font-weight:800;font-size:13.5px;color:#0a4631">Alur Hafalan Program</span>
+          <span style="font-size:11.5px;color:#9aa1ad">Target 15 juz dalam 3 tahun · lanjut bonus Juz 11–25</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:14px 20px;align-items:flex-start">
+          <sc-for list="{{ roadmapGroups }}" as="g" hint-placeholder-count="4">
+            <div>
+              <div style="{{ g.labelStyle }}">{{ g.label }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:5px">
+                <sc-for list="{{ g.chips }}" as="c" hint-placeholder-count="5"><span style="{{ c.style }}">{{ c.j }}</span></sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
       <sc-if value="{{ galleryEmpty }}" hint-placeholder-val="{{ false }}">
         <div style="text-align:center;padding:64px 20px">
           <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ true }}">
@@ -909,6 +926,13 @@ const PROGRAM = [30,29,28,27,26,1,2,3,4,5,6,7,8,9,10];
 // Over-achievers continue 11..25 (a second 15-juz "lap") → completion can reach 200% (all 30 juz).
 const PROGRAM_FULL = PROGRAM.concat([11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]);
 const TARGET_JUZ = 15;
+// The memorization journey shown on the gallery (per-year target + bonus lap).
+const ROADMAP = [
+  {label:'Tahun 1', juz:[30,29,28,27,26], gold:false},
+  {label:'Tahun 2', juz:[1,2,3,4,5], gold:false},
+  {label:'Tahun 3', juz:[6,7,8,9,10], gold:false},
+  {label:'Bonus', juz:[11,12,13,14,15,16,17,18,19,20,21,22,23,24,25], gold:true},
+];
 // Next juz to memorize = first in program order not yet done.
 function nextProgramJuz(doneSet){ return PROGRAM_FULL.find(j=>!doneSet.has(j)) || 30; }
 
@@ -1160,7 +1184,11 @@ class Component extends DCLogic {
     const og=grade(overall), tier=tierOf(overall==null?0:overall), v=this.cardVisual(theme,tier);
     const initials=r.nick.slice(0,2).toUpperCase();
     // ---- Gallery card visuals: progress ring, tier accent, halaqah dot, juz line ----
-    const curArab=String(curJuz).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d));
+    const toArab=x=>String(x).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d));
+    const curArab=toArab(curJuz);
+    // ring centre = the juz being memorized now, in roadmap order (30,29,…,26,1,…,10, bonus 11,…,25);
+    // ✓ once all 30 are done.
+    const frontierArab=(juzCount>=30)?'✓':toArab(nextJuz);
     const started=juzCount>0 || !!pInfo;                     // has any memorization or a current page
     const ringPct=Math.min(100, hafPct);
     // 0–100% (0–15 juz): green fills the track. Past 100% (bonus lap 11–25): green is full and a GOLD
@@ -1176,7 +1204,7 @@ class Component extends DCLogic {
     const halDot=hname?HAL_PALETTE[hh%HAL_PALETTE.length]:'#cbb98a';
     return {...r, initials, overall, gLetter:og.l, gName:og.name, gColor:og.c, tier, tierColor:TIER_ACCENT[tier],
       started, ringStyle, hafAccent, halDot, isMumtaz:(og.l==='A'),
-      ringNum:(started?curArab:'—'), juzLine:(started?(juzCount+' / '+TARGET_JUZ+' Juz'):'Belum mulai'),
+      ringNum:frontierArab, juzLine:(started?(juzCount+' / '+TARGET_JUZ+' Juz'):'Belum mulai'),
       hafPctText:(started?(hafPct+'%'):''), halaqahShow:(hd.label!=='—'?hd.label:''),
       juz:juzCount, curJuz, juzDone,
       curpg:pg, hasPage:!!pInfo, pgInJuz:pInfo?pInfo.inJuz:0, pgLenJuz:pInfo?pInfo.lenJuz:0, pgPctJuz:pInfo?pInfo.pctJuz:0, pgLeft:pInfo?pInfo.leftInJuz:0, pgNextJuz:pInfo?pInfo.nextJuz:0,
@@ -1385,6 +1413,9 @@ class Component extends DCLogic {
       gallery, galleryCount:gallery.length, roster, rosterCount:roster.length,
       galleryHasItems:!galleryEmpty, galleryEmpty, rosterHasItems:!rosterEmpty, rosterEmpty,
       isLoading, listMsg, listSub,
+      roadmapGroups: ROADMAP.map(g=>({ label:g.label, gold:g.gold,
+        labelStyle:'font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;color:'+(g.gold?'#a5791f':'#0a4631'),
+        chips: g.juz.map(j=>({ j, style:'display:inline-grid;place-items:center;min-width:23px;height:23px;padding:0 5px;border-radius:7px;font-size:11.5px;font-weight:800;'+(g.gold?'background:#fbf5e4;border:1px solid #ecdcae;color:#a5791f':'background:#eaf3ea;border:1px solid #cfe3d0;color:#2f8f3a') })) })),
       totalJuz, avgJuz:avgJuz.toFixed(1),
       mumtazCount:roster.filter(s=>s.gLetter==='A').length,
       filterOpen:st.filterOpen, filterLabel, filterCount, filterActive: gf!=='all', allChip, kelasChips, halChips,
