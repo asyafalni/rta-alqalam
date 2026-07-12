@@ -548,37 +548,52 @@ juz    =MATCH(P, Quran!$B$2:$B$31, 1)                                    → 1..
 ```
 (e.g. `P=268` → juz **14**, % = (268−262+1)/(281−262+1) = **35%**.)
 
-#### (2) Per-student **`Grid`** tab (604 rows) — the overlap-proof page mastery
-Assume this student's setoran is in a local **`Log`** tab (pulled via `=QUERY(IMPORTRANGE(<central log>,
-"Setoran!A:J"),"where Col1='sX'")`), columns **C=`jenis` D=`hal_dari` E=`hal_ke`** (adjust to yours).
-In `Grid`: **A2** `=SEQUENCE(604)` (fills pages 1–604). **B2**, filled down to row 605:
+#### (2) `Grid` tab — one wide grid (pages × santri), overlap-proof
+Assume the central **`Setoran`** tab (Form A responses) has **B=`id` D=`jenis` E=`hal_dari` F=`hal_ke`**
+(A = Timestamp — adjust letters). In `Grid`:
+- **A1** = `page`; **A2** `=SEQUENCE(604)` (pages 1–604).
+- **B1** (santri ids spill across): `=TRANSPOSE(FILTER(Master!$A$2:$A, Master!$A$2:$A<>""))`
+- **B2**, then **fill right** (to col AE = 30 santri buffer) and **down** to row 605:
 ```
-=IF(COUNTIFS(Log!$C:$C,"Ziyadah",Log!$D:$D,"<="&$A2,Log!$E:$E,">="&$A2)=0,"",
-    COUNTIFS(Log!$C:$C,"Muroja'ah",Log!$D:$D,"<="&$A2,Log!$E:$E,">="&$A2))
+=IF(COUNTIFS(Setoran!$B:$B,B$1, Setoran!$D:$D,"Ziyadah",   Setoran!$E:$E,"<="&$A2, Setoran!$F:$F,">="&$A2)=0, "",
+    COUNTIFS(Setoran!$B:$B,B$1, Setoran!$D:$D,"Muroja'ah", Setoran!$E:$E,"<="&$A2, Setoran!$F:$F,">="&$A2))
 ```
-A page is covered by a row when `hal_dari ≤ page ≤ hal_ke`. Overlapping Ziyadah → still one "memorized";
-Muroja'ah counts stack. *(Optional accuracy: if `surah`/`ayat` are filled, you can refine a partial page —
-but pages alone already drive progress; keep this as a later enhancement.)*
+Cell = **blank** (not memorized) · **0** (Ziyadah, 0 review) · **N** (reviewed N×). A page is covered when
+`hal_dari ≤ page ≤ hal_ke`. Overlapping Ziyadah → still memorized **once** (idempotent); Muroja'ah stacks.
 
 #### (3) `Ringkasan` tab — roll up to `juzct` + `curpg`
-Build a 30-row helper in **program order** (`PROGRAM_FULL`: 30,29,…,26,1,…,10,11,…,25). For each juz look
-up its range from `Quran`, then:
-- **memo** (pages memorized in the juz) — note `>=0` catches memorized incl. the "0" cells, blanks are `""`:
-  `=COUNTIFS(Grid!$A:$A,">="&hal_awal, Grid!$A:$A,"<="&hal_akhir, Grid!$B:$B,">=0")`
-- **full?** `=memo >= (hal_akhir-hal_awal+1)`
-- **`juzct`** = leading run of full juz: `=IFERROR(MATCH(FALSE, full_range, 0)-1, 30)`
-- **`curpg`** = furthest memorized page in the frontier juz (first not-full). With `fawal/fakhir` = that
-  juz's range: `=IFERROR(MAXIFS(Grid!$A:$A, Grid!$A:$A,">="&fawal, Grid!$A:$A,"<="&fakhir, Grid!$B:$B,">=0"), "")`
+A 30-row helper in **program order** + one column per santri, then two summary rows.
+- **A1:E1** = `urut juz awal akhir len`. **A2** `=SEQUENCE(30)`. **B2:B31** = paste `PROGRAM_FULL`
+  (`30,29,28,27,26,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25`).
+- **C2** `=VLOOKUP($B2,Quran!$A:$C,2,FALSE)` · **D2** `=VLOOKUP($B2,Quran!$A:$C,3,FALSE)` · **E2** `=D2-C2+1` (fill down).
+- **F1** `=TRANSPOSE(FILTER(Master!$A$2:$A,Master!$A$2:$A<>""))` — santri ids.
+- **F2** (pages memorized in that juz, per santri) — fill right + down to row 31:
+```
+=COUNTIFS(Grid!$A$2:$A$605,">="&$C2, Grid!$A$2:$A$605,"<="&$D2,
+          INDEX(Grid!$B$2:$AE$605,0,MATCH(F$1,Grid!$B$1:$AE$1,0)),">=0")
+```
+- **F33 `juzct`** (leading run of full juz): `=IFERROR(MATCH(FALSE, ARRAYFORMULA(F2:F31>=$E2:$E31), 0)-1, 30)`
+- **F34 `curpg`** (furthest page in the frontier juz):
+```
+=IF(F33>=30,"", LET(fr, INDEX($B$2:$B$31, F33+1),
+   a, VLOOKUP(fr,Quran!$A:$C,2,FALSE), b, VLOOKUP(fr,Quran!$A:$C,3,FALSE),
+   IFERROR(MAXIFS(Grid!$A$2:$A$605, INDEX(Grid!$B$2:$AE$605,0,MATCH(F$1,Grid!$B$1:$AE$1,0)),">=0",
+     Grid!$A$2:$A$605,">="&a, Grid!$A$2:$A$605,"<="&b), "")))
+```
+(fill F33:F34 right for all santri). `>=0` counts memorized cells incl. the "0" (blanks are `""`, excluded).
 
 #### (4) Feed `Master`
-Point `Master!` `juzct` (col N) and `curpg` (col O) at the `Ringkasan` values for each santri (one
-`Ringkasan` row per student, mirrored via `IMPORTRANGE`, or `juzct`/`curpg` computed straight into
-`Master` if you keep everything in one file). The app reads `juzct`/`curpg` → the ring, %, "N/15 Juz",
-and roadmap juz all update automatically. No `PROGRAM_FULL` logic to maintain in the sheet beyond the
-program-order list — the app already owns the ring math.
+`Master!` `juzct` (col N) and `curpg` (col O), per santri row:
+```
+N2 =INDEX(Ringkasan!$F$33:$AZ$33, MATCH(A2, Ringkasan!$F$1:$AZ$1, 0))
+O2 =INDEX(Ringkasan!$F$34:$AZ$34, MATCH(A2, Ringkasan!$F$1:$AZ$1, 0))
+```
+The app reads `juzct`/`curpg` → the ring, %, "N/15 Juz", and the roadmap frontier juz all update
+automatically on each setoran. The app owns the ring math; the sheet only supplies these two numbers.
 
-> **Scale:** ~30 santri → keep the 604-cell `Grid` in a **per-student file** so each recomputes
-> independently (fast, parallel). One giant file with 30×604 cells recalcs as a single unit.
+> **Scale:** ~30 santri in one file = 604×30 `Grid` + 30×30 `Ringkasan` COUNTIFS cells — fine for Google.
+> Past ~60 santri, split the `Grid` into per-student files (each recalcs independently) and mirror their
+> `juzct`/`curpg` into the central `Master`.
 
 ---
 
