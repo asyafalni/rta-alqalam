@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+<!-- Clerk (client-side auth). Publishable key is public by design. -->
+<script async crossorigin="anonymous"
+  data-clerk-publishable-key="pk_test_YnVzeS1zZXJ2YWwtMjUuY2xlcmsuYWNjb3VudHMuZGV2JA"
+  src="https://busy-serval-25.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Marcellus&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+  body{margin:0;background:#f6efe0;font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;color:#26302a}
+  a{color:#0c6240;text-decoration:none}
+  a:hover{color:#08321f}
+  input,select,textarea,button{font-family:inherit}
+  input:focus,select:focus,textarea:focus{border-color:#c6a052!important;outline:none}
+  ::selection{background:#c6a052;color:#093526}
+  .arb{font-family:'Amiri',serif}
+  .disp{font-family:'Marcellus',serif;font-weight:400}
+  .book-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:760px){.book-grid{grid-template-columns:repeat(2,1fr);gap:14px}}
+  @media(max-width:460px){.book-grid{grid-template-columns:1fr;gap:12px}}
+  /* slide-over sheet: bottom sheet on mobile, right drawer on desktop */
+  .sheet-backdrop{position:fixed;inset:0;z-index:70;background:rgba(6,28,18,.5);backdrop-filter:blur(2px);animation:dcFade .2s ease}
+  .sheet{position:fixed;z-index:71;background:#f6efe0;box-shadow:0 -12px 44px rgba(0,0,0,.28);display:flex;flex-direction:column;overflow:hidden;left:0;right:0;bottom:0;height:90vh;border-radius:20px 20px 0 0;animation:dcUp .3s cubic-bezier(.2,.8,.2,1)}
+  @media(min-width:640px){.sheet{top:0;bottom:0;right:0;left:auto;height:100%;width:min(500px,100%);border-radius:0;animation:dcRight .3s cubic-bezier(.2,.8,.2,1)}}
+  @keyframes dcUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  @keyframes dcRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
+  @keyframes dcFade{from{opacity:0}to{opacity:1}}
+  @keyframes dcSpin{to{transform:rotate(360deg)}}
+  .dc-spin{animation:dcSpin .8s linear infinite}
+  /* report card (rapor) — printable */
+  .rapor-overlay{position:fixed;inset:0;z-index:80;background:#e9e3d4;display:flex;flex-direction:column;animation:dcFade .2s ease}
+  .rapor-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;background:#fff;border-bottom:1px solid #e6e1d5}
+  .rapor-scroll{flex:1;overflow:auto;padding:24px 14px 60px;display:flex;justify-content:center;align-items:flex-start}
+  .rapor-page{width:210mm;max-width:100%;min-height:auto;background:#fff;color:#16264d;padding:24mm 20mm;box-shadow:0 8px 30px rgba(0,0,0,.15);box-sizing:border-box}
+  .rapor-page .sig{page-break-inside:avoid;break-inside:avoid}
+  @media print{
+    body *{visibility:hidden!important}
+    .rapor-overlay,.rapor-overlay *{visibility:visible!important}
+    .rapor-overlay{position:absolute;background:#fff;display:block}
+    .rapor-toolbar,.no-print{display:none!important}
+    .rapor-scroll{overflow:visible;padding:0;display:block}
+    .rapor-page{width:auto;max-width:none;box-shadow:none;padding:0}
+    @page{size:A4;margin:14mm}
+  }
+  /* responsive staff-screen grids */
+  .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(min-width:700px){.stat-grid{grid-template-columns:repeat(4,1fr);gap:14px}}
+  .detail-grid{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}
+  @media(min-width:768px){.detail-grid{grid-template-columns:290px 1fr;gap:26px}}
+  .radar-grid{display:grid;grid-template-columns:1fr;gap:16px;align-items:center}
+  @media(min-width:520px){.radar-grid{grid-template-columns:150px 1fr;gap:20px}}
+  .juz-map{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+  @media(min-width:480px){.juz-map{grid-template-columns:repeat(10,1fr)}}
+  @media(min-width:720px){.juz-map{grid-template-columns:repeat(15,1fr)}}
+  .roster-head{display:none}
+  @media(min-width:760px){.roster-head{display:grid;grid-template-columns:1.15fr 1.55fr 92px 116px;gap:12px}}
+  .roster-row{display:grid;gap:9px 10px;align-items:center;grid-template-columns:1fr auto auto;grid-template-areas:'santri grade act' 'prog prog prog'}
+  .roster-row>.r-tier{grid-area:tier}
+  .roster-row>.r-santri{grid-area:santri;min-width:0}
+  .roster-row>.r-prog{grid-area:prog}
+  .roster-row>.r-grade{grid-area:grade}
+  .roster-row>.r-act{grid-area:act}
+  @media(min-width:760px){.roster-row{grid-template-columns:1.15fr 1.55fr 92px 116px;grid-template-areas:'santri prog grade act'}}
+</style>
+</helmet>
+
+<div style="min-height:100vh">
+
+  <!-- ============ LOGIN ============ -->
+  <sc-if value="{{ loginOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeLogin }}" style="position:fixed;inset:0;z-index:60;background:rgba(6,28,18,.6);backdrop-filter:blur(3px);display:grid;place-items:center;padding:20px">
+      <div onClick="{{ stopLogin }}" style="width:100%;max-width:400px;text-align:center;background:radial-gradient(120% 90% at 50% -10%,#0e5a3c 0%,#0a4631 55%,#063626 100%);border:1px solid rgba(198,160,82,.32);border-radius:20px;padding:24px 22px 20px;box-shadow:0 30px 70px rgba(0,0,0,.45);position:relative">
+        <button onClick="{{ closeLogin }}" title="Tutup" style="position:absolute;top:13px;right:13px;width:30px;height:30px;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#ecdfc2;cursor:pointer;display:grid;place-items:center;padding:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+        <img src="../assets/logo-rta.png" alt="RTA Al-Qalam" style="width:78px;height:auto;margin:2px auto 6px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.4))" />
+        <h1 class="disp" style="font-size:23px;color:#fbf3df;margin:2px 0 4px">Masuk Staff</h1>
+        <p style="font-size:12.5px;color:rgba(245,243,236,.6);margin:0 0 18px;line-height:1.5">Pilih peran untuk memantau &amp; input nilai santri.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;text-align:left">
+          <button onClick="{{ loginAdmin }}" style="display:flex;align-items:center;gap:13px;padding:13px 15px;border-radius:13px;border:1px solid rgba(232,194,74,.35);background:rgba(232,194,74,.08);color:#fff;cursor:pointer;transition:.15s" style-hover="background:rgba(232,194,74,.14)">
+            <span style="width:38px;height:38px;border-radius:10px;background:#0a4631;display:grid;place-items:center;font-weight:800;color:#e8c24a;flex:none">A</span>
+            <span style="flex:1"><span style="display:block;font-weight:700;font-size:14.5px">Admin</span><span style="font-size:11px;color:rgba(245,243,236,.55)">Akses penuh · akademik, hafalan &amp; semua halaqah</span></span>
+          </button>
+          <button onClick="{{ loginMudir }}" style="display:flex;align-items:center;gap:13px;padding:13px 15px;border-radius:13px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;cursor:pointer;transition:.15s" style-hover="background:rgba(255,255,255,.1)">
+            <span style="width:38px;height:38px;border-radius:10px;background:#cfa02c;display:grid;place-items:center;font-weight:800;color:#0a4631;flex:none">M</span>
+            <span style="flex:1"><span style="display:block;font-weight:700;font-size:14.5px">Mudir</span><span style="font-size:11px;color:rgba(245,243,236,.55)">Hafalan · semua halaqah &amp; input nilai</span></span>
+          </button>
+          <button onClick="{{ loginMusyrif }}" style="display:flex;align-items:center;gap:13px;padding:13px 15px;border-radius:13px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;cursor:pointer;transition:.15s" style-hover="background:rgba(255,255,255,.1)">
+            <span style="width:38px;height:38px;border-radius:10px;background:#2f8f3a;display:grid;place-items:center;font-weight:800;color:#fff;flex:none">Mu</span>
+            <span style="flex:1"><span style="display:block;font-weight:700;font-size:14.5px">Musyrif</span><span style="font-size:11px;color:rgba(245,243,236,.55)">Semua halaqah · pantau &amp; setor hafalan</span></span>
+          </button>
+        </div>
+        <p style="font-size:10.5px;color:rgba(245,243,236,.4);margin-top:15px;line-height:1.6">Prototipe · login demo (nanti diganti Clerk).</p>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ RAPOR (printable report card) ============ -->
+  <sc-if value="{{ raporOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="rapor-overlay">
+      <div class="rapor-toolbar no-print">
+        <button onClick="{{ closeRapor }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">← Tutup</button>
+        <div style="display:flex;align-items:center;gap:8px;min-width:0">
+          <span style="font-weight:700;color:#0a4631;font-size:13px;flex:none">Rapor · Semester</span>
+          <select value="{{ termId }}" onChange="{{ setTerm }}" style="max-width:100%;padding:8px 10px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;color:#16264d;font-size:12.5px;font-weight:600;cursor:pointer;outline:none">
+            <sc-for list="{{ terms }}" as="t" hint-placeholder-count="3"><option value="{{ t.id }}">{{ t.label }}</option></sc-for>
+          </select>
+        </div>
+        <button onClick="{{ printRapor }}" style="padding:9px 18px;border-radius:9px;border:none;background:#0a4631;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;flex:none">Cetak / Simpan PDF</button>
+      </div>
+      <div class="rapor-scroll">
+        <div class="rapor-page">
+          <div style="text-align:center;border-bottom:3px double #0a4631;padding-bottom:14px;margin-bottom:18px">
+            <img src="../assets/logo-rta.png" alt="RTA Al-Qalam" style="height:54px;margin:0 auto 6px;display:block" />
+            <div class="arb" style="font-size:16px;color:#0a4631">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+            <div class="disp" style="font-size:22px;color:#0a4631;margin-top:6px">Laporan Hasil Belajar Santri</div>
+            <div style="font-size:12px;color:#6b7280">Rumah Tahfidz Al-Qur’an Al-Qalam · Darul Huffadz</div>
+            <div style="font-size:12.5px;color:#8a6d1e;font-weight:700;margin-top:3px">{{ term }}</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 24px;font-size:12.5px;margin-bottom:20px">
+            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Nama</span><span style="font-weight:700">: {{ sel.name }}</span></div>
+            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">NIS</span><span style="font-weight:700">: {{ selNis }}</span></div>
+            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Kelas</span><span style="font-weight:700">: {{ sel.kelas }}</span></div>
+            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Peringkat</span><span style="font-weight:700">: {{ selRankLabel }}</span></div>
+            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Halaqah</span><span style="font-weight:700">: {{ sel.halaqahName }}</span></div>
+            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Musyrif</span><span style="font-weight:700">: {{ sel.musyrif }}</span></div>
+            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Asal</span><span style="font-weight:700">: {{ sel.kota }}, {{ sel.prov }}</span></div>
+            <div style="display:flex;gap:6px"><span style="width:78px;color:#6b7280;flex:none">Mudir</span><span style="font-weight:700">: {{ sel.mudir }}</span></div>
+          </div>
+          <div style="font-weight:800;font-size:13px;color:#0a4631;margin-bottom:6px">A. Bidang Tahfidz &amp; Diniyah</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px">
+            <thead><tr style="background:#eef4ee"><th style="text-align:left;padding:7px 10px;border:1px solid #d8e3d8">Aspek Penilaian</th><th style="width:64px;padding:7px 10px;border:1px solid #d8e3d8">Nilai</th><th style="width:130px;padding:7px 10px;border:1px solid #d8e3d8">Predikat</th></tr></thead>
+            <tbody><sc-for list="{{ raporDiniyah }}" as="p" hint-placeholder-count="5">
+              <tr><td style="padding:7px 10px;border:1px solid #e6e1d5">{{ p.label }}</td><td style="text-align:center;font-weight:700;padding:7px 10px;border:1px solid #e6e1d5">{{ p.score }}</td><td style="text-align:center;font-weight:700;color:{{ p.color }};padding:7px 10px;border:1px solid #e6e1d5">{{ p.pname }}</td></tr>
+            </sc-for></tbody>
+          </table>
+          <div style="font-weight:800;font-size:13px;color:#0a4631;margin-bottom:6px">B. Bidang Umum</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px">
+            <thead><tr style="background:#eef4ee"><th style="text-align:left;padding:7px 10px;border:1px solid #d8e3d8">Mata Pelajaran</th><th style="width:64px;padding:7px 10px;border:1px solid #d8e3d8">Nilai</th><th style="width:130px;padding:7px 10px;border:1px solid #d8e3d8">Predikat</th></tr></thead>
+            <tbody><sc-for list="{{ raporAkademik }}" as="p" hint-placeholder-count="2">
+              <tr><td style="padding:7px 10px;border:1px solid #e6e1d5">{{ p.label }}</td><td style="text-align:center;font-weight:700;padding:7px 10px;border:1px solid #e6e1d5">{{ p.score }}</td><td style="text-align:center;font-weight:700;color:{{ p.color }};padding:7px 10px;border:1px solid #e6e1d5">{{ p.pname }}</td></tr>
+            </sc-for></tbody>
+          </table>
+          <sc-if value="{{ hasEkskul }}" hint-placeholder-val="{{ true }}">
+          <div style="font-weight:800;font-size:13px;color:#0a4631;margin-bottom:6px">C. Bidang Ekstrakurikuler</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px">
+            <thead><tr style="background:#eef4ee"><th style="text-align:left;padding:7px 10px;border:1px solid #d8e3d8">Mata Pelajaran</th><th style="width:64px;padding:7px 10px;border:1px solid #d8e3d8">Nilai</th><th style="width:130px;padding:7px 10px;border:1px solid #d8e3d8">Predikat</th></tr></thead>
+            <tbody><sc-for list="{{ raporEkskul }}" as="p" hint-placeholder-count="2">
+              <tr><td style="padding:7px 10px;border:1px solid #e6e1d5">{{ p.label }}</td><td style="text-align:center;font-weight:700;padding:7px 10px;border:1px solid #e6e1d5">{{ p.score }}</td><td style="text-align:center;font-weight:700;color:{{ p.color }};padding:7px 10px;border:1px solid #e6e1d5">{{ p.pname }}</td></tr>
+            </sc-for></tbody>
+          </table>
+          </sc-if>
+          <div style="background:#fbf7ea;border:1px solid #ecdfae;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12.5px;line-height:1.6"><span style="font-weight:800;color:#8a6d1e">Capaian Hafalan:</span> {{ raporHafalanNote }} · Predikat umum: <b>{{ sel.gName }}</b></div>
+          <sc-if value="{{ hasAttendance }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px">
+            <span style="font-weight:800;font-size:13px;color:#0a4631">Kehadiran</span>
+            <span style="font-size:12px;color:#6b7280">Skor Kehadiran: <b style="font-size:15px;color:#1f7a34">{{ kehScore }}</b> · Hadir {{ attHadir }} dari {{ attTotal }} hari efektif</span>
+          </div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px">
+            <thead><tr style="background:#eef4ee"><th style="padding:7px 10px;border:1px solid #d8e3d8">Hadir</th><th style="padding:7px 10px;border:1px solid #d8e3d8">Sakit</th><th style="padding:7px 10px;border:1px solid #d8e3d8">Izin</th><th style="padding:7px 10px;border:1px solid #d8e3d8">Alpa</th><th style="padding:7px 10px;border:1px solid #d8e3d8">Hari Efektif</th></tr></thead>
+            <tbody><tr>
+              <td style="text-align:center;font-weight:700;color:#1f7a34;padding:7px 10px;border:1px solid #e6e1d5">{{ attHadir }}</td>
+              <td style="text-align:center;font-weight:700;padding:7px 10px;border:1px solid #e6e1d5">{{ attSakit }}</td>
+              <td style="text-align:center;font-weight:700;padding:7px 10px;border:1px solid #e6e1d5">{{ attIzin }}</td>
+              <td style="text-align:center;font-weight:700;color:#b4483a;padding:7px 10px;border:1px solid #e6e1d5">{{ attAlpa }}</td>
+              <td style="text-align:center;font-weight:700;padding:7px 10px;border:1px solid #e6e1d5">{{ attTotal }}</td>
+            </tr></tbody>
+          </table>
+          <sc-if value="{{ hasAttNotes }}" hint-placeholder-val="{{ true }}">
+            <div style="font-weight:700;font-size:12px;color:#0a4631;margin:-8px 0 5px">Keterangan Ketidakhadiran</div>
+            <div style="border:1px solid #e6e1d5;border-radius:8px;padding:8px 12px;margin-bottom:18px;font-size:11.5px">
+              <sc-for list="{{ attNotes }}" as="a" hint-placeholder-count="2">
+                <div style="display:flex;flex-wrap:wrap;gap:4px 10px;padding:3px 0"><span style="flex:none;font-weight:800;color:{{ a.color }};min-width:44px">{{ a.label }}</span><span style="flex:none;color:#9aa1ad;min-width:110px">{{ a.tgl }}{{ a.waktu }}</span><span style="color:#333">{{ a.reason }}</span></div>
+              </sc-for>
+            </div>
+          </sc-if>
+          </sc-if>
+          <div style="font-weight:800;font-size:13px;color:#0a4631;margin-bottom:4px">Catatan Musyrif &amp; Mudir</div>
+          <p style="font-size:12.5px;line-height:1.6;color:#333;border:1px solid #e6e1d5;border-radius:8px;padding:12px 14px;min-height:52px;margin:0 0 26px">{{ raporNote }}</p>
+          <div class="sig" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;text-align:center;font-size:12px">
+            <div><div style="color:#6b7280">Orang Tua / Wali</div><div style="height:54px"></div><div style="border-top:1px solid #333;padding-top:5px">(............................)</div></div>
+            <div><div style="color:#6b7280">Musyrif</div><div style="height:54px"></div><div style="border-top:1px solid #333;padding-top:5px;font-weight:700">{{ sel.musyrif }}</div></div>
+            <div><div style="color:#6b7280">Mudir</div><div style="height:54px"></div><div style="border-top:1px solid #333;padding-top:5px;font-weight:700">{{ sel.mudir }}</div></div>
+          </div>
+          <div style="text-align:right;font-size:11.5px;color:#6b7280;margin-top:12px">Bekasi, ....................... 20....</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ APP SHELL (non-login) ============ -->
+  <sc-if value="{{ role }}" hint-placeholder-val="mudir">
+  <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}"></sc-if>
+  <div style="display:none"></div>
+  </sc-if>
+
+  <!-- NAV BAR shown for all non-login views -->
+  <sc-if value="{{ isGallery }}" hint-placeholder-val="{{ true }}"><dc-import name="__navmarker" hint-size="0,0"></dc-import></sc-if>
+
+  <!-- We render nav inline within each screen wrapper below -->
+
+  <!-- ============ GALLERY ============ -->
+  <sc-if value="{{ isGallery }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:1180px;margin:0 auto;padding:0 20px 60px">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;padding:16px 0 14px">
+        <img src="../assets/logo-rta.png" style="height:44px;width:auto" />
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:800;font-size:16px;line-height:1.1">RTA Al-Qalam — Progres Santri</div>
+          <div style="font-size:12px;color:#6b7280">Angkatan I · Tahun Ajaran 2026/2027</div>
+        </div>
+        <sc-if value="{{ isStaff }}" hint-placeholder-val="{{ false }}">
+          <span style="font-size:12.5px;color:#6b7280;font-weight:600;white-space:nowrap">{{ greeting }}</span>
+          <button onClick="{{ goDashboard }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Dashboard</button>
+          <button onClick="{{ logout }}" title="Keluar" style="width:36px;height:34px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;cursor:pointer;display:grid;place-items:center;padding:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+        </sc-if>
+        <sc-if value="{{ isPublic }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ goLogin }}" title="Masuk Staff" style="width:40px;height:36px;border-radius:999px;border:none;background:#0a4631;color:#fff;cursor:pointer;display:grid;place-items:center;padding:0"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></button>
+        </sc-if>
+      </div>
+
+      <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:22px">
+        <input value="{{ search }}" onInput="{{ onSearch }}" placeholder="Cari nama atau kota…" style="flex:1;min-width:180px;padding:10px 13px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13.5px;outline:none;color:#16264d" />
+        <div style="position:relative;flex:none">
+          <button onClick="{{ toggleFilter }}" style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-size:13px;font-weight:600;cursor:pointer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0a4631" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            <span>{{ filterLabel }}</span>
+            <span style="flex:none;min-width:18px;text-align:center;font-size:10.5px;font-weight:800;color:#0a4631;background:#eef4ee;border:1px solid #cfe3d0;padding:1px 6px;border-radius:999px">{{ filterCount }}</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9aa1ad" stroke-width="2.6" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <sc-if value="{{ filterOpen }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ closeFilter }}" style="position:fixed;inset:0;z-index:40"></div>
+            <div style="position:absolute;top:46px;left:0;z-index:41;min-width:236px;background:#fff;border:1px solid #e6e1d5;border-radius:14px;box-shadow:0 14px 34px rgba(20,30,60,.16);padding:12px;animation:dcFade .12s ease">
+              <button onClick="{{ allChip.onPick }}" style="width:100%;padding:9px 11px;border-radius:9px;border:1px solid {{ allChip.bd }};background:{{ allChip.bg }};color:{{ allChip.fg }};font-size:13px;font-weight:700;cursor:pointer;text-align:left">Semua Santri</button>
+              <div style="font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#9aa1ad;margin:13px 4px 7px">Kelas</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <sc-for list="{{ kelasChips }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.onPick }}" style="padding:6px 13px;border-radius:999px;border:1px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-size:12.5px;font-weight:700;cursor:pointer">{{ c.label }}</button></sc-for>
+              </div>
+              <div style="font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#9aa1ad;margin:13px 4px 7px">Halaqah</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <sc-for list="{{ halChips }}" as="c" hint-placeholder-count="2"><button onClick="{{ c.onPick }}" style="padding:6px 13px;border-radius:999px;border:1px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-size:12.5px;font-weight:700;cursor:pointer">{{ c.label }}</button></sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+        <sc-if value="{{ filterActive }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ resetFilter }}" title="Reset filter" style="flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:10px;border:1px solid #e6e1d5;background:#fff;color:#16264d;cursor:pointer;padding:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </sc-if>
+      </div>
+
+      <div style="background:linear-gradient(135deg,#fbfaf6,#f3f7f2);border:1px solid #e6e1d5;border-radius:14px;padding:15px 18px 16px;margin-bottom:22px">
+        <div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;margin-bottom:13px">
+          <span style="font-weight:800;font-size:13.5px;color:#0a4631">Alur Hafalan Program</span>
+          <span style="font-size:11.5px;color:#9aa1ad">Target 15 juz dalam 3 tahun · lanjut bonus Juz 11–25</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:14px 20px;align-items:flex-start">
+          <sc-for list="{{ roadmapGroups }}" as="g" hint-placeholder-count="4">
+            <div>
+              <div style="{{ g.labelStyle }}">{{ g.label }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:5px">
+                <sc-for list="{{ g.chips }}" as="c" hint-placeholder-count="5"><span style="{{ c.style }}">{{ c.j }}</span></sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <sc-if value="{{ galleryEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;padding:64px 20px">
+          <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ true }}">
+            <div class="dc-spin" style="width:40px;height:40px;margin:0 auto 14px;border-radius:50%;border:3px solid #e6e1d5;border-top-color:#0a4631"></div>
+          </sc-if>
+          <div style="font-size:15px;font-weight:700;color:#0a4631;margin-bottom:6px">{{ listMsg }}</div>
+          <div style="font-size:12.5px;color:#9aa1ad;max-width:340px;margin:0 auto">{{ listSub }}</div>
+        </div>
+      </sc-if>
+      <div class="book-grid">
+        <sc-for list="{{ gallery }}" as="s" hint-placeholder-count="8">
+          <div onClick="{{ s.onOpen }}" style="background:#fffdf7;border:1px solid #ece3cf;border-top:4px solid {{ s.hafAccent }};border-radius:18px;padding:16px 14px 18px;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 6px 20px rgba(120,95,30,.08);position:relative;display:flex;flex-direction:column;align-items:center;text-align:center" style-hover="transform:translateY(-5px);box-shadow:0 16px 32px rgba(120,95,30,.17)">
+            <sc-if value="{{ s.isMumtaz }}" hint-placeholder-val="{{ false }}">
+              <div title="Mumtaz" style="position:absolute;top:11px;right:11px;display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:800;color:#8a6d1e;background:#f5ecd3;border:1px solid #e6d3a0;padding:2px 7px;border-radius:999px">★ Mumtaz</div>
+            </sc-if>
+            <img src="../assets/quran-icon.png" alt="Al-Qur'an" style="width:74px;height:auto;margin:2px auto 0;display:block" />
+            <div style="position:relative;width:92px;height:92px;margin-top:10px;border-radius:50%;background:{{ s.ringStyle }};display:grid;place-items:center">
+              <div style="width:72px;height:72px;border-radius:50%;background:#fbf7ea;border:1px solid #ecdcae;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1">
+                <span style="font-size:8.5px;font-weight:700;letter-spacing:.08em;color:#b7a77f;text-transform:uppercase">Juz</span>
+                <span class="arb" dir="rtl" style="font-size:23px;font-weight:700;color:#0a4631">{{ s.ringNum }}</span>
+              </div>
+            </div>
+            <div class="disp" style="font-size:17px;color:#0a4631;line-height:1.2;margin-top:11px">{{ s.name }}</div>
+            <div style="font-size:11.5px;color:#9a8c6a;margin-top:3px">{{ s.kota }} · Kelas {{ s.kelas }}</div>
+            <div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#8a7f66;margin-top:5px"><span style="width:7px;height:7px;border-radius:50%;background:{{ s.halDot }};flex:none"></span>{{ s.halaqahShow }}</div>
+            <div style="width:100%;margin-top:13px;display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #f0e8d4;padding-top:11px">
+              <span style="font-size:12.5px;font-weight:700;color:#0a4631">{{ s.juzLine }}</span>
+              <span style="font-size:13px;font-weight:800;color:{{ s.hafPctColor }}">{{ s.hafPctText }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ galleryHasItems }}" hint-placeholder-val="{{ true }}">
+        <p style="text-align:center;color:#9aa1ad;font-size:12px;margin-top:26px">{{ galleryCount }} santri · klik kartu untuk profil lengkap</p>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- ============ DETAIL ============ -->
+  <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+    <sc-if value="{{ sel }}" hint-placeholder-val="{{ true }}">
+    <div style="max-width:1000px;margin:0 auto;padding:16px 20px 60px">
+      <button onClick="{{ back }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer;margin-bottom:18px">← Kembali</button>
+      <div class="detail-grid">
+        <!-- hero card -->
+        <div style="background:radial-gradient(120% 90% at 50% -10%,#0e5a3c 0%,#0a4631 55%,#063626 100%);border-radius:18px;padding:24px 22px;color:#f5f3ec;text-align:center;box-shadow:0 14px 32px rgba(10,50,30,.32)">
+          <div style="width:104px;height:104px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;font-size:34px;font-weight:800;background:rgba(255,255,255,.07);border:3px solid {{ sel.gColor }};color:#fff">{{ sel.initials }}</div>
+          <div style="font-size:19px;font-weight:800">{{ sel.name }}</div>
+          <div style="font-size:12.5px;color:rgba(245,243,236,.6);margin-top:3px">{{ sel.kota }} · {{ sel.prov }}</div>
+          <div style="display:flex;justify-content:center;gap:8px;margin-top:16px">
+            <div style="background:rgba(255,255,255,.06);border-radius:11px;padding:10px 4px;flex:1">
+              <div style="font-size:26px;font-weight:800;color:{{ sel.gColor }};line-height:1">{{ sel.gLetter }}</div>
+              <div style="font-size:9.5px;color:rgba(245,243,236,.6);margin-top:3px;font-weight:600">{{ sel.gName }}</div>
+            </div>
+            <div style="background:rgba(255,255,255,.06);border-radius:11px;padding:10px 4px;flex:1">
+              <div style="font-size:26px;font-weight:800;color:#e8c24a;line-height:1">{{ sel.juz }}</div>
+              <div style="font-size:9.5px;color:rgba(245,243,236,.6);margin-top:3px;font-weight:600">dari 15 Juz</div>
+            </div>
+          </div>
+          <div style="margin-top:16px;text-align:left;font-size:11.5px;color:rgba(245,243,236,.55);line-height:1.7">
+            <div style="display:flex;justify-content:space-between;gap:12px"><span>Kelas</span><span style="color:#f5f3ec;font-weight:600;text-align:right">Kelas {{ sel.kelas }}</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span>Halaqah</span><span style="color:#f5f3ec;font-weight:600;text-align:right">{{ sel.halaqahName }}</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span>Musyrif</span><span style="color:#f5f3ec;font-weight:600;text-align:right">{{ sel.musyrif }}</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span>Mudir</span><span style="color:#f5f3ec;font-weight:600;text-align:right">{{ sel.mudir }}</span></div>
+          </div>
+        </div>
+        <!-- right column -->
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:20px 22px">
+            <div style="font-weight:800;font-size:14px;margin-bottom:16px">Profil Kemampuan</div>
+            <div class="radar-grid">
+              <div style="aspect-ratio:1;max-width:170px">{{ selRadar }}</div>
+              <div style="display:flex;flex-direction:column;gap:11px">
+                <sc-for list="{{ sel.pillars }}" as="p" hint-placeholder-count="6">
+                  <div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="font-weight:600;color:#16264d">{{ p.label }}</span><span style="font-weight:800;color:{{ p.color }}">{{ p.tag }}</span></div>
+                    <div style="height:7px;border-radius:6px;background:#eef0f4;overflow:hidden"><div style="height:100%;width:{{ p.pct }}%;background:{{ p.color }};border-radius:6px"></div></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:20px 22px">
+            <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin-bottom:14px"><span style="font-weight:800;font-size:14px;margin-right:auto">Peta Hafalan — 30 Juz</span><span style="font-size:12px;color:#6b7280">{{ sel.juz }}/15 juz target · {{ sel.juzPct }}%</span><sc-if value="{{ sel.overTarget }}" hint-placeholder-val="{{ true }}"><span style="font-size:10px;font-weight:800;color:#8a6d1e;background:#fbf5e4;border:1px solid #ecdcae;padding:1px 7px;border-radius:999px">Melampaui target</span></sc-if></div>
+            <sc-if value="{{ sel.hasPage }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-bottom:14px;padding:11px 13px;background:#f7f6f2;border:1px solid #ece3cf;border-radius:11px;font-size:12px;color:#16264d">
+                <span style="font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9aa1ad">Posisi saat ini</span>
+                <span style="color:#c9cdd4">·</span>
+                <span style="font-weight:800;color:#0a4631">Halaman {{ sel.curpg }}<span style="color:#9aa1ad;font-weight:600">/604</span></span>
+                <span style="color:#c9cdd4">·</span>
+                <span>Sedang di Juz {{ sel.curJuz }}</span>
+              </div>
+            </sc-if>
+            <div class="juz-map">
+              <sc-for list="{{ selJuz }}" as="j" hint-placeholder-count="30">
+                <div style="aspect-ratio:1;border-radius:7px;border:1px solid;display:grid;place-items:center;font-size:10.5px;font-weight:700;{{ j.style }}">{{ j.n }}</div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:16px;margin-top:14px;font-size:11px;color:#6b7280">
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#2f8f3a"></span>Selesai</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;border:2px solid #cfa02c"></span>Sedang berjalan</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;border:1px solid #e6e1d5"></span>Belum</span>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:20px 22px">
+            <div style="font-weight:800;font-size:14px;margin-bottom:6px">Riwayat Nilai & Ujian</div>
+            <sc-if value="{{ hasNilai }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column">
+                <sc-for list="{{ selNilai }}" as="n" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid #f0ede4">
+                    <span style="flex:none;font-size:9.5px;font-weight:800;color:#0a4631;background:#eef4ee;border:1px solid #cfe3d0;padding:2px 8px;border-radius:6px">{{ n.bidang }}</span>
+                    <div style="flex:1;min-width:130px"><div style="font-weight:700;font-size:13px;color:#16264d">{{ n.mapel }}</div><div style="font-size:11px;color:#9aa1ad">{{ n.jenis }} · {{ n.tgl }}</div></div>
+                    <div style="text-align:right;white-space:nowrap"><span style="font-size:15px;font-weight:800;color:{{ n.pcolor }}">{{ n.nilai }}</span> <span style="font-size:10.5px;font-weight:700;color:{{ n.pcolor }}">{{ n.pred }}</span></div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noNilai }}" hint-placeholder-val="{{ false }}">
+              <p style="font-size:12.5px;color:#9aa1ad;margin:6px 0 0">Belum ada nilai atau ujian yang tercatat.</p>
+            </sc-if>
+          </div>
+          <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;padding:20px 22px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><span style="font-weight:800;font-size:14px">Riwayat Setoran Harian</span><span style="font-size:11px;color:#9aa1ad">{{ setoranTotal }} tercatat · 10 terbaru</span></div>
+            <sc-if value="{{ hasSetoran }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+                <span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:#2f8f3a;background:#eef7ef;border:1px solid #cfe6d1;padding:4px 10px;border-radius:999px"><span style="width:8px;height:8px;border-radius:50%;background:#2f8f3a"></span>Ziyadah {{ setoranZi }}</span>
+                <span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:#a07d1e;background:#fbf5e4;border:1px solid #ecdcae;padding:4px 10px;border-radius:999px"><span style="width:8px;height:8px;border-radius:50%;background:#cfa02c"></span>Muroja'ah {{ setoranMu }}</span>
+                <span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:#33608f;background:#eef3fa;border:1px solid #cddcef;padding:4px 10px;border-radius:999px"><span style="width:8px;height:8px;border-radius:50%;background:#3f6fa8"></span>Tahsin {{ setoranTa }}</span>
+              </div>
+              <div style="display:flex;flex-direction:column">
+                <sc-for list="{{ selSetoran }}" as="r" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid #f0ede4">
+                    <span style="flex:none;font-size:9.5px;font-weight:800;color:#fff;background:{{ r.jcolor }};padding:2px 8px;border-radius:6px">{{ r.jenis }}</span>
+                    <div style="flex:1;min-width:130px"><div style="font-weight:700;font-size:13px;color:#16264d">Juz {{ r.juz }} · {{ r.halRef }}{{ r.ayahRef }}</div><div style="font-size:11px;color:#9aa1ad">{{ r.tgl }} <span style="color:#e0a92c;letter-spacing:1px;font-size:12px">{{ r.stars }}</span></div></div>
+                    <div style="flex:1;min-width:120px;font-size:11.5px;color:#6b7280;text-align:right">{{ r.catatan }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noSetoran }}" hint-placeholder-val="{{ false }}">
+              <p style="font-size:12.5px;color:#9aa1ad;margin:6px 0 0">Belum ada setoran harian yang tercatat.</p>
+            </sc-if>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <sc-if value="{{ canManage }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ sel.onEntry }}" style="padding:11px 20px;border-radius:10px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:13px;cursor:pointer">+ Input</button>
+            </sc-if>
+            <sc-if value="{{ canRapor }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ openRapor }}" style="padding:11px 20px;border-radius:10px;border:1px solid #cfa02c;background:#fbf7ea;color:#8a6d1e;font-weight:700;font-size:13px;cursor:pointer">Cetak Rapor</button>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+  </sc-if>
+
+  <!-- ============ DASHBOARD ============ -->
+  <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:1120px;margin:0 auto;padding:16px 20px 60px">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;padding:0 0 20px">
+        <img src="../assets/logo-rta.png" style="height:44px;width:auto" />
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:800;font-size:16px;line-height:1.1">Dashboard {{ roleLabel }}</div>
+          <div style="font-size:12px;color:#6b7280">Pemantauan hafalan &amp; nilai · Angkatan I</div>
+        </div>
+        <span style="font-size:12.5px;color:#6b7280;font-weight:600;white-space:nowrap;margin-right:2px">{{ greeting }}</span>
+        <button onClick="{{ goGallery }}" style="padding:8px 14px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer">Progres Santri</button>
+        <button onClick="{{ goEntry }}" style="padding:8px 14px;border-radius:9px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer">+ Input</button>
+        <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ openKeh }}" style="display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:9px;border:1px solid #0a4631;background:#eef4ee;color:#0a4631;font-weight:700;font-size:12.5px;cursor:pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="m9 16 2 2 4-4"/></svg>Absensi</button>
+        </sc-if>
+        <button onClick="{{ goConfig }}" title="Konfigurasi" style="width:36px;height:34px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#0a4631;cursor:pointer;display:grid;place-items:center;padding:0">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+        </button>
+        <button onClick="{{ logout }}" title="Keluar" style="width:36px;height:34px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;cursor:pointer;display:grid;place-items:center;padding:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+      </div>
+
+      <div class="stat-grid" style="margin-bottom:22px">
+        <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:16px 18px"><div style="font-size:12px;color:#6b7280;font-weight:600">Total Santri</div><div style="font-size:28px;font-weight:800;margin-top:4px">{{ rosterCount }}</div></div>
+        <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:16px 18px"><div style="font-size:12px;color:#6b7280;font-weight:600">Total Juz Terhafal</div><div style="font-size:28px;font-weight:800;margin-top:4px;color:#2f8f3a">{{ totalJuz }}</div></div>
+        <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:16px 18px"><div style="font-size:12px;color:#6b7280;font-weight:600">Rata-rata Juz</div><div style="font-size:28px;font-weight:800;margin-top:4px">{{ avgJuz }}</div></div>
+        <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:16px 18px"><div style="font-size:12px;color:#6b7280;font-weight:600">Predikat Mumtaz</div><div style="font-size:28px;font-weight:800;margin-top:4px;color:#cfa02c">{{ mumtazCount }}</div></div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="position:relative">
+          <button onClick="{{ toggleFilter }}" style="display:flex;align-items:center;gap:8px;padding:9px 13px;border-radius:10px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-size:13px;font-weight:600;cursor:pointer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0a4631" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            <span>{{ filterLabel }}</span>
+            <span style="flex:none;min-width:18px;text-align:center;font-size:10.5px;font-weight:800;color:#0a4631;background:#eef4ee;border:1px solid #cfe3d0;padding:1px 6px;border-radius:999px">{{ filterCount }}</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9aa1ad" stroke-width="2.6" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <sc-if value="{{ filterOpen }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ closeFilter }}" style="position:fixed;inset:0;z-index:40"></div>
+            <div style="position:absolute;top:46px;left:0;z-index:41;min-width:236px;background:#fff;border:1px solid #e6e1d5;border-radius:14px;box-shadow:0 14px 34px rgba(20,30,60,.16);padding:12px;animation:dcFade .12s ease">
+              <button onClick="{{ allChip.onPick }}" style="width:100%;padding:9px 11px;border-radius:9px;border:1px solid {{ allChip.bd }};background:{{ allChip.bg }};color:{{ allChip.fg }};font-size:13px;font-weight:700;cursor:pointer;text-align:left">Semua Santri</button>
+              <div style="font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#9aa1ad;margin:13px 4px 7px">Kelas</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <sc-for list="{{ kelasChips }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.onPick }}" style="padding:6px 13px;border-radius:999px;border:1px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-size:12.5px;font-weight:700;cursor:pointer">{{ c.label }}</button></sc-for>
+              </div>
+              <div style="font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#9aa1ad;margin:13px 4px 7px">Halaqah</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <sc-for list="{{ halChips }}" as="c" hint-placeholder-count="2"><button onClick="{{ c.onPick }}" style="padding:6px 13px;border-radius:999px;border:1px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-size:12.5px;font-weight:700;cursor:pointer">{{ c.label }}</button></sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+        <sc-if value="{{ filterActive }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ resetFilter }}" title="Reset filter" style="flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;border:1px solid #e6e1d5;background:#fff;color:#16264d;cursor:pointer;padding:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </sc-if>
+      </div>
+      <div style="background:#fff;border:1px solid #e6e1d5;border-radius:16px;overflow:hidden">
+        <sc-if value="{{ rosterHasItems }}" hint-placeholder-val="{{ true }}">
+        <div class="roster-head" style="padding:13px 18px;background:#f7f6f2;border-bottom:1px solid #e6e1d5;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#9aa1ad">
+          <span onClick="{{ sortName }}" style="cursor:pointer;user-select:none">Santri{{ arrowName }}</span><span onClick="{{ sortProg }}" style="cursor:pointer;user-select:none">Progres Hafalan{{ arrowProg }}</span><span onClick="{{ sortNilai }}" style="text-align:center;cursor:pointer;user-select:none">Nilai{{ arrowNilai }}</span><span></span>
+        </div>
+        </sc-if>
+        <sc-for list="{{ roster }}" as="s" hint-placeholder-count="10">
+          <div class="roster-row" style="padding:12px 18px;border-bottom:1px solid #f0ede4">
+            <div class="r-santri" style="display:flex;align-items:center;gap:10px;min-width:0">
+              <span title="{{ s.tier }}" style="width:34px;height:34px;border-radius:50%;background:{{ s.tierColor }};color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.12)">{{ s.initials }}</span>
+              <div style="min-width:0"><div style="display:flex;align-items:center;gap:6px;min-width:0"><span style="font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.nick }}</span><span style="flex:none;font-size:9.5px;font-weight:800;color:#8a6d1e;background:#f5ecd3;border:1px solid #e6d3a0;padding:1px 6px;border-radius:6px">{{ s.kelas }}</span></div><div style="font-size:11px;color:#9aa1ad">{{ s.halaqahLabel }}</div></div>
+            </div>
+            <div class="r-prog">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:4px"><span>{{ s.juz }}/15 Juz</span><span>{{ s.juzPct }}%</span></div>
+              <div style="position:relative;height:7px;border-radius:6px;background:#eef0f4;overflow:hidden"><div style="height:100%;width:{{ s.barBase }}%;background:#2f8f3a;border-radius:6px"></div><div style="position:absolute;top:0;left:0;height:100%;width:{{ s.barOver }}%;background:linear-gradient(90deg,#cfa02c,#e8bd57);border-radius:6px"></div></div>
+            </div>
+            <span class="r-grade" style="justify-self:center;font-size:19px;font-weight:800;color:{{ s.gColor }}">{{ s.gLetter }}</span>
+            <div class="r-act" style="display:flex;gap:6px;justify-self:end;align-items:center">
+              <button onClick="{{ s.onOpen }}" title="Lihat profil" style="width:32px;height:32px;border-radius:8px;border:1px solid #e6e1d5;background:#fff;color:#0a4631;cursor:pointer;display:grid;place-items:center;padding:0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg>
+              </button>
+              <button onClick="{{ s.onEntry }}" title="Input nilai" style="width:32px;height:32px;border-radius:8px;border:none;background:#2f8f3a;color:#fff;cursor:pointer;display:grid;place-items:center;padding:0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ s.onAbsen }}" title="Absensi" style="width:32px;height:32px;border-radius:8px;border:1px solid #e6d3a0;background:#fff;color:#a5791f;cursor:pointer;display:grid;place-items:center;padding:0">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="m9 16 2 2 4-4"/></svg>
+                </button>
+              </sc-if>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ rosterEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:52px 20px">
+            <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ true }}">
+              <div class="dc-spin" style="width:36px;height:36px;margin:0 auto 12px;border-radius:50%;border:3px solid #e6e1d5;border-top-color:#0a4631"></div>
+            </sc-if>
+            <div style="font-size:14.5px;font-weight:700;color:#0a4631;margin-bottom:5px">{{ listMsg }}</div>
+            <div style="font-size:12.5px;color:#9aa1ad;max-width:340px;margin:0 auto">{{ listSub }}</div>
+          </div>
+        </sc-if>
+      </div>
+      <sc-if value="{{ canManage }}" hint-placeholder-val="{{ false }}"></sc-if>
+    </div>
+  </sc-if>
+
+  <!-- ============ INPUT NILAI (slide-over sheet) ============ -->
+  <sc-if value="{{ entryOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeEntry }}" class="sheet-backdrop"></div>
+    <div class="sheet">
+      <div style="display:flex;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid #e6ddc8;background:#fff">
+        <h1 style="font-size:17px;font-weight:800;margin:0;flex:1;color:#0a4631">{{ entryTitle }}</h1>
+        <button onClick="{{ closeEntry }}" title="Tutup" style="width:32px;height:32px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;cursor:pointer;display:grid;place-items:center;padding:0">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div style="display:flex;gap:8px;padding:12px 18px;border-bottom:1px solid #e6ddc8;background:#faf8f2">
+        <button onClick="{{ showSetoran }}" style="{{ segSetoranStyle }}">Setoran Harian</button>
+        <button onClick="{{ showNilai }}" style="{{ segNilaiStyle }}">Nilai Ujian/Tes</button>
+      </div>
+      <!-- SETORAN -->
+      <sc-if value="{{ isSetoran }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;overflow:auto;padding:18px">
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Santri
+            <select value="{{ sSantri }}" onChange="{{ setSSantri }}" style="width:100%;margin-top:6px;padding:10px 38px 10px 12px;border-radius:9px;border:1px solid #16264d;background-color:#16264d;background-image:url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2212%22%20height=%2212%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22white%22%20stroke-width=%222.6%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M6%209l6%206%206-6%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:calc(100% - 14px) center;background-size:12px 12px;font-size:13px;font-weight:700;color:#fff;-webkit-appearance:none;-moz-appearance:none;appearance:none"><option value="">— pilih santri —</option><sc-for list="{{ santriOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
+          </label>
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Tanggal
+            <input type="date" value="{{ sDate }}" onInput="{{ setSDate }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" />
+          </label>
+          <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">Jenis setoran</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px"><sc-for list="{{ sJenisChips }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.onPick }}" style="{{ c.style }}">{{ c.v }}</button></sc-for></div>
+          <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">Halaman mushaf <span style="color:#9aa1ad">(1–604 · wajib benar — penggerak progres)</span></div>
+          <div style="display:flex;gap:10px;margin-bottom:12px">
+            <label style="flex:1;font-size:11.5px;color:#6b7280">Halaman dari<input value="{{ sHalDari }}" onInput="{{ setSHalDari }}" inputmode="numeric" placeholder="mis. 204" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+            <label style="flex:1;font-size:11.5px;color:#6b7280">Halaman ke<input value="{{ sHalKe }}" onInput="{{ setSHalKe }}" inputmode="numeric" placeholder="mis. 205" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+          </div>
+          <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">Surah &amp; ayat <span style="color:#9aa1ad">(opsional — pertajam % bila mulai/berhenti di tengah halaman)</span></div>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <label style="flex:1;font-size:11.5px;color:#6b7280">No. Surah<input value="{{ sSurah }}" onInput="{{ setSSurah }}" placeholder="opsional" style="width:100%;margin-top:6px;padding:10px 10px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+            <label style="flex:1;font-size:11.5px;color:#6b7280">Ayat dari<input value="{{ sAyatDari }}" onInput="{{ setSAyatDari }}" placeholder="—" style="width:100%;margin-top:6px;padding:10px 10px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+            <label style="flex:1;font-size:11.5px;color:#6b7280">Ayat ke<input value="{{ sAyatKe }}" onInput="{{ setSAyatKe }}" placeholder="—" style="width:100%;margin-top:6px;padding:10px 10px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+          </div>
+          <div style="font-size:11.5px;color:#6b7280;margin-bottom:4px">Kualitas setoran</div>
+          <div style="display:flex;gap:4px;margin-bottom:12px"><sc-for list="{{ sStars }}" as="s" hint-placeholder-count="5"><span onClick="{{ s.onPick }}" style="cursor:pointer;font-size:28px;line-height:1;color:{{ s.col }}">{{ s.star }}</span></sc-for></div>
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:14px">Catatan<input value="{{ sCatatan }}" onInput="{{ setSCatatan }}" placeholder="opsional" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+          <button onClick="{{ saveSetoran }}" style="width:100%;padding:12px;border-radius:10px;border:none;background:#0a4631;color:#fff;font-weight:800;font-size:13.5px;cursor:pointer">Simpan Setoran</button>
+          <div style="min-height:16px;margin-top:8px;font-size:11.5px;font-weight:700;color:#0a4631;text-align:center">{{ sMsg }}</div>
+          <sc-if value="{{ setoranNotReady }}" hint-placeholder-val="{{ false }}"><p style="font-size:11px;color:#b58a3a;background:#fbf5e4;border:1px solid #ecdcae;border-radius:8px;padding:8px 11px;margin-top:10px;line-height:1.5">Form Setoran belum berupa <b>pre-filled link</b> — isi di Config sheet agar tersimpan ke Google (lihat GUIDE §5). Sekarang tombol Simpan belum menulis ke sheet.</p></sc-if>
+        </div>
+      </sc-if>
+      <!-- NILAI -->
+      <sc-if value="{{ isNilai }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;overflow:auto;padding:18px">
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Santri
+            <select value="{{ nSantri }}" onChange="{{ setNSantri }}" style="width:100%;margin-top:6px;padding:10px 38px 10px 12px;border-radius:9px;border:1px solid #16264d;background-color:#16264d;background-image:url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2212%22%20height=%2212%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22white%22%20stroke-width=%222.6%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M6%209l6%206%206-6%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:calc(100% - 14px) center;background-size:12px 12px;font-size:13px;font-weight:700;color:#fff;-webkit-appearance:none;-moz-appearance:none;appearance:none"><option value="">— pilih santri —</option><sc-for list="{{ santriOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
+          </label>
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Tanggal
+            <input type="date" value="{{ nDate }}" onInput="{{ setNDate }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" />
+          </label>
+          <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">Bidang</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px"><sc-for list="{{ nBidangChips }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.onPick }}" style="{{ c.style }}">{{ c.v }}</button></sc-for></div>
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Mata Pelajaran
+            <select value="{{ nMapel }}" onChange="{{ setNMapel }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d"><option value="">— pilih mapel —</option><sc-for list="{{ nMapelOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
+          </label>
+          <div style="display:flex;gap:10px;margin-bottom:14px">
+            <label style="flex:1;font-size:11.5px;color:#6b7280">Jenis<input value="{{ nJenis }}" onInput="{{ setNJenis }}" placeholder="Tes / Kuis" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+            <label style="flex:1;font-size:11.5px;color:#6b7280">Nilai (0–100)<input value="{{ nNilai }}" onInput="{{ setNNilai }}" placeholder="88" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
+          </div>
+          <button onClick="{{ saveNilai }}" style="width:100%;padding:12px;border-radius:10px;border:none;background:#0a4631;color:#fff;font-weight:800;font-size:13.5px;cursor:pointer">Simpan Nilai</button>
+          <div style="min-height:16px;margin-top:8px;font-size:11.5px;font-weight:700;color:#0a4631;text-align:center">{{ nMsg }}</div>
+          <sc-if value="{{ nilaiNotReady }}" hint-placeholder-val="{{ false }}"><p style="font-size:11px;color:#b58a3a;background:#fbf5e4;border:1px solid #ecdcae;border-radius:8px;padding:8px 11px;margin-top:10px;line-height:1.5">Form Nilai belum berupa <b>pre-filled link</b> — isi di Config sheet agar tersimpan ke Google (GUIDE §5).</p></sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- ============ KONFIGURASI (slide-over sheet) ============ -->
+  <sc-if value="{{ configOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeConfig }}" class="sheet-backdrop"></div>
+    <div class="sheet">
+      <div style="display:flex;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid #e6ddc8;background:#fff">
+        <h1 style="font-size:17px;font-weight:800;margin:0;flex:1;color:#0a4631">Konfigurasi</h1>
+        <button onClick="{{ closeConfig }}" title="Tutup" style="width:32px;height:32px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;cursor:pointer;display:grid;place-items:center;padding:0">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div style="flex:1;overflow:auto;padding:18px">
+        <p style="font-size:12.5px;color:#6b7280;margin:0 0 12px;line-height:1.5">Semua koneksi dibaca dari <b>Config Sheet</b> (tab <code>Config</code>). Panel ini hanya <b>menampilkan</b> yang sedang aktif — untuk mengubah, edit di Google Sheet lalu tekan <b>Muat Ulang</b>.</p>
+        <a href="{{ cfgSheetUrl }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#0c6240;margin-bottom:14px">Buka Config Sheet ↗</a>
+        <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:8px 16px;margin-bottom:14px">
+          <sc-for list="{{ cfgRows }}" as="c" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #f0ede4">
+              <span style="flex:none;width:9px;height:9px;border-radius:50%;background:{{ c.dot }}"></span>
+              <span style="flex:1;font-size:12.5px;font-weight:600;color:#16264d">{{ c.label }}</span>
+              <span style="flex:none;font-size:11.5px;font-family:ui-monospace,monospace;color:#6b7280">{{ c.val }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;color:#6b7280;margin-bottom:14px">Status data: <span style="font-weight:800;color:#0a4631">{{ dataStatus }}</span></div>
+        <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;margin-bottom:14px;background:{{ demoBg }};border:1px solid {{ demoBd }};border-radius:11px;cursor:pointer">
+          <input type="checkbox" checked="{{ forceDemo }}" onChange="{{ toggleDemo }}" style="width:17px;height:17px;margin-top:1px;accent-color:#0a4631;cursor:pointer" />
+          <span style="flex:1"><span style="display:block;font-size:12.5px;font-weight:800;color:#16264d">Gunakan data contoh (demo)</span><span style="font-size:11px;color:#6b7280;line-height:1.5">Tampilkan 11 santri contoh untuk pratinjau tampilan — mengabaikan data live. Tersimpan di browser ini.</span></span>
+        </label>
+        <button onClick="{{ reloadConfig }}" style="width:100%;padding:11px;border-radius:10px;border:none;background:#2f8f3a;color:#fff;font-weight:700;font-size:13px;cursor:pointer">↻ Muat Ulang dari Config Sheet</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ KEHADIRAN (admin quick-log, slide-over sheet) ============ -->
+  <sc-if value="{{ kehOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeKeh }}" class="sheet-backdrop"></div>
+    <div class="sheet">
+      <div style="display:flex;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid #e6ddc8;background:#fff">
+        <div style="flex:1"><h1 style="font-size:17px;font-weight:800;margin:0;color:#0a4631">Absensi</h1><div style="font-size:11.5px;color:#9aa1ad">Semua Hadir — catat hanya yang izin/sakit/alpa</div></div>
+        <button onClick="{{ closeKeh }}" title="Tutup" style="width:32px;height:32px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;cursor:pointer;display:grid;place-items:center;padding:0">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div style="flex:1;overflow:auto;padding:18px">
+        <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:14px">Tanggal
+          <input type="date" value="{{ kehDate }}" onInput="{{ setKehDate }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" />
+        </label>
+        <div style="background:#fff;border:1px solid #e6e1d5;border-radius:14px;padding:16px;margin-bottom:16px">
+          <div style="font-weight:800;font-size:13px;margin-bottom:12px;color:#0a4631">Catat Ketidakhadiran</div>
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Santri
+            <select value="{{ kehSantri }}" onChange="{{ setKehSantri }}" style="width:100%;margin-top:6px;padding:10px 38px 10px 12px;border-radius:9px;border:1px solid #16264d;background-color:#16264d;background-image:url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2212%22%20height=%2212%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22white%22%20stroke-width=%222.6%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M6%209l6%206%206-6%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:calc(100% - 14px) center;background-size:12px 12px;font-size:13px;font-weight:700;color:#fff;-webkit-appearance:none;-moz-appearance:none;appearance:none">
+              <option value="">— pilih santri —</option>
+              <sc-for list="{{ kehSantriOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o.v }}">{{ o.label }}</option></sc-for>
+            </select>
+          </label>
+          <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">Status</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <sc-for list="{{ kehStatusChips }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.onPick }}" style="{{ c.style }}">{{ c.v }}</button></sc-for>
+          </div>
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Jam <span style="color:#9aa1ad">(opsional — kosongkan bila sehari penuh)</span>
+            <div style="display:flex;gap:8px;margin-top:6px">
+              <input value="{{ kehJam }}" onInput="{{ setKehJam }}" placeholder="mis. 10:30" style="flex:1;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" />
+              <button onClick="{{ kehNow }}" style="padding:10px 14px;border-radius:9px;border:1px solid #cfe3d0;background:#eef4ee;color:#0a4631;font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap">Sekarang</button>
+            </div>
+          </label>
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:14px">Alasan
+            <input value="{{ kehReason }}" onInput="{{ setKehReason }}" placeholder="mis. Sakit demam / izin acara keluarga" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" />
+          </label>
+          <button onClick="{{ saveKeh }}" style="width:100%;padding:12px;border-radius:10px;border:none;background:#0a4631;color:#fff;font-weight:800;font-size:13.5px;cursor:pointer">Simpan</button>
+          <div style="min-height:16px;margin-top:8px;font-size:11.5px;font-weight:700;color:#0a4631;text-align:center">{{ kehMsg }}</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><span style="font-weight:800;font-size:13px;color:#0a4631">Ketidakhadiran tanggal ini</span><span style="font-size:11.5px;color:#9aa1ad">{{ kehCount }} santri · sisanya Hadir</span></div>
+        <sc-if value="{{ hasKehList }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#fff;border:1px solid #e6e1d5;border-radius:12px;padding:6px 14px">
+            <sc-for list="{{ kehList }}" as="a" hint-placeholder-count="2">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 0;border-bottom:1px solid #f0ede4">
+                <span style="flex:none;font-size:9.5px;font-weight:800;color:#fff;background:{{ a.statusColor }};padding:2px 8px;border-radius:6px">{{ a.status }}</span>
+                <div style="flex:1;min-width:120px"><div style="font-weight:700;font-size:13px;color:#16264d">{{ a.who }}<span style="color:#9aa1ad;font-weight:600">{{ a.waktu }}</span></div><div style="font-size:11px;color:#9aa1ad">{{ a.reason }}</div></div>
+                <sc-if value="{{ a.pending }}" hint-placeholder-val="{{ true }}"><button onClick="{{ a.onUndo }}" title="Batalkan" style="flex:none;font-size:11px;color:#b4483a;background:none;border:none;cursor:pointer;font-weight:700">Batal</button></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ kehNotConfigured }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size:11px;color:#b58a3a;background:#fbf5e4;border:1px solid #ecdcae;border-radius:8px;padding:8px 11px;margin-top:12px;line-height:1.5">Form absensi belum dikonfigurasi (Konfigurasi → pre-filled link). Entri di sini hanya tersimpan sesi ini dan belum tertulis ke sheet.</p>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const NAVY='#16264d', NAVY2='#0f1c3a', GREEN='#2f8f3a', GOLD='#cfa02c', CREAM='#f5f3ec', PAPER='#ffffff', LINE='#e6e1d5', INK='#16264d', MUT='#6b7280';
+
+// ============================================================================
+// CONFIG SHEET — the single source of truth for connections. Set this to the ID
+// of a PUBLIC Google Sheet that has a tab named "Config" with two columns:
+//   key        | value
+//   sheet_id   | <PUBLIC data sheet ID>  (blank = use this same sheet)
+//   setoran    | <Setoran form ID or link>
+//   nilai      | <Nilai form ID or link>
+//   absensi    | <Absensi pre-filled link>
+// The app reads it on load; Konfigurasi just DISPLAYS it (edit in the sheet).
+// Leave '' to always run on demo data.
+const CONFIG_ID = '1SnffTFvWwICjyskkoW2L66puVSpcuwNF2RplRqUQt44';
+
+// Score keys: haf/tah/mur/ilm/akh = diniyah (musyrif/mudir) · akd/bhs = akademik (admin)
+// juzct = how many juz are completed (a count) → ring fill / % derive from it; the roadmap
+// order (PROGRAM_FULL) says which juz those are. curpg = current page (1-604) → current juz/surah/ayah.
+const RAW = [
+  {id:'s1', name:'Ahmad Fauzan Ramadhani', nick:'Fauzan', kelas:'VIII', kota:'Depok', prov:'Jawa Barat', hal:'As-Shiddiq', haf:88,tah:91,mur:85,ilm:85,akh:90,akd:84,bhs:86, juzct:8, curpg:70, nis:'2426001'},
+  {id:'s2', name:'Muhammad Rifki Hakim', nick:'Rifki', kelas:'VII', kota:'Bogor', prov:'Jawa Barat', hal:'As-Shiddiq', haf:82,tah:83,mur:78,ilm:80,akh:86,akd:88,bhs:84, juzct:6, curpg:31, nis:'2426002'},
+  {id:'s3', name:'Zaid Abdullah Faris', nick:'Zaid', kelas:'VII', kota:'Bekasi', prov:'Jawa Barat', hal:'As-Shiddiq', haf:94,tah:94,mur:90,ilm:92,akh:93,akd:88,bhs:90, juzct:10, curpg:111, nis:'2426003'},
+  {id:'s4', name:'Yusuf Ar-Ramadhan', nick:'Yusuf', kelas:'VIII', kota:'Subang', prov:'Jawa Barat', hal:'As-Shiddiq', haf:70,tah:73,mur:68,ilm:70,akh:78,akd:76,bhs:72, juzct:4, curpg:511, nis:'2426004'},
+  {id:'s5', name:'Hafizh Anwar Syafiq', nick:'Hafizh', kelas:'VII', kota:'Bandung', prov:'Jawa Barat', hal:'As-Shiddiq', haf:86,tah:87,mur:82,ilm:84,akh:88,akd:80,bhs:83, juzct:7, curpg:51, nis:'2426005'},
+  {id:'s6', name:'Ibrahim Malik Ibrahim', nick:'Ibrahim', kelas:'VIII', kota:'Cirebon', prov:'Jawa Barat', hal:'Al-Khattab', haf:78,tah:78,mur:74,ilm:77,akh:82,akd:82,bhs:79, juzct:5, curpg:10, nis:'2426006'},
+  {id:'s7', name:'Umar Hidayatullah', nick:'Umar', kelas:'VII', kota:'Sukabumi', prov:'Jawa Barat', hal:'Al-Khattab', haf:64,tah:68,mur:62,ilm:66,akh:74,akd:72,bhs:68, juzct:3, curpg:531, nis:'2426007'},
+  {id:'s8', name:'Bilal Saputra Nugroho', nick:'Bilal', kelas:'VII', kota:'Depok', prov:'Jawa Barat', hal:'Al-Khattab', haf:80,tah:83,mur:79,ilm:80,akh:85,akd:78,bhs:81, juzct:6, curpg:31, nis:'2426008'},
+  {id:'s9', name:'Fathan Nasution', nick:'Fathan', kelas:'VIII', kota:'Asahan', prov:'Sumatera Utara', hal:'Al-Khattab', haf:90,tah:89,mur:86,ilm:88,akh:90,akd:85,bhs:87, juzct:9, curpg:91, nis:'2426009'},
+  {id:'s10',name:'Rasyid Pratama Wijaya', nick:'Rasyid', kelas:'VII', kota:'Sungailiat', prov:'Kep. Bangka Belitung', hal:'Al-Khattab', haf:74,tah:77,mur:72,ilm:75,akh:80,akd:80,bhs:76, juzct:5, curpg:10, nis:'2426010'},
+  {id:'s11',name:'Abdullah Hafizhan', nick:'Abdullah', kelas:'VIII', kota:'Garut', prov:'Jawa Barat', hal:'As-Shiddiq', haf:97,tah:95,mur:94,ilm:95,akh:96,akd:91,bhs:93, juzct:18, curpg:268, nis:'2426011'},
+];
+// Halaqah = a named memorization circle with a single musyrif. The NAME lives in Master's HAL
+// column (e.g. "As-Shiddiq"); the "Halaqah" sheet tab maps that name → musyrif. Demo fallback:
+const HALAQAH = {
+  'As-Shiddiq': { nama:'As-Shiddiq', musyrif:'Ustadz Salman Al-Farisi' },
+  'Al-Khattab': { nama:'Al-Khattab', musyrif:'Ustadz Hamzah Abdurrahman' },
+};
+// One mudir for the whole school.
+const MUDIR = 'Ustadz Alfath Syam, Lc.';
+// Academic terms for the report card (newest first). `start`/`end` bound which Nilai rows the
+// Rapor averages (inclusive, YYYY-MM-DD). `days` = jumlah hari efektif in the term → the Kehadiran
+// score = (days − jumlah absensi) / days. Semester Ganjil ≈ Jul–Dec, Genap ≈ Jan–Jun.
+// Admin picks the term from a dropdown on the Rapor; TERMS[0] is the default (current) term.
+const TERMS = [
+  { id:'2026g', label:'Semester Ganjil · Tahun Ajaran 2026/2027', start:'2026-07-01', end:'2026-12-31', days:110 },
+  { id:'2025e', label:'Semester Genap · Tahun Ajaran 2025/2026', start:'2026-01-01', end:'2026-06-30', days:112 },
+  { id:'2025g', label:'Semester Ganjil · Tahun Ajaran 2025/2026', start:'2025-07-01', end:'2025-12-31', days:108 },
+];
+// Normalize a sheet date cell (ISO text or GViz "Date(y,m,d)") to YYYY-MM-DD.
+function ymd(t){ t=String(t||''); const m=t.match(/Date\((\d+),(\d+),(\d+)/); if(m){ return m[1]+'-'+String(+m[2]+1).padStart(2,'0')+'-'+String(+m[3]).padStart(2,'0'); } return t.slice(0,10); }
+function inTerm(t, term){ const d=ymd(t); return !d || (d>=term.start && d<=term.end); }
+// Display date in a readable Indonesian format: "10 Jul 2026".
+const BULAN=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+function fmtTgl(v){ const s=ymd(v); const m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); return m ? ((+m[3])+' '+BULAN[(+m[2])-1]+' '+m[1]) : s; }
+// Normalize a time cell to "HH:MM" — handles GViz Date(1899,11,30,h,m,s) (a Time-only cell) or plain text.
+function hhmm(v){ v=String(v||'').trim(); if(!v) return ''; const m=v.match(/Date\(\d+,\d+,\d+,(\d+),(\d+)/); if(m) return String(+m[1]).padStart(2,'0')+':'+String(+m[2]).padStart(2,'0'); const t=v.match(/^(\d{1,2}):(\d{2})/); return t ? (String(+t[1]).padStart(2,'0')+':'+t[2]) : v; }
+// Per-test records (Islamic + secular). Same shape as the Google Sheet 'Nilai' tab.
+// mapel here references the Mapel `id` (P1..P12) — stable across renames/reorders
+const NILAI = [
+  {id:'s1', tanggal:'2026-09-05', bidang:'Diniyah', mapel:'P1', jenis:'Setoran', nilai:90},
+  {id:'s1', tanggal:'2026-09-12', bidang:'Diniyah', mapel:'P2', jenis:'Ujian', nilai:88},
+  {id:'s1', tanggal:'2026-09-19', bidang:'Umum', mapel:'P6', jenis:'Tes / Kuis', nilai:84},
+  {id:'s1', tanggal:'2026-09-24', bidang:'Umum', mapel:'P10', jenis:'Ujian', nilai:86},
+  {id:'s3', tanggal:'2026-09-06', bidang:'Diniyah', mapel:'P1', jenis:'Setoran', nilai:95},
+  {id:'s3', tanggal:'2026-09-14', bidang:'Diniyah', mapel:'P4', jenis:'Hafalan', nilai:92},
+  {id:'s3', tanggal:'2026-09-20', bidang:'Umum', mapel:'P7', jenis:'Ujian', nilai:88},
+  {id:'s3', tanggal:'2026-09-25', bidang:'Umum', mapel:'P6', jenis:'Tes / Kuis', nilai:90},
+  {id:'s4', tanggal:'2026-09-10', bidang:'Diniyah', mapel:'P3', jenis:'Setoran', nilai:72},
+  {id:'s4', tanggal:'2026-09-18', bidang:'Umum', mapel:'P6', jenis:'Ujian', nilai:76},
+  {id:'s5', tanggal:'2026-09-09', bidang:'Diniyah', mapel:'P1', jenis:'Setoran', nilai:87},
+  {id:'s5', tanggal:'2026-09-22', bidang:'Umum', mapel:'P9', jenis:'Tes / Kuis', nilai:83},
+  {id:'s2', tanggal:'2026-09-11', bidang:'Diniyah', mapel:'P2', jenis:'Ujian', nilai:84},
+  {id:'s2', tanggal:'2026-09-21', bidang:'Umum', mapel:'P8', jenis:'Ujian', nilai:85},
+  {id:'s3', tanggal:'2026-09-16', bidang:'Diniyah', mapel:'P2', jenis:'Ujian', nilai:93},
+  {id:'s3', tanggal:'2026-09-28', bidang:'Umum', mapel:'P10', jenis:'Ujian', nilai:87},
+  {id:'s3', tanggal:'2026-09-30', bidang:'Ekstrakurikuler', mapel:'P11', jenis:'Proyek', nilai:90},
+  {id:'s3', tanggal:'2026-10-02', bidang:'Ekstrakurikuler', mapel:'P12', jenis:'Praktik', nilai:88},
+  {id:'s1', tanggal:'2026-09-30', bidang:'Ekstrakurikuler', mapel:'P11', jenis:'Proyek', nilai:85},
+  {id:'s11', tanggal:'2026-09-14', bidang:'Diniyah', mapel:'P1', jenis:'Setoran', nilai:97},
+  {id:'s11', tanggal:'2026-09-19', bidang:'Diniyah', mapel:'P2', jenis:'Ujian', nilai:95},
+  {id:'s11', tanggal:'2026-09-26', bidang:'Umum', mapel:'P6', jenis:'Ujian', nilai:92},
+  {id:'s11', tanggal:'2026-10-01', bidang:'Ekstrakurikuler', mapel:'P11', jenis:'Proyek', nilai:94},
+];
+// Daily setoran log (Islamic self/staff journal side). Same shape as the public 'Setoran' sheet tab.
+// halDari/halKe = absolute mushaf page (1-604). Juz derives from the page (juzOfPage).
+const SETORAN = [
+  {id:'s3', tanggal:'2026-10-06', jenis:'Ziyadah', halDari:204, halKe:205, surah:11, ayatDari:6, ayatKe:24, nilai:5, catatan:'Lancar, tajwid baik'},
+  {id:'s3', tanggal:'2026-10-05', jenis:'Muroja’ah', halDari:182, halKe:201, nilai:4, catatan:'Tersendat di ayat panjang'},
+  {id:'s3', tanggal:'2026-10-04', jenis:'Ziyadah', halDari:202, halKe:203, surah:11, ayatDari:1, ayatKe:5, nilai:4, catatan:'Baik'},
+  {id:'s3', tanggal:'2026-10-02', jenis:'Tahsin', halDari:210, halKe:210, surah:11, ayatDari:41, ayatKe:41, nilai:4, catatan:'Perbaikan makhraj huruf ظ'},
+  {id:'s1', tanggal:'2026-10-06', jenis:'Ziyadah', halDari:166, halKe:166, surah:8, ayatDari:40, ayatKe:48, nilai:5, catatan:'Lancar'},
+  {id:'s1', tanggal:'2026-10-05', jenis:'Muroja’ah', halDari:142, halKe:151, nilai:4, catatan:'Baik'},
+  {id:'s11', tanggal:'2026-10-06', jenis:'Ziyadah', halDari:268, halKe:268, surah:15, ayatDari:1, ayatKe:15, nilai:5, catatan:'Mumtaz, sangat lancar'},
+  {id:'s11', tanggal:'2026-10-05', jenis:'Muroja’ah', halDari:222, halKe:241, nilai:5, catatan:'Kuat'},
+];
+// Star string for a 1–5 daily rating (Google Forms Rating field). 0/blank → no stars.
+function starStr(n){ n=Math.max(0,Math.min(5,Math.round(Number(n)||0))); return n? '★★★★★'.slice(0,n)+'☆☆☆☆☆'.slice(0,5-n) : ''; }
+// Category of a setoran by jenis: 'zi' ziyadah (new hafalan), 'mu' muroja'ah (review), 'ta' tahsin/other.
+function setoranCat(j){ j=String(j||''); if(/ziyad|ziya|tambah|hafal/i.test(j)) return 'zi'; if(/muroj|muraj|ulang|review/i.test(j)) return 'mu'; return 'ta'; }
+// Color a setoran by its jenis (ziyadah = green, muroja'ah = gold, tahsin/other = blue).
+function setoranColor(j){ const c=setoranCat(j); return c==='zi'?'#2f8f3a':c==='mu'?'#cfa02c':'#3f6fa8'; }
+// Attendance status → canonical key. Blank/unknown defaults to 'hadir'.
+function attStatus(s){ s=String(s||'').trim().toLowerCase(); if(/sakit|^s$/.test(s)) return 'sakit'; if(/izin|ijin|^i$/.test(s)) return 'izin'; if(/alpa|alfa|tanpa|bolos|^a$/.test(s)) return 'alpa'; return 'hadir'; }
+// Daily attendance log (one row per santri per day). Same shape as the 'Kehadiran' sheet tab.
+// Absensi log — only NON-present days are recorded (Sakit/Izin/Alpa). Presence is the default.
+const KEHADIRAN = [
+  {id:'s3', tanggal:'2026-09-08', status:'Sakit', jam:'', reason:'Demam, ada surat dokter'},
+  {id:'s3', tanggal:'2026-10-05', status:'Izin', jam:'10:30', reason:'Pulang, acara keluarga'},
+  {id:'s1', tanggal:'2026-09-14', status:'Alpa', jam:'', reason:'Tanpa keterangan'},
+  {id:'s1', tanggal:'2026-10-02', status:'Sakit', jam:'', reason:'Batuk pilek'},
+  {id:'s11', tanggal:'2026-10-03', status:'Izin', jam:'', reason:'Lomba tahfidz antar pesantren'},
+];
+// Local date/time (browser) for the attendance quick-log.
+function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function nowHM(){ const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+// Parse a Kehadiran Google Form "pre-filled link" → POST action + field map. Works whether the
+// Pull a Google Form ID from anything the user pastes: a bare ID, a /viewform URL, or a
+// pre-filled link. So all three form fields accept the same kinds of input.
+function extractFormId(s){ s=String(s||'').trim(); const m=s.match(/forms\/d\/e\/([^\/?#]+)/)||s.match(/forms\/d\/([^\/?#]+)/); return m?m[1]:s; }
+// questions are Dropdown/Date/Time or plain Short answer: Date fields are detected by the
+// entry.N_year part, Time by entry.N_hour; status/reason by value or sentinel; whatever single
+// value is left over = id (so any id format works).
+function parseKehLink(link){
+  link=String(link||'').trim(); if(!link) return null;
+  const fm=link.match(/forms\/d\/e\/([^\/?#]+)/); if(!fm) return null;
+  const cfg={action:'https://docs.google.com/forms/d/e/'+fm[1]+'/formResponse', tanggal:null, jam:null, id:null, status:null, reason:null};
+  const STAT={hadir:1,sakit:1,izin:1,alpa:1}; const singles=[];
+  const re=/entry\.(\d+)(_year|_month|_day|_hour|_minute)?=([^&#]*)/g; let m;
+  while((m=re.exec(link))){ const num=m[1], suf=m[2]||'', val=decodeURIComponent((m[3]||'').replace(/\+/g,' '));
+    if(suf==='_year') cfg.tanggal={dateBase:num};
+    else if(suf==='_hour') cfg.jam={timeBase:num};
+    else if(!suf) singles.push({entry:'entry.'+num, val}); }
+  // Identify each field by sentinel OR the pattern of a real example value (date/time/status/id).
+  for(const s of singles){ const v=s.val.toLowerCase();
+    if((s.val==='__TANGGAL__'||/^\d{4}-\d{1,2}-\d{1,2}$/.test(s.val))&&!cfg.tanggal){ cfg.tanggal={simple:s.entry}; s.used=1; }
+    else if((s.val==='__JAM__'||/^\d{1,2}:\d{2}$/.test(s.val))&&!cfg.jam){ cfg.jam={simple:s.entry}; s.used=1; }
+    else if(s.val==='__STATUS__'||STAT[v]){ cfg.status=s.entry; s.used=1; }
+    else if(s.val==='__ID__'||/^s\d+$/i.test(s.val)){ cfg.id=s.entry; s.used=1; }
+    else if(s.val==='__REASON__'||s.val==='__ALASAN__'){ cfg.reason=s.entry; s.used=1; } }
+  if(!cfg.id){ const rem=singles.find(s=>!s.used); if(rem){ cfg.id=rem.entry; rem.used=1; } }
+  if(!cfg.reason){ const rem=singles.find(s=>!s.used); if(rem) cfg.reason=rem.entry; }
+  if(!cfg.id||!cfg.tanggal||!cfg.status) return null;
+  return cfg;
+}
+// Field order for the Setoran / Nilai forms (used for order-based pre-fill mapping).
+const SETORAN_KEYS=['id','tanggal','jenis','hal_dari','hal_ke','surah','ayat_dari','ayat_ke','nilai','catatan']; // hal_dari/ke = absolute mushaf page 1-604 (juz derived from it); surah/ayat optional
+const NILAI_KEYS=['id','tanggal','mapel','jenis','nilai']; // mapel = the Mapel `id` (P1..) — bidang & name derive from it
+// Pre-filled-link parser for the Setoran/Nilai custom forms. Maps each entry to a field by POSITION
+// (fill the pre-fill with real example values in field order), and a __KEY__ sentinel value overrides
+// the position for that field (order-independent). Date/Time sub-parts collapse to one slot.
+function parseFormLink(link, keys){
+  link=String(link||'').trim(); if(!link || !keys) return null;
+  const fm=link.match(/forms\/d\/e\/([^\/?#]+)/); if(!fm) return null;
+  const action='https://docs.google.com/forms/d/e/'+fm[1]+'/formResponse';
+  const slots=[], seen={}; const re=/entry\.(\d+)(_year|_month|_day|_hour|_minute)?=([^&#]*)/g; let m;
+  while((m=re.exec(link))){ const num=m[1], suf=m[2]||'', val=decodeURIComponent((m[3]||'').replace(/\+/g,' '));
+    if(suf){ if(!seen[num]){ seen[num]=1; slots.push(/_(year|month|day)/.test(suf)?{dateBase:num}:{timeBase:num}); } }
+    else slots.push({simple:'entry.'+num, val}); }
+  const map={};
+  slots.forEach((s,i)=>{ let key=keys[i]; if(s.val){ const mm=s.val.match(/^__([A-Z_]+)__$/); if(mm) key=mm[1].toLowerCase(); } if(key) map[key]=s; });
+  return (map.id && map.tanggal) ? {action, map} : null;
+}
+// Build a no-cors POST body from a parsed config + a record. Splits date (YYYY-MM-DD) / time (HH:MM).
+function buildFormBody(cfg, rec){
+  const b=new URLSearchParams();
+  for(const k in cfg.map){ const e=cfg.map[k], v=rec[k]; if(v==null||v==='') continue;
+    if(e.dateBase){ const p=String(v).split('-'); b.append('entry.'+e.dateBase+'_year',p[0]); b.append('entry.'+e.dateBase+'_month',String(+p[1])); b.append('entry.'+e.dateBase+'_day',String(+p[2])); }
+    else if(e.timeBase){ const p=String(v).split(':'); b.append('entry.'+e.timeBase+'_hour',String(+p[0])); b.append('entry.'+e.timeBase+'_minute',String(+p[1])); }
+    else b.append(e.simple, v); }
+  return b;
+}
+// Post a record to a form via its parsed config (no-cors); returns whether it was configured.
+function postForm(cfg, rec){ if(!cfg) return false; try{ fetch(cfg.action,{method:'POST',mode:'no-cors',body:buildFormBody(cfg,rec)}); }catch(e){ console.error('postForm failed',e); } return true; }
+const PILLARS = [
+  {key:'haf', abbr:'HAF', label:'Hafalan', grp:'diniyah'},
+  {key:'tah', abbr:'TAH', label:'Tahsin', grp:'diniyah'},
+  {key:'mur', abbr:'MUR', label:'Muroja’ah', grp:'diniyah'},
+  {key:'ilm', abbr:'ILM', label:'Ilmu & B. Arab', grp:'diniyah'},
+  {key:'akh', abbr:'AKH', label:'Akhlak', grp:'diniyah'},
+  {key:'akd', abbr:'UMU', label:'Umum', grp:'umum'},
+  {key:'bhs', abbr:'BHS', label:'Bahasa', grp:'umum'},
+];
+// ---- Rapor bidang: the three groups are FIXED; the subjects (mapel) inside each are
+//      DYNAMIC — the admin defines them in the "Mapel" sheet tab (bidang, mapel).
+const BIDANG = [
+  {key:'Diniyah', title:'Tahfidz & Diniyah', head:'Aspek Penilaian'},
+  {key:'Umum', title:'Umum', head:'Mata Pelajaran'},
+  {key:'Ekstrakurikuler', title:'Ekstrakurikuler', head:'Mata Pelajaran'},
+];
+function normBidang(b){ b=String(b||'').toLowerCase(); if(/ekstra|ekskul/.test(b)) return 'Ekstrakurikuler'; if(/akad|umum/.test(b)) return 'Umum'; if(/dini|tahfi|diniyah/.test(b)) return 'Diniyah'; return ''; }
+// Segmented-toggle button styles (active / inactive) for the Input sheet.
+const SEG_ON='flex:1;padding:9px 12px;border-radius:9px;border:none;background:#0a4631;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer';
+const SEG_OFF='flex:1;padding:9px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#fff;color:#16264d;font-weight:600;font-size:12.5px;cursor:pointer';
+// Order Kelas naturally: digits by value, Roman numerals (VII/VIII/IX…) by their integer value.
+function romanToInt(s){ const m={i:1,v:5,x:10,l:50,c:100}; s=String(s||'').toLowerCase(); let n=0; for(let i=0;i<s.length;i++){ const c=m[s[i]]||0, nx=m[s[i+1]]||0; n+= c<nx?-c:c; } return n; }
+function kelasRank(k){ k=String(k||'').trim(); if(/^\d+$/.test(k)) return +k; return romanToInt(k)||999; }
+// Built-in demo subject definitions; overridden by the "Mapel" sheet when configured.
+const MAPEL = [
+  {id:'P1', bidang:'Diniyah', mapel:'Tahfidz (Ziyadah)', alias:''},
+  {id:'P2', bidang:'Diniyah', mapel:'Tahsin & Tajwid', alias:''},
+  {id:'P3', bidang:'Diniyah', mapel:'Muroja’ah', alias:''},
+  {id:'P4', bidang:'Diniyah', mapel:'Mutun Ilmiyah', alias:''},
+  {id:'P5', bidang:'Diniyah', mapel:'Akhlak', alias:''},
+  {id:'P6', bidang:'Umum', mapel:'Matematika', alias:''},
+  {id:'P7', bidang:'Umum', mapel:'IPA', alias:'Sains'},
+  {id:'P8', bidang:'Umum', mapel:'IPS', alias:'Sosial'},
+  {id:'P9', bidang:'Umum', mapel:'Bahasa Indonesia', alias:''},
+  {id:'P10', bidang:'Umum', mapel:'Bahasa Inggris', alias:''},
+  {id:'P11', bidang:'Ekstrakurikuler', mapel:'Informatika', alias:'Teknologi Informasi'},
+  {id:'P12', bidang:'Ekstrakurikuler', mapel:'Kewirausahaan', alias:''},
+];
+
+function grade(n){
+  // No score yet (blank cell) → N/A, NOT the lowest grade. Dha'if means "assessed & weak",
+  // which is different from "not assessed".
+  if(n==null || isNaN(n)) return {l:'–', name:'N/A', c:'#9aa1ad', na:true};
+  if(n>=90) return {l:'A', name:'Mumtaz', c:'#1f7a34'};
+  if(n>=80) return {l:'B', name:'Jayyid Jiddan', c:'#3f9a49'};
+  if(n>=70) return {l:'C', name:'Jayyid', c:GOLD};
+  if(n>=60) return {l:'D', name:'Maqbul', c:'#d9822b'};
+  return {l:'E', name:'Dha’if', c:'#b4483a'};
+}
+function tierOf(n){ return n>=85?'gold': n>=75?'silver':'bronze'; }
+const TIER_ACCENT = {gold:'#cfa02c', silver:'#8593a8', bronze:'#b07a4a'};
+// Standard Madinah/Uthmani mushaf: 604 pages, 30 juz. JUZ_START[i] = first page of Juz i+1.
+const MUSHAF_PAGES = 604;
+const JUZ_START = [1,22,42,62,82,102,122,142,162,182,202,222,242,262,282,302,322,342,362,382,402,422,442,462,482,502,522,542,562,582];
+function juzOfPage(p){ p=Number(p)||0; if(p<1) return 0; let j=1; for(let i=0;i<30;i++){ if(p>=JUZ_START[i]) j=i+1; } return Math.min(30,j); }
+// From a current page → which juz, progress within it, and pages left to finish it.
+function mushafInfo(p){ p=Number(p)||0; if(p<1||p>MUSHAF_PAGES) return null; const j=juzOfPage(p); const start=JUZ_START[j-1]; const end=(j<30?JUZ_START[j]-1:MUSHAF_PAGES); return {juz:j, page:p, inJuz:p-start+1, lenJuz:end-start+1, leftInJuz:end-p, pctJuz:Math.round((p-start+1)/(end-start+1)*100), nextJuz:(j<30?j+1:30)}; }
+// Memorization program (manhaj): back 5 juz then front 10 = the 15-juz, 3-year TARGET (in order).
+const PROGRAM = [30,29,28,27,26,1,2,3,4,5,6,7,8,9,10];
+// Over-achievers continue 11..25 (a second 15-juz "lap") → completion can reach 200% (all 30 juz).
+const PROGRAM_FULL = PROGRAM.concat([11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]);
+const TARGET_JUZ = 15;
+// The memorization journey shown on the gallery (per-year target + bonus lap).
+const ROADMAP = [
+  {label:'Tahun 1', juz:[30,29,28,27,26], gold:false},
+  {label:'Tahun 2', juz:[1,2,3,4,5], gold:false},
+  {label:'Tahun 3', juz:[6,7,8,9,10], gold:false},
+  {label:'Bonus', juz:[11,12,13,14,15,16,17,18,19,20,21,22,23,24,25], gold:true},
+];
+// Next juz to memorize = first in program order not yet done.
+function nextProgramJuz(doneSet){ return PROGRAM_FULL.find(j=>!doneSet.has(j)) || 30; }
+
+class Component extends DCLogic {
+  state = {
+    view:'gallery', role:'public', loginOpen:false, selectedId:null, theme:'minimal', search:'',
+    sortKey:'juz', sortDir:'desc',
+    setoranFormId:'', nilaiFormId:'', entryKind:'setoran',
+    sheetId:'', sheetTab:'Roster', students:null, loadState:'demo', cfgFound:false,
+    forceDemo:(typeof window!=='undefined' && window.localStorage && localStorage.getItem('rtaDemo')==='1'),
+    clerkReady:false, userName:'', entryOpen:false, configOpen:false,
+    nilai:null, setoran:null, kehadiran:null, mapelDef:null, halaqahDef:null, raporOpen:false, termId:'2026g', groupFilter:'all', filterOpen:false,
+    // Admin attendance quick-log
+    kehOpen:false, kehDate:'', kehSantri:'', kehStatus:'Izin', kehJam:'', kehReason:'', kehPending:[], kehLink:'', kehMsg:'',
+    // Custom Setoran / Nilai input forms
+    sSantri:'', sDate:'', sJenis:'Ziyadah', sHalDari:'', sHalKe:'', sSurah:'', sAyatDari:'', sAyatKe:'', sRating:0, sCatatan:'', sMsg:'',
+    nSantri:'', nDate:'', nBidang:'Diniyah', nMapel:'', nJenis:'Tes / Kuis', nNilai:'', nMsg:'',
+  };
+
+  // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
+  //      the demo RAW until a viewable sheet + "Roster" tab are configured.
+  componentDidMount(){ this.loadConfig(); this.initClerk(); }
+
+  // ---- Config: read a public "Config" tab (key | value) from the hardcoded CONFIG_ID sheet, then
+  //      load the data tabs from the sheet it points to. Falls back to demo if unreachable/empty.
+  async loadConfig(){
+    if(!CONFIG_ID){ this.setState({loadState:'demo'}); return; }
+    this.setState({loadState:'loading'});
+    try{
+      // Read raw (no headers=1): column A = key, column B = value. No header row needed.
+      const url='https://docs.google.com/spreadsheets/d/'+CONFIG_ID+'/gviz/tq?tqx=out:json&sheet=Config';
+      const text=await (await fetch(url)).text();
+      const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
+      const map={}; (json.table.rows||[]).forEach(r=>{ const c=r.c||[]; const k=String((c[0]&&c[0].v!=null)?c[0].v:'').trim().toLowerCase(); const val=String((c[1]&&c[1].v!=null)?c[1].v:'').trim(); if(k&&k!=='key') map[k]=val; });
+      // Only a real Config tab has these keys (else GViz returned the default sheet, e.g. Roster).
+      const isConfig=['sheet_id','sheetid','setoran','nilai','absensi'].some(k=>k in map);
+      const sheetId=(map.sheet_id||map.sheetid||'').trim()||CONFIG_ID;
+      this.setState({ sheetId, setoranFormId:map.setoran||map.setoran_link||'', nilaiFormId:map.nilai||map.nilai_link||'', kehLink:map.absensi||map.absensi_link||'', cfgFound:isConfig });
+      // give setState a tick to flush, then load the data tabs from sheetId
+      setTimeout(()=>{ this.loadRoster(); this.loadNilai(); this.loadSetoran(); this.loadKehadiran(); this.loadMapel(); this.loadHalaqah(); }, 0);
+    }catch(e){
+      // No "Config" tab (or unreachable) → still read the data tabs straight from CONFIG_ID.
+      console.error('loadConfig failed', e);
+      this.setState({cfgFound:false, sheetId:CONFIG_ID});
+      if(CONFIG_ID){ setTimeout(()=>{ this.loadRoster(); this.loadNilai(); this.loadSetoran(); this.loadKehadiran(); this.loadMapel(); this.loadHalaqah(); }, 0); }
+      else this.setState({loadState:'demo'});
+    }
+  }
+
+  // ---- Auth: Clerk (client-side). Reads the signed-in user's role from
+  //      publicMetadata.role (admin/mudir/musyrif); falls back to the demo
+  //      role-picker modal when Clerk isn't available (e.g. opened as file://).
+  initClerk(){
+    if(this._clerkStarted) return; this._clerkStarted=true;
+    const boot=()=>{
+      const C=window.Clerk;
+      if(!C){ setTimeout(boot,300); return; }
+      C.load().then(()=>{
+        this.setState({clerkReady:true});
+        this.applyClerkUser();
+        C.addListener(()=>this.applyClerkUser());
+      }).catch(e=>console.error('Clerk load failed', e));
+    };
+    boot();
+  }
+
+  applyClerkUser(){
+    const C=window.Clerk, u=C&&C.user;
+    if(u){
+      const raw=(u.publicMetadata&&u.publicMetadata.role)||'';
+      const role=['admin','mudir','musyrif'].indexOf(raw)>=0?raw:'musyrif';
+      const email=(u.primaryEmailAddress&&u.primaryEmailAddress.emailAddress)||(u.emailAddresses&&u.emailAddresses[0]&&u.emailAddresses[0].emailAddress)||'';
+      const name=u.fullName||u.firstName||u.username||(email?email.split('@')[0]:'')||'Staff';
+      const patch={role, userName:name, loginOpen:false};
+      if(this._afterSignIn || !this._applied){ patch.view='dashboard'; }
+      this._applied=true; this._afterSignIn=false;
+      this.setState(patch);
+    } else if(this.state.role!=='public'){
+      this.setState({role:'public', userName:'', view:'gallery'});
+    }
+  }
+
+  async loadRoster(){
+    const id=(this.state.sheetId||'').trim();
+    if(!id){ this.setState({students:null, loadState:'demo'}); return; }
+    this.setState({loadState:'loading'});
+    try{
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&headers=1&sheet='+encodeURIComponent(this.state.sheetTab||'Roster');
+      const text=await (await fetch(url)).text();
+      const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
+      const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
+      const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); return this.mapRow(o); }).filter(s=>s.id&&s.name);
+      this.setState(rows.length?{students:rows, loadState:'live'}:{students:null, loadState:'empty'});
+    }catch(e){ console.error('loadRoster failed', e); this.setState({students:null, loadState:'error'}); }
+  }
+
+  async loadNilai(){
+    const id=(this.state.sheetId||'').trim();
+    if(!id){ this.setState({nilai:null}); return; }
+    try{
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&headers=1&sheet=Nilai';
+      const text=await (await fetch(url)).text();
+      const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
+      const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
+      const num=x=>{ const n=Number(x); return isFinite(n)?n:0; };
+      const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); return {id:String(o.id!=null?o.id:''), tanggal:o.tanggal!=null?String(o.tanggal):'', bidang:o.bidang||'', mapel:o.mapel||'', jenis:o.jenis||'', nilai:num(o.nilai)}; }).filter(x=>x.id&&x.mapel);
+      this.setState({nilai:rows.length?rows:null});
+    }catch(e){ console.error('loadNilai failed', e); this.setState({nilai:null}); }
+  }
+
+  async loadSetoran(){
+    const id=(this.state.sheetId||'').trim();
+    if(!id){ this.setState({setoran:null}); return; }
+    try{
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&headers=1&sheet=Setoran';
+      const text=await (await fetch(url)).text();
+      const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
+      const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
+      const num=x=>{ const n=Number(x); return isFinite(n)?n:0; };
+      const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); const g=(...ks)=>{ for(const k of ks){ if(o[k]!=null&&o[k]!=='') return o[k]; } return null; };
+        const hd=num(g('hal_dari','halaman_dari','hal dari','halaman dari','haldari','hal_awal')), hk=num(g('hal_ke','halaman_ke','hal ke','halaman ke','halke','hal_akhir'));
+        return {id:String(o.id!=null?o.id:''), tanggal:o.tanggal!=null?String(o.tanggal):'', jenis:o.jenis||'', halDari:hd, halKe:(hk||hd),
+          surah:num(g('surah','no surah','no. surah','nosurah')), ayatDari:num(g('ayat_dari','ayat dari','ayatdari','dari','ayat_awal','ayat awal')), ayatKe:num(g('ayat_ke','ayat ke','ayatke','sampai','ke','ayat_akhir','ayat akhir')),
+          nilai:num(o.nilai!=null?o.nilai:o.rating), catatan:o.catatan!=null?String(o.catatan):''}; }).filter(x=>x.id&&x.jenis);
+      this.setState({setoran:rows.length?rows:null});
+    }catch(e){ console.error('loadSetoran failed', e); this.setState({setoran:null}); }
+  }
+
+  async loadKehadiran(){
+    const id=(this.state.sheetId||'').trim();
+    if(!id){ this.setState({kehadiran:null}); return; }
+    try{
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&headers=1&sheet=Absensi';
+      const text=await (await fetch(url)).text();
+      const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
+      const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
+      const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); return {id:String(o.id!=null?o.id:''), tanggal:o.tanggal!=null?String(o.tanggal):'', status:o.status||'', jam:hhmm(o.jam), reason:o.reason||o.alasan||o.keterangan||o.catatan||''}; }).filter(x=>x.id);
+      this.setState({kehadiran:rows.length?rows:null});
+    }catch(e){ console.error('loadKehadiran failed', e); this.setState({kehadiran:null}); }
+  }
+
+  async loadMapel(){
+    const id=(this.state.sheetId||'').trim();
+    if(!id){ this.setState({mapelDef:null}); return; }
+    try{
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&headers=1&sheet=Mapel';
+      const text=await (await fetch(url)).text();
+      const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
+      const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
+      const rows=(json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); return {id:String(o.id!=null?o.id:'').trim(), bidang:o.bidang||'', mapel:o.mapel||'', alias:String(o.alias!=null?o.alias:'').trim()}; }).filter(x=>x.bidang&&x.mapel);
+      this.setState({mapelDef:rows.length?rows:null});
+    }catch(e){ console.error('loadMapel failed', e); this.setState({mapelDef:null}); }
+  }
+
+  async loadHalaqah(){
+    const id=(this.state.sheetId||'').trim();
+    if(!id){ this.setState({halaqahDef:null}); return; }
+    try{
+      const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&headers=1&sheet=Halaqah';
+      const text=await (await fetch(url)).text();
+      const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
+      const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
+      // Halaqah tab maps the halaqah NAME (as written in Master HAL) → its musyrif.
+      const map={}; (json.table.rows||[]).forEach(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); const h=(o.nama!=null?String(o.nama):(o.name!=null?String(o.name):(o.hal!=null?String(o.hal):''))).trim(); if(h) map[h]={ nama:h, musyrif:(o.musyrif||'').toString().trim() }; });
+      this.setState({halaqahDef:Object.keys(map).length?map:null});
+    }catch(e){ console.error('loadHalaqah failed', e); this.setState({halaqahDef:null}); }
+  }
+
+  mapRow(o){
+    const num=x=>{ const n=Number(x); return isFinite(n)?n:0; };
+    // Score cells: blank → null ("not assessed"), so we don't average a missing value as 0.
+    const sc=x=>{ if(x==null||String(x).trim()==='') return null; const n=Number(x); return isFinite(n)?n:null; };
+    return { id:String(o.id!=null?o.id:''), name:o.name||o.nama||'',
+      nick:o.nick||o.panggilan||(o.name?String(o.name).split(' ')[0]:''),
+      kota:o.kota||'', prov:o.prov||o.provinsi||'', kelas:o.kelas!=null?String(o.kelas):'', hal:(o.hal!=null?String(o.hal):'').trim(), curpg:num(o.curpg),
+      juzct:( (o.juzct!=null&&String(o.juzct).trim()!=='')?num(o.juzct) : (o.juzdone!=null&&String(o.juzdone).trim()!=='')?String(o.juzdone).split(/[^0-9]+/).filter(x=>x!=='').length : num(o.juz) ),
+      haf:sc(o.haf), tah:sc(o.tah), mur:sc(o.mur), ilm:sc(o.ilm), akh:sc(o.akh), akd:sc(o.akd), bhs:sc(o.bhs),
+      nis:o.nis!=null?String(o.nis):'',
+      khd:(o.khd!=null&&String(o.khd).trim()!=='')?num(o.khd):null };
+  }
+
+  sortBy(key){
+    const {sortKey,sortDir}=this.state;
+    if(sortKey===key) this.setState({sortDir:sortDir==='asc'?'desc':'asc'});
+    else this.setState({sortKey:key, sortDir:(key==='nick'||key==='kota')?'asc':'desc'});
+  }
+
+  cardVisual(theme, tier){
+    const accent = TIER_ACCENT[tier];
+    if(theme==='gold'){
+      const g = tier==='gold' ? 'linear-gradient(150deg,#f6e29a 0%,#dcb84f 42%,#c69b2c 100%)'
+              : tier==='silver' ? 'linear-gradient(150deg,#eef1f6 0%,#c7cfdb 45%,#aab4c4 100%)'
+              : 'linear-gradient(150deg,#f2d6b0 0%,#d6a877 45%,#b9865a 100%)';
+      const ink = tier==='bronze' ? '#4a3218' : NAVY;
+      return {card:{background:g, border:'1px solid rgba(0,0,0,.12)', boxShadow:'0 10px 26px rgba(20,30,60,.18)'},
+        name:{color:ink}, sub:{color:'rgba(20,30,60,.62)'}, rating:{color:ink}, ratingSub:{color:'rgba(20,30,60,.7)'},
+        chip:{background:'rgba(255,255,255,.55)', color:ink}, statLabel:{color:'rgba(20,30,60,.55)'}, statVal:{color:ink},
+        ring:'rgba(255,255,255,.7)', avBg:'rgba(255,255,255,.5)', avColor:ink, divider:'rgba(0,0,0,.12)', clip:null};
+    }
+    if(theme==='navy'){
+      return {card:{background:'linear-gradient(160deg,#1c3157 0%,#0f1c3a 100%)', border:'1px solid '+accent, boxShadow:'0 10px 26px rgba(10,18,40,.45)'},
+        name:{color:CREAM}, sub:{color:'rgba(245,243,236,.6)'}, rating:{color:accent}, ratingSub:{color:'rgba(245,243,236,.7)'},
+        chip:{background:'rgba(255,255,255,.08)', color:CREAM}, statLabel:{color:'rgba(245,243,236,.5)'}, statVal:{color:CREAM},
+        ring:accent, avBg:'rgba(255,255,255,.06)', avColor:CREAM, divider:'rgba(255,255,255,.12)', clip:null};
+    }
+    if(theme==='crest'){
+      return {card:{background:'linear-gradient(160deg,#1c3157 0%,#0f1c3a 100%)', border:'2px solid '+GREEN, boxShadow:'0 12px 28px rgba(10,18,40,.5)',
+        clipPath:'polygon(50% 0, 100% 15%, 100% 100%, 0 100%, 0 15%)'},
+        name:{color:CREAM}, sub:{color:'rgba(245,243,236,.6)'}, rating:{color:GOLD}, ratingSub:{color:'rgba(245,243,236,.7)'},
+        chip:{background:'rgba(47,143,58,.22)', color:'#bfe6c4'}, statLabel:{color:'rgba(245,243,236,.5)'}, statVal:{color:CREAM},
+        ring:GOLD, avBg:'rgba(255,255,255,.06)', avColor:CREAM, divider:'rgba(255,255,255,.14)', clip:true};
+    }
+    // minimal (default pick)
+    return {card:{background:PAPER, border:'1px solid '+LINE, boxShadow:'0 6px 18px rgba(20,30,60,.07)', borderTop:'4px solid '+accent},
+      name:{color:NAVY}, sub:{color:MUT}, rating:{color:accent}, ratingSub:{color:MUT},
+      chip:{background:CREAM, color:NAVY}, statLabel:{color:'#9aa1ad'}, statVal:{color:NAVY},
+      ring:accent, avBg:CREAM, avColor:NAVY, divider:LINE, clip:null};
+  }
+
+  enrich(r){
+    const theme=this.state.theme;
+    // Halaqah: named circle + single musyrif, from the "Halaqah" sheet (fallback: HALAQAH constant).
+    const _demo=this.state.loadState==='demo'||this.state.forceDemo;
+    const halMap=(!_demo&&this.state.halaqahDef&&Object.keys(this.state.halaqahDef).length)?this.state.halaqahDef:(_demo?HALAQAH:{});
+    const hname=String(r.hal||'').trim();
+    const hdef=halMap[hname]||null;
+    const hd={ nama:hname||'—', musyrif:(hdef&&hdef.musyrif)?hdef.musyrif:'—' };
+    hd.label=hname?('Halaqah '+hname):'—';
+    // which specific juz are memorized (any order); count & progress derive from it
+    // juzct = how many juz are done (a count). The roadmap order (PROGRAM_FULL: 30,29,…,26,1,…,10,
+    // then bonus 11,…,25) tells us WHICH juz those are — the first `juzct` of the program.
+    const juzCount=Math.max(0, Math.min(30, Math.round(r.juzct||0)));
+    const juzDone=PROGRAM_FULL.slice(0, juzCount);
+    const doneSet=new Set(juzDone);
+    // Continuous progress: completed juz (juzct) + how far into the juz being memorized NOW.
+    // Within a juz the manhaj goes front-to-back, so curpg's position in that juz is a linear fraction.
+    const pg = r.curpg>0 ? r.curpg : 0;
+    const pInfo = pg ? mushafInfo(pg) : null;
+    const nextJuz = nextProgramJuz(doneSet);          // the juz being memorized now (roadmap frontier)
+    const curJuz = pInfo ? pInfo.juz : nextJuz;
+    // partial credit only when curpg sits inside that frontier juz (and the 30-juz cap isn't hit)
+    const juzFrac = (pInfo && pInfo.juz===nextJuz && juzCount<30) ? Math.min(0.999, Math.max(0, pInfo.pctJuz/100)) : 0;
+    // Completion vs the 15-juz TARGET; over-achievers (bonus juz 11..25) can reach 200%.
+    const hafPct=Math.min(200, Math.round((juzCount+juzFrac)/TARGET_JUZ*100));
+    const barBase=Math.min(100, hafPct), barOver=Math.max(0, hafPct-100), overTarget=hafPct>100;
+    const scores=PILLARS.map(p=>({...p, score:r[p.key], g:grade(r[p.key])}));
+    const avail=scores.filter(s=>s.score!=null && !isNaN(s.score));
+    const overall = avail.length ? Math.round(avail.reduce((a,s)=>a+s.score,0)/avail.length) : null;
+    const noScores = avail.length===0;
+    const og=grade(overall), tier=tierOf(overall==null?0:overall), v=this.cardVisual(theme,tier);
+    const initials=r.nick.slice(0,2).toUpperCase();
+    // ---- Gallery card visuals: progress ring, tier accent, halaqah dot, juz line ----
+    const toArab=x=>String(x).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d));
+    const curArab=toArab(curJuz);
+    // ring centre = the juz being memorized now, in roadmap order (30,29,…,26,1,…,10, bonus 11,…,25);
+    // ✓ once all 30 are done.
+    const frontierArab=(juzCount>=30)?'✓':toArab(nextJuz);
+    const started=juzCount>0 || !!pInfo;                     // has any memorization or a current page
+    const ringPct=Math.min(100, hafPct);
+    // 0–100% (0–15 juz): green fills the track. Past 100% (bonus lap 11–25): green is full and a GOLD
+    // arc grows over it — barOver% — reaching a full gold ring only at 200% (30/30 juz).
+    const ringStyle=overTarget
+      ? 'conic-gradient(#e0a92c 0% '+barOver+'%, #2f8f3a '+barOver+'% 100%)'
+      : 'conic-gradient(#2f8f3a 0% '+ringPct+'%, #e7ece6 '+ringPct+'% 100%)';
+    // card top-accent by hafalan progress (meaningful even before Profil scores exist)
+    const hafAccent=(overTarget||hafPct>=100)?'#cfa02c':hafPct>=50?'#2f8f3a':hafPct>0?'#7bbf83':'#ece3cf';
+    // per-halaqah colour dot so identical cards read as individuals
+    const HAL_PALETTE=['#2f8f3a','#cfa02c','#3f6fa8','#a05ec2','#c2643f','#3fa39a'];
+    let hh=0; for(let i=0;i<hname.length;i++) hh=(hh*31+hname.charCodeAt(i))>>>0;
+    const halDot=hname?HAL_PALETTE[hh%HAL_PALETTE.length]:'#cbb98a';
+    return {...r, initials, overall, gLetter:og.l, gName:og.name, gColor:og.c, tier, tierColor:TIER_ACCENT[tier],
+      started, ringStyle, hafAccent, halDot, isMumtaz:(og.l==='A'),
+      ringNum:frontierArab, juzLine:(started?(juzCount+' / '+TARGET_JUZ+' Juz'):'Belum mulai'),
+      hafPctText:(started?(hafPct+'%'):''), halaqahShow:(hd.label!=='—'?hd.label:''),
+      juz:juzCount, curJuz, juzDone,
+      curpg:pg, hasPage:!!pInfo, pgInJuz:pInfo?pInfo.inJuz:0, pgLenJuz:pInfo?pInfo.lenJuz:0, pgPctJuz:pInfo?pInfo.pctJuz:0, pgLeft:pInfo?pInfo.leftInJuz:0, pgNextJuz:pInfo?pInfo.nextJuz:0,
+      juzPct:hafPct, barBase, barOver, overTarget, hafPctColor:(overTarget?'#a07d1e':'#2f8f3a'), halaqahLabel:hd.label, halaqahName:hd.nama, musyrif:hd.musyrif, mudir:MUDIR, kelas:r.kelas||'—',
+      curArab,
+      pillars:scores.map(s=>({abbr:s.abbr, label:s.label, score:(s.score==null?'—':s.score), pct:(s.score==null?0:s.score), letter:s.g.l, color:s.g.c, grp:s.grp, pname:s.g.name, tag:(s.score==null?'N/A':(s.g.l+' · '+s.score))})),
+      overallScore:(overall==null?'—':overall), noScores,
+      cardStyle:v.card, nameStyle:v.name, subStyle:v.sub, ratingStyle:v.rating, ratingSubStyle:v.ratingSub,
+      chipStyle:v.chip, statLabelStyle:v.statLabel, statValStyle:v.statVal,
+      avStyle:{background:v.avBg, color:v.avColor, border:'2px solid '+v.ring},
+      divStyle:{borderColor:v.divider},
+      barTrack:{background:theme==='minimal'?'#eef0f4':'rgba(255,255,255,.14)'},
+      onOpen:()=>this.setState({selectedId:r.id, view:'detail'}),
+      onEntry:()=>this.setState({entryOpen:true, sSantri:r.id, nSantri:r.id}),
+      onAbsen:()=>this.setState({kehOpen:true, kehSantri:r.id, kehDate:this.state.kehDate||todayStr(), kehMsg:''}),
+    };
+  }
+
+  // Open book (gold cover, white pages) with a loading bar across the pages
+  // whose green fill tracks memorization progress (juz / 15).
+  // A 15-juz Qur'an: big current juz number centered on the LEFT page,
+  // the word جُزْء centered on the RIGHT page (Aref Ruqaa).
+  bookSvg(juz, uid){
+    const E=(t,p,c)=>React.createElement(t,p,c);
+    const j=Math.max(0,Math.min(15,juz||0));
+    const cur=j>=15?15:j+1;
+    const arb=String(cur).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'.charAt(+d));
+    const two=cur>=10;
+    const OUT='#b98f3e', GOLD='#e8bd57', INK='#0a4631', PAGE='#fdf8ec', ARB="'Aref Ruqaa','Amiri',serif";
+    const cover={fill:GOLD, stroke:OUT, strokeWidth:2.2, strokeLinejoin:'round'};
+    const page={fill:PAGE, stroke:OUT, strokeWidth:1.6, strokeLinejoin:'round'};
+    return E('svg',{viewBox:'0 0 140 122',width:'100%',height:'100%'},[
+      E('path',{key:'or',d:'M70,7 L75,15 L70,23 L65,15 Z',fill:GOLD,stroke:OUT,strokeWidth:1.4,strokeLinejoin:'round'}),
+      E('path',{key:'cl',d:'M70,108 L70,26 Q42,16 9,26 L14,100 Q44,94 70,108 Z',...cover}),
+      E('path',{key:'cr',d:'M70,108 L70,26 Q98,16 131,26 L126,100 Q96,94 70,108 Z',...cover}),
+      E('path',{key:'pl',d:'M70,99 L70,32 Q45,23 17,30 L21,90 Q45,85 70,99 Z',...page}),
+      E('path',{key:'pr',d:'M70,99 L70,32 Q95,23 123,30 L119,90 Q95,85 70,99 Z',...page}),
+      E('text',{key:'jw',x:97,y:64,textAnchor:'middle',dominantBaseline:'middle',fontSize:19,fontWeight:700,fill:INK,fontFamily:ARB},'جُزْء'),
+      E('text',{key:'nm',x:43,y:64,textAnchor:'middle',dominantBaseline:'middle',fontSize:two?34:44,fontWeight:700,fill:INK,fontFamily:"'Amiri',serif"},arb),
+    ]);
+  }
+
+  radar(s){
+    const R=64, cx=80, cy=80, N=s.pillars.length;
+    const pt=(i,rad)=>{ const a=-Math.PI/2 + i*2*Math.PI/N; return [cx+Math.cos(a)*rad, cy+Math.sin(a)*rad]; };
+    const rings=[0.25,0.5,0.75,1].map((f,k)=>React.createElement('polygon',{key:'r'+k,
+      points:Array.from({length:N},(_,i)=>pt(i,R*f).join(',')).join(' '), fill:'none', stroke:'rgba(20,30,60,.12)', strokeWidth:1}));
+    const spokes=Array.from({length:N},(_,i)=>{const[x,y]=pt(i,R);return React.createElement('line',{key:'s'+i,x1:cx,y1:cy,x2:x,y2:y,stroke:'rgba(20,30,60,.1)',strokeWidth:1});});
+    const dataPts=s.pillars.map((p,i)=>pt(i,R*((p.pct||0)/100)));
+    const poly=React.createElement('polygon',{points:dataPts.map(p=>p.join(',')).join(' '), fill:'rgba(47,143,58,.20)', stroke:GREEN, strokeWidth:2});
+    const dots=dataPts.map((p,i)=>React.createElement('circle',{key:'d'+i,cx:p[0],cy:p[1],r:2.6,fill:GREEN}));
+    const labels=s.pillars.map((p,i)=>{const[x,y]=pt(i,R+15);return React.createElement('text',{key:'l'+i,x,y,fontSize:9,fontWeight:700,fill:NAVY,textAnchor:'middle',dominantBaseline:'middle',fontFamily:'ui-monospace,monospace'},p.abbr);});
+    return React.createElement('svg',{viewBox:'-8 -8 176 176',width:'100%',height:'100%'},[...rings,...spokes,poly,...dots,...labels]);
+  }
+
+  juzCells(s){
+    const done=new Set(s.juzDone||[]);
+    return Array.from({length:30},(_,i)=>{
+      const n=i+1, st = done.has(n)?'done': n===s.curJuz?'current':'todo';
+      const style = st==='done'?('background:'+GREEN+';color:#fff;border-color:'+GREEN)
+        : st==='current'?('background:#fff;color:'+GOLD+';border-color:'+GOLD+';border-width:2px')
+        : ('background:#fff;color:#c2c7d0;border-color:'+LINE);
+      return {n, st, style};
+    });
+  }
+
+  renderVals(){
+    const st=this.state, v=st.view;
+    // Demo data ONLY when genuinely unconfigured (loadState 'demo'). Once a sheet is configured
+    // (loading/live/empty/error), never fall back to demo — show live data or a placeholder.
+    const demoMode = st.loadState==='demo' || !!st.forceDemo;
+    const source=demoMode?RAW:((st.students&&st.students.length)?st.students:[]);
+    const all=source.map(r=>this.enrich(r));
+    const dataStatus = st.forceDemo?'Data contoh (demo) · mode preview aktif'
+      : st.loadState==='live'?'Live · Google Sheet'
+      : st.loadState==='loading'?'Memuat data…'
+      : st.loadState==='empty'?'Terhubung · tab Roster masih kosong (belum ada baris santri)'
+      : st.loadState==='error'?'Gagal muat · cek sharing (Anyone with link → Viewer) & tab "Roster"'
+      : st.cfgFound?'Config terbaca · data contoh (demo)'
+      : 'Config Sheet tidak ditemukan · data contoh (demo)';
+    const q=st.search.trim().toLowerCase();
+    // One combined filter (shared by gallery + roster): 'all' | 'kelas:VII' | 'hal:1'.
+    const gf=st.groupFilter||'all';
+    const groupMatch=s=> gf==='all' ? true : gf.indexOf('kelas:')===0 ? String(s.kelas)===gf.slice(6) : gf.indexOf('hal:')===0 ? String(s.hal)===gf.slice(4) : true;
+    const filterCount=all.filter(groupMatch).length;
+    const kelasList=Array.from(new Set(all.map(s=>String(s.kelas||'').trim()).filter(k=>k&&k!=='—'))).sort((a,b)=>kelasRank(a)-kelasRank(b));
+    const halList=Array.from(new Set(all.map(s=>String(s.hal||'').trim()).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
+    const halNameByHal={}; all.forEach(s=>{ halNameByHal[String(s.hal)]=s.halaqahName; });
+    // Popover filter: chips carry their own onPick + active-state colors (like s.onOpen).
+    const mkChip=(v,label)=>{ const active=gf===v; return {v, label, active, bg:active?'#0a4631':'#f7f6f2', fg:active?'#fff':'#16264d', bd:active?'#0a4631':'#e6e1d5', onPick:()=>this.setState({groupFilter:v, filterOpen:false})}; };
+    const allChip=mkChip('all','Semua Santri');
+    const kelasChips=kelasList.map(k=>mkChip('kelas:'+k, k));
+    const halChips=halList.map(h=>mkChip('hal:'+h, halNameByHal[h]||h));
+    const filterLabel = gf==='all' ? 'Semua Santri' : gf.indexOf('kelas:')===0 ? 'Kelas '+gf.slice(6) : 'Halaqah '+(halNameByHal[gf.slice(4)]||gf.slice(4));
+    let gallery=all.filter(s=> groupMatch(s) && (!q || s.name.toLowerCase().includes(q) || s.kota.toLowerCase().includes(q)));
+    gallery=gallery.slice().sort((a,b)=>b.overall-a.overall);
+    // dashboard roster (for now all staff roles see every halaqah; musyrif scope TODO)
+    let roster=all.filter(groupMatch);
+    const sk=st.sortKey||'juz', sd=st.sortDir||'desc';
+    const cmpBy={ nick:(a,b)=>a.nick.localeCompare(b.nick), juz:(a,b)=>a.juz-b.juz, kota:(a,b)=>(a.kota||'').localeCompare(b.kota||''), overall:(a,b)=>a.overall-b.overall };
+    const cmp=cmpBy[sk]||cmpBy.juz;
+    roster.sort((a,b)=>sd==='asc'?cmp(a,b):-cmp(a,b));
+    const totalJuz=roster.reduce((a,s)=>a+s.juz,0);
+    const avgJuz=roster.length?(totalJuz/roster.length):0;
+    // Placeholder (loading / empty / error) shown in place of demo data once a sheet is configured.
+    const noData=all.length===0, isLoading=st.loadState==='loading';
+    const dataMsg = isLoading?'Memuat data santri…' : st.loadState==='empty'?'Belum ada santri terdaftar' : st.loadState==='error'?'Gagal memuat data' : 'Belum ada data';
+    const dataSub = isLoading?'Menghubungkan ke Google Sheet…' : st.loadState==='empty'?'Tambahkan baris santri pada tab “Master”, lalu muat ulang.' : st.loadState==='error'?'Periksa sharing sheet (Anyone with link → Viewer) & nama tab.' : '';
+    const galleryEmpty=gallery.length===0, rosterEmpty=roster.length===0;
+    const listMsg = noData?dataMsg:'Tidak ada santri pada filter ini';
+    const listSub = noData?dataSub:'Coba ubah atau atur ulang filter.';
+    const sel = all.find(s=>s.id===st.selectedId)||null;
+    const term = TERMS.find(t=>t.id===st.termId) || TERMS[0];
+    // Rapor extras: ranking within the same Kelas, and attendance tallied from the Kehadiran log (term-scoped).
+    let selRank=0, selRankTotal=0;
+    if(sel){ const peers=all.filter(s=>String(s.kelas)===String(sel.kelas)).slice().sort((a,b)=>b.overall-a.overall); selRankTotal=peers.length; selRank=peers.findIndex(s=>s.id===sel.id)+1; }
+    const activeKehadiran = demoMode?KEHADIRAN:((st.kehadiran&&st.kehadiran.length)?st.kehadiran:[]);
+    // Only absences are recorded → count S/I/A; Hadir & the Kehadiran score derive from hari efektif.
+    const selAtt = sel ? activeKehadiran.filter(r=>r.id===sel.id && inTerm(r.tanggal, term) && attStatus(r.status)!=='hadir') : [];
+    const att = {sakit:0, izin:0, alpa:0};
+    selAtt.forEach(r=>{ const k=attStatus(r.status); if(att[k]!=null) att[k]++; });
+    const absTotal = att.sakit+att.izin+att.alpa;
+    const hariEfektif = term.days||0;
+    const attHadir = Math.max(0, hariEfektif-absTotal);
+    // Kehadiran score: sheet-computed `khd` (weighted formula, §2f) wins; else a simple presence %.
+    const kehDerived = hariEfektif ? Math.round(attHadir/hariEfektif*100) : 0;
+    const kehScore = (sel && sel.khd!=null) ? sel.khd : kehDerived;
+    const hasAttendance = (sel && sel.khd!=null) || hariEfektif>0;
+    // Absence notes: each recorded absence with time + reason.
+    const ATT_LABEL={sakit:'Sakit', izin:'Izin', alpa:'Alpa'}, ATT_COLOR={sakit:'#3f6fa8', izin:'#8a6d1e', alpa:'#b4483a'};
+    const attNotes = selAtt.filter(r=>attStatus(r.status)!=='hadir').map(r=>{ const k=attStatus(r.status); const jam=hhmm(r.jam); return {ymd:ymd(r.tanggal), tgl:fmtTgl(r.tanggal), waktu: jam?(' · '+jam):'', label:ATT_LABEL[k], color:ATT_COLOR[k], reason:String(r.reason||'').trim()||'—'}; }).sort((a,b)=>(a.ymd||'').localeCompare(b.ymd||''));
+    const hasAttNotes = attNotes.length>0;
+
+    const roleLabel = st.role==='admin'?'Admin':st.role==='mudir'?'Mudir':st.role==='musyrif'?'Musyrif':'Publik';
+    const activeNilai = demoMode?NILAI:((st.nilai&&st.nilai.length)?st.nilai:[]);
+    // Match/resolve a Nilai row's `mapel` value against Mapel definitions — by id first
+    // (stable across renames/reorders), then by name/alias (legacy sheets stored the name).
+    const activeMapel = demoMode?MAPEL:((st.mapelDef&&st.mapelDef.length)?st.mapelDef:[]);
+    const nmz=(s)=>String(s||'').trim().toLowerCase();
+    const mapelMatch=(nmapel, def)=>{ const v=nmz(nmapel); return !!v && (v===nmz(def.id) || v===nmz(def.mapel) || (def.alias && v===nmz(def.alias))); };
+    const mapelName=(nmapel)=>{ const d=activeMapel.find(def=>mapelMatch(nmapel, def)); return d?d.mapel:String(nmapel||''); };
+    const selNilaiRows = sel ? activeNilai.filter(n=>n.id===sel.id).slice().sort((a,b)=>(b.tanggal||'').localeCompare(a.tanggal||'')).map(n=>{ const g=grade(n.nilai); return {...n, mapel:mapelName(n.mapel), tgl:fmtTgl(n.tanggal), pred:g.name, pcolor:g.c}; }) : [];
+    const activeSetoran = demoMode?SETORAN:((st.setoran&&st.setoran.length)?st.setoran:[]);
+    const selSetoranAll = sel ? activeSetoran.filter(r=>r.id===sel.id) : [];
+    const selSetoranRows = selSetoranAll.map(r=>{ const su=Number(r.surah)||0, ad=Number(r.ayatDari)||0, ak=Number(r.ayatKe)||0; const ayahRef = su ? (' · QS '+su+(ad?(':'+ad+(ak&&ak>ad?'–'+ak:'')):' · 1 surah penuh')) : ''; const hd=Number(r.halDari)||0, hk=Number(r.halKe)||hd; const halRef = hd ? ('hal. '+hd+(hk>hd?('–'+hk):'')) : '—'; const juz = hd ? juzOfPage(hd) : ''; return {...r, juz, halRef, ymd:ymd(r.tanggal), tgl:fmtTgl(r.tanggal), jcolor:setoranColor(r.jenis), stars:starStr(r.nilai), ayahRef}; }).sort((a,b)=>(b.ymd||'').localeCompare(a.ymd||'')).slice(0,10);
+    const setoranStat = { zi:0, mu:0, ta:0 };
+    selSetoranAll.forEach(r=>{ setoranStat[setoranCat(r.jenis)]++; });
+    // Rapor tables: subjects are DYNAMIC (defined in the "Mapel" sheet, falling back to the demo MAPEL);
+    // the three bidang groups are FIXED. Each subject's score is the average of that santri's Nilai
+    // records for it; Akhlak (a credit, not a test) falls back to the roster aggregate.
+    const raporHafalanNote = sel ? (sel.juz+' dari 15 juz ('+sel.juzPct+'%) · sedang menghafal Juz '+sel.curJuz + (sel.hasPage?(' · halaman '+sel.curpg+'/'+MUSHAF_PAGES):'') + (sel.overTarget?' · melampaui target':'')) : '';
+    const entryKind = st.entryKind||'setoran';
+    const activeFormId = extractFormId(entryKind==='nilai' ? (st.nilaiFormId||'') : (st.setoranFormId||''));
+    const formConfigured = !!activeFormId && activeFormId.indexOf('SAMPLE')<0;
+    const raporRows = (bidangKey)=>{
+      if(!sel) return [];
+      const defs = activeMapel.filter(d=>normBidang(d.bidang)===bidangKey);
+      const nil = activeNilai.filter(n=>n.id===sel.id && inTerm(n.tanggal, term));
+      // With defined subjects, group by the Mapel definition (order + names come from the sheet).
+      // Fallback (no Mapel tab): group by whatever raw mapel value appears, filtered by bidang.
+      const list = defs.length ? defs : Array.from(new Set(nil.filter(n=>normBidang(n.bidang)===bidangKey).map(n=>n.mapel))).map(m=>({id:'', mapel:m, alias:''}));
+      return list.map(def=>{
+        const arr = nil.filter(n=>defs.length ? mapelMatch(n.mapel, def) : n.mapel===def.mapel).map(n=>n.nilai);
+        let v = arr.length ? Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) : null;
+        if(v==null && bidangKey==='Diniyah' && /akhlak/i.test(def.mapel)){ const akh=sel.pillars.find(p=>p.abbr==='AKH'); if(akh && akh.pct) v=akh.pct; }
+        if(v==null) return {label:def.mapel, score:'—', pname:'Belum dinilai', color:'#9aa1ad'};
+        const g=grade(v); return {label:def.mapel, score:v, pname:g.name, color:g.c};
+      });
+    };
+    const diniyahRows = raporRows('Diniyah');
+    const akademikRows = raporRows('Umum');
+    const ekskulRows = raporRows('Ekstrakurikuler');
+
+    // ---- Attendance quick-log (admin) ----
+    const nameById={}; all.forEach(s=>{ nameById[s.id]=s.nick||s.name; });
+    const kehDate = st.kehDate||todayStr();
+    const kss = st.kehStatus||'Izin';
+    const kehStatusChips = ['Sakit','Izin','Alpa'].map(v=>{ const active=kss===v, c=ATT_COLOR[v.toLowerCase()]; return {v, style:'flex:1;padding:9px 8px;border-radius:9px;border:1px solid '+(active?c:'#e6e1d5')+';background:'+(active?c:'#fff')+';color:'+(active?'#fff':'#16264d')+';font-weight:700;font-size:12.5px;cursor:pointer', onPick:()=>this.setState({kehStatus:v})}; });
+    const kehSantriOpts = all.slice().sort((a,b)=>(a.nick||a.name).localeCompare(b.nick||b.name)).map(s=>({v:s.id, label:(s.nick||s.name)+' · '+(s.kelas||'')}));
+    const kehCfg = parseKehLink(st.kehLink), kehConfigured=!!kehCfg;
+    const kehList = (st.kehPending||[]).map((r,i)=>({r,i})).filter(x=>x.r.tanggal===kehDate)
+        .map(({r,i})=>({who:nameById[r.id]||r.id, status:r.status, statusColor:ATT_COLOR[attStatus(r.status)]||'#8a6d1e', waktu:r.jam?(' · '+r.jam):'', reason:r.reason||'—', pending:true, onUndo:(idx=>()=>{ const p=(this.state.kehPending||[]).slice(); p.splice(idx,1); this.setState({kehPending:p}); })(i)}))
+      .concat(activeKehadiran.filter(r=>ymd(r.tanggal)===kehDate && attStatus(r.status)!=='hadir')
+        .map(r=>({who:nameById[r.id]||r.id, status:r.status, statusColor:ATT_COLOR[attStatus(r.status)]||'#8a6d1e', waktu:(String(r.jam||'').trim())?(' · '+String(r.jam).trim()):'', reason:String(r.reason||'').trim()||'—', pending:false, onUndo:null})));
+
+    // ---- Custom Setoran / Nilai input forms (POST to their pre-filled-link forms) ----
+    const santriOpts = kehSantriOpts; // shared santri dropdown
+    const sJenisCol={'Ziyadah':'#2f8f3a','Muroja’ah':'#cfa02c','Tahsin':'#3f6fa8'};
+    const sJenisChips=['Ziyadah','Muroja’ah','Tahsin'].map(vv=>{ const active=(st.sJenis||'Ziyadah')===vv, c=sJenisCol[vv]; return {v:vv, style:'flex:1;padding:9px 6px;border-radius:9px;border:1px solid '+(active?c:'#e6e1d5')+';background:'+(active?c:'#fff')+';color:'+(active?'#fff':'#16264d')+';font-weight:700;font-size:12px;cursor:pointer', onPick:()=>this.setState({sJenis:vv})}; });
+    const sRating=st.sRating||0;
+    const sStars=[1,2,3,4,5].map(n=>({n, star:(n<=sRating?'★':'☆'), col:(n<=sRating?'#e0a92c':'#d8d5cc'), onPick:()=>this.setState({sRating:n})}));
+    const nBidangChips=['Diniyah','Umum','Ekstrakurikuler'].map(vv=>{ const active=(st.nBidang||'Diniyah')===vv, c='#0a4631'; return {v:vv, style:'flex:1;padding:9px 5px;border-radius:9px;border:1px solid '+(active?c:'#e6e1d5')+';background:'+(active?c:'#fff')+';color:'+(active?'#fff':'#16264d')+';font-weight:700;font-size:11px;cursor:pointer', onPick:()=>this.setState({nBidang:vv, nMapel:''})}; });
+    const nMapelOpts=activeMapel.filter(d=>normBidang(d.bidang)===(st.nBidang||'Diniyah')).map(d=>({v:d.id||d.mapel, label:d.mapel}));
+    const setoranReady=!!parseFormLink(st.setoranFormId, SETORAN_KEYS), nilaiReady=!!parseFormLink(st.nilaiFormId, NILAI_KEYS);
+
+    return {
+      view:v, role:st.role, roleLabel, userName:st.userName, greeting: st.userName?('Halo, '+st.userName):'',
+      isLogin:v==='login', isGallery:v==='gallery', isDetail:v==='detail', isDashboard:v==='dashboard',
+      loginOpen:st.loginOpen, entryOpen:st.entryOpen, configOpen:st.configOpen,
+      canManage: st.role==='admin'||st.role==='mudir'||st.role==='musyrif',
+      canManageSecular: st.role==='admin', isAdmin: st.role==='admin',
+      kehOpen:st.kehOpen, kehDate, kehSantri:st.kehSantri, kehStatus:kss, kehJam:st.kehJam, kehReason:st.kehReason, kehLink:st.kehLink, kehMsg:st.kehMsg,
+      kehStatusChips, kehSantriOpts, kehList, kehCount:kehList.length, hasKehList:kehList.length>0, kehConfigured, kehNotConfigured:!kehConfigured,
+      isStaff: st.role==='admin'||st.role==='mudir'||st.role==='musyrif',
+      isPublic: st.role==='public',
+      gallery, galleryCount:gallery.length, roster, rosterCount:roster.length,
+      galleryHasItems:!galleryEmpty, galleryEmpty, rosterHasItems:!rosterEmpty, rosterEmpty,
+      isLoading, listMsg, listSub,
+      roadmapGroups: ROADMAP.map(g=>({ label:g.label, gold:g.gold,
+        labelStyle:'font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;color:'+(g.gold?'#a5791f':'#0a4631'),
+        chips: g.juz.map(j=>({ j, style:'display:inline-grid;place-items:center;min-width:23px;height:23px;padding:0 5px;border-radius:7px;font-size:11.5px;font-weight:800;'+(g.gold?'background:#fbf5e4;border:1px solid #ecdcae;color:#a5791f':'background:#eaf3ea;border:1px solid #cfe3d0;color:#2f8f3a') })) })),
+      totalJuz, avgJuz:avgJuz.toFixed(1),
+      mumtazCount:roster.filter(s=>s.gLetter==='A').length,
+      filterOpen:st.filterOpen, filterLabel, filterCount, filterActive: gf!=='all', allChip, kelasChips, halChips,
+      toggleFilter:()=>this.setState({filterOpen:!this.state.filterOpen}),
+      closeFilter:()=>this.setState({filterOpen:false}),
+      resetFilter:()=>this.setState({groupFilter:'all', filterOpen:false}),
+      sel, selRadar: sel?this.radar(sel):null, selJuz: sel?this.juzCells(sel):[],
+      // per-subject test records (Islamic + secular)
+      selNilai:selNilaiRows, hasNilai:selNilaiRows.length>0, noNilai:!selNilaiRows.length,
+      selSetoran:selSetoranRows, hasSetoran:selSetoranRows.length>0, noSetoran:!selSetoranRows.length,
+      setoranZi:setoranStat.zi, setoranMu:setoranStat.mu, setoranTa:setoranStat.ta, setoranTotal:selSetoranAll.length,
+      // report card (admin only)
+      term:term.label, termId:term.id, terms:TERMS.map(t=>({id:t.id, label:t.label})),
+      raporHafalanNote,
+      selNis: sel ? (sel.nis||'—') : '',
+      selRankLabel: (sel&&selRank) ? (selRank+' dari '+selRankTotal+' santri · Kelas '+sel.kelas) : '—',
+      hasAttendance, attHadir, attSakit:att.sakit, attIzin:att.izin, attAlpa:att.alpa, attTotal:hariEfektif, kehScore,
+      attNotes, hasAttNotes,
+      canRapor: st.role==='admin', raporOpen:st.raporOpen,
+      raporDiniyah: diniyahRows, raporAkademik: akademikRows,
+      raporEkskul: ekskulRows, hasEkskul: ekskulRows.length>0,
+      raporNote: sel ? ('Alhamdulillah, capaian '+sel.nick+' pada semester ini tergolong '+sel.gName+'. '+(sel.overall>=85?'Pertahankan dan tingkatkan terus, istiqamah dalam menghafal serta belajar.':'Teruslah bersemangat memperbaiki hafalan, muraja’ah, dan nilai akademik.')) : '',
+      openRapor:()=>this.setState({raporOpen:true}),
+      closeRapor:()=>this.setState({raporOpen:false}),
+      setTerm:(ev)=>this.setState({termId:ev.target.value}),
+      printRapor:()=>{ try{ window.print(); }catch(e){} },
+      search:st.search, onSearch:(ev)=>this.setState({search:ev.target.value}),
+      sortName:()=>this.sortBy('nick'), sortProg:()=>this.sortBy('juz'), sortAsal:()=>this.sortBy('kota'), sortNilai:()=>this.sortBy('overall'),
+      arrowName: st.sortKey==='nick'?(st.sortDir==='asc'?' ↑':' ↓'):'',
+      arrowProg: st.sortKey==='juz'?(st.sortDir==='asc'?' ↑':' ↓'):'',
+      arrowAsal: st.sortKey==='kota'?(st.sortDir==='asc'?' ↑':' ↓'):'',
+      arrowNilai: st.sortKey==='overall'?(st.sortDir==='asc'?' ↑':' ↓'):'',
+      // nav
+      login:(role)=>this.setState({role, view: role==='public'?'gallery':'dashboard'}),
+      goGallery:()=>this.setState({view:'gallery'}),
+      goDashboard:()=>this.setState({view:'dashboard'}),
+      goEntry:()=>this.setState({entryOpen:true, sSantri:'', nSantri:''}),
+      closeEntry:()=>this.setState({entryOpen:false}),
+      goConfig:()=>this.setState({configOpen:true, entryOpen:false}),
+      closeConfig:()=>this.setState({configOpen:false}),
+      // ---- Attendance quick-log (admin) ----
+      openKeh:()=>this.setState({kehOpen:true, kehSantri:'', kehDate:this.state.kehDate||todayStr(), kehMsg:''}),
+      closeKeh:()=>this.setState({kehOpen:false}),
+      setKehDate:(ev)=>this.setState({kehDate:ev.target.value}),
+      setKehSantri:(ev)=>this.setState({kehSantri:ev.target.value}),
+      setKehStatus:(v)=>()=>this.setState({kehStatus:v}),
+      setKehJam:(ev)=>this.setState({kehJam:ev.target.value}),
+      kehNow:()=>this.setState({kehJam:nowHM()}),
+      setKehReason:(ev)=>this.setState({kehReason:ev.target.value}),
+      setKehLink:(ev)=>this.setState({kehLink:ev.target.value}),
+      saveKeh:()=>{
+        const s=this.state; const id=(s.kehSantri||'').trim(), tgl=(s.kehDate||todayStr()).trim();
+        if(!id){ this.setState({kehMsg:'Pilih santri dahulu.'}); return; }
+        const rec={id, tanggal:tgl, status:s.kehStatus||'Izin', jam:(s.kehJam||'').trim(), reason:(s.kehReason||'').trim()};
+        const cfg=parseKehLink(s.kehLink);
+        if(cfg){ try{ const b=new URLSearchParams();
+          b.append(cfg.id, rec.id); b.append(cfg.status, rec.status);
+          if(cfg.tanggal.dateBase){ const p=rec.tanggal.split('-'); b.append('entry.'+cfg.tanggal.dateBase+'_year',p[0]); b.append('entry.'+cfg.tanggal.dateBase+'_month',String(+p[1])); b.append('entry.'+cfg.tanggal.dateBase+'_day',String(+p[2])); } else b.append(cfg.tanggal.simple, rec.tanggal);
+          if(rec.jam && cfg.jam){ if(cfg.jam.timeBase){ const t=rec.jam.split(':'); b.append('entry.'+cfg.jam.timeBase+'_hour',String(+t[0])); b.append('entry.'+cfg.jam.timeBase+'_minute',String(+t[1])); } else b.append(cfg.jam.simple, rec.jam); }
+          if(cfg.reason) b.append(cfg.reason, rec.reason);
+          fetch(cfg.action,{method:'POST',mode:'no-cors',body:b}); }catch(e){ console.error('keh POST failed',e); } }
+        this.setState({kehPending:[rec].concat(s.kehPending||[]), kehSantri:'', kehJam:'', kehReason:'', kehMsg: cfg?'Tersimpan ✓':'Tercatat sesi ini (form belum dikonfigurasi — belum tersimpan ke sheet).'});
+      },
+      undoKeh:(i)=>()=>{ const p=(this.state.kehPending||[]).slice(); p.splice(i,1); this.setState({kehPending:p}); },
+      goLogin:()=>{ const C=window.Clerk; if(C){ this._afterSignIn=true; const here=window.location.href, o={afterSignInUrl:here, afterSignUpUrl:here, signInForceRedirectUrl:here, signUpForceRedirectUrl:here}; if(C.loaded){ C.openSignIn(o); } else { C.load().then(()=>C.openSignIn(o)).catch(()=>this.setState({loginOpen:true})); } } else { this.setState({loginOpen:true}); } },
+      closeLogin:()=>this.setState({loginOpen:false}),
+      stopLogin:(ev)=>{ ev && ev.stopPropagation && ev.stopPropagation(); },
+      logout:()=>{ try{ if(window.Clerk && window.Clerk.user) window.Clerk.signOut(); }catch(e){} this.setState({view:'gallery', role:'public', loginOpen:false, selectedId:null, userName:''}); },
+      back:()=>this.setState({view: st.role==='public'?'gallery':'dashboard'}),
+      loginAdmin:()=>this.setState({role:'admin', view:'dashboard', loginOpen:false}),
+      loginMudir:()=>this.setState({role:'mudir', view:'dashboard', loginOpen:false}),
+      loginMusyrif:()=>this.setState({role:'musyrif', view:'dashboard', loginOpen:false}),
+      loginPublic:()=>this.setState({role:'public', view:'gallery'}),
+      // Custom input forms (+ Input toggle): daily Setoran + periodic Nilai ujian, both POST to their forms.
+      entryKind, isSetoran: entryKind==='setoran', isNilai: entryKind==='nilai',
+      entryTitle: entryKind==='nilai' ? 'Input Nilai Ujian/Tes' : 'Input Setoran Harian',
+      segSetoranStyle: entryKind==='setoran'?SEG_ON:SEG_OFF, segNilaiStyle: entryKind==='nilai'?SEG_ON:SEG_OFF,
+      showSetoran:()=>this.setState({entryKind:'setoran'}),
+      showNilai:()=>this.setState({entryKind:'nilai'}),
+      santriOpts,
+      // Setoran form
+      sSantri:st.sSantri, sDate:st.sDate||todayStr(), sJenisChips, sHalDari:st.sHalDari, sHalKe:st.sHalKe, sSurah:st.sSurah, sAyatDari:st.sAyatDari, sAyatKe:st.sAyatKe, sStars, sCatatan:st.sCatatan, sMsg:st.sMsg, setoranReady, setoranNotReady:!setoranReady,
+      setSSantri:(e)=>this.setState({sSantri:e.target.value}), setSDate:(e)=>this.setState({sDate:e.target.value}),
+      setSHalDari:(e)=>this.setState({sHalDari:e.target.value}), setSHalKe:(e)=>this.setState({sHalKe:e.target.value}),
+      setSSurah:(e)=>this.setState({sSurah:e.target.value}), setSAyatDari:(e)=>this.setState({sAyatDari:e.target.value}), setSAyatKe:(e)=>this.setState({sAyatKe:e.target.value}),
+      setSCatatan:(e)=>this.setState({sCatatan:e.target.value}),
+      saveSetoran:()=>{ const s=this.state; const id=(s.sSantri||'').trim(); if(!id){ this.setState({sMsg:'Pilih santri dahulu.'}); return; }
+        if(!String(s.sHalDari||'').trim()){ this.setState({sMsg:'Isi halaman (dari) dahulu.'}); return; }
+        const hd=String(s.sHalDari||'').trim(), hk=String(s.sHalKe||'').trim()||hd;   // ke kosong → satu halaman
+        const rec={ id, tanggal:(s.sDate||todayStr()), jenis:s.sJenis||'Ziyadah', hal_dari:hd, hal_ke:hk, surah:String(s.sSurah||'').trim(), ayat_dari:String(s.sAyatDari||'').trim(), ayat_ke:String(s.sAyatKe||'').trim(), nilai:(s.sRating?String(s.sRating):''), catatan:String(s.sCatatan||'').trim() };
+        const ok=postForm(parseFormLink(s.setoranFormId, SETORAN_KEYS), rec);
+        this.setState({ sHalDari:'', sHalKe:'', sSurah:'', sAyatDari:'', sAyatKe:'', sRating:0, sCatatan:'', sMsg: ok?'Setoran tersimpan ✓':'Belum tersimpan — form Setoran perlu pre-filled link (Konfigurasi, GUIDE §5).' }); },
+      // Nilai form
+      nSantri:st.nSantri, nDate:st.nDate||todayStr(), nBidangChips, nMapel:st.nMapel, nMapelOpts, nJenis:st.nJenis, nNilai:st.nNilai, nMsg:st.nMsg, nilaiReady, nilaiNotReady:!nilaiReady,
+      setNSantri:(e)=>this.setState({nSantri:e.target.value}), setNDate:(e)=>this.setState({nDate:e.target.value}),
+      setNMapel:(e)=>this.setState({nMapel:e.target.value}), setNJenis:(e)=>this.setState({nJenis:e.target.value}), setNNilai:(e)=>this.setState({nNilai:e.target.value}),
+      saveNilai:()=>{ const s=this.state; const id=(s.nSantri||'').trim(); if(!id){ this.setState({nMsg:'Pilih santri dahulu.'}); return; } if(!(s.nMapel||'').trim()){ this.setState({nMsg:'Pilih mapel dahulu.'}); return; }
+        const rec={ id, tanggal:(s.nDate||todayStr()), mapel:s.nMapel, jenis:s.nJenis||'Tes / Kuis', nilai:String(s.nNilai||'').trim() };
+        const ok=postForm(parseFormLink(s.nilaiFormId, NILAI_KEYS), rec);
+        this.setState({ nMapel:'', nNilai:'', nMsg: ok?'Nilai tersimpan ✓':'Belum tersimpan — form Nilai perlu pre-filled link (Konfigurasi, GUIDE §5).' }); },
+      setoranFormId:st.setoranFormId, nilaiFormId:st.nilaiFormId,
+      dataStatus, sheetId:st.sheetId,
+      forceDemo:!!st.forceDemo, demoBg:(st.forceDemo?'#eef4ee':'#f7f6f2'), demoBd:(st.forceDemo?'#0a4631':'#e6e1d5'),
+      toggleDemo:()=>{ const nv=!this.state.forceDemo; try{ if(window.localStorage){ nv?localStorage.setItem('rtaDemo','1'):localStorage.removeItem('rtaDemo'); } }catch(e){} this.setState({forceDemo:nv}); },
+      setSheetId:(ev)=>this.setState({sheetId:ev.target.value}),
+      // Config sheet (read-only display)
+      cfgSheetUrl:'https://docs.google.com/spreadsheets/d/'+CONFIG_ID+'/edit',
+      reloadConfig:()=>this.loadConfig(),
+      cfgRows:[
+        { label:'Sumber data (Sheet)', ok:!!(st.sheetId&&st.sheetId!==CONFIG_ID), dot:(st.sheetId?'#1f7a34':'#c9cdd4'), val: st.sheetId?(String(st.sheetId).slice(0,8)+'…'):'— config sheet' },
+        { label:'Form Setoran Harian', ok:setoranReady, dot:(setoranReady?'#1f7a34':(st.setoranFormId?'#cfa02c':'#c9cdd4')), val: setoranReady?'terhubung':(st.setoranFormId?'perlu pre-filled link':'belum diisi') },
+        { label:'Form Nilai Ujian/Tes', ok:nilaiReady, dot:(nilaiReady?'#1f7a34':(st.nilaiFormId?'#cfa02c':'#c9cdd4')), val: nilaiReady?'terhubung':(st.nilaiFormId?'perlu pre-filled link':'belum diisi') },
+        { label:'Absensi (pre-filled link)', ok:kehConfigured, dot:(kehConfigured?'#1f7a34':'#c9cdd4'), val: kehConfigured?'terhubung':'belum diisi' },
+      ],
+      reloadRoster:()=>{ this.loadRoster(); this.loadNilai(); this.loadSetoran(); this.loadKehadiran(); this.loadMapel(); this.loadHalaqah(); },
+    };
+  }
+}
+</script>
+</body>
+</html>
