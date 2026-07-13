@@ -225,10 +225,12 @@ keys (the tracker matches by header):
 | P | `kelas` | class level, e.g. `VII` / `VIII` | text | staff |
 | Q | `nis` | **optional, public** — the santri's NIS, shown in the Rapor header. Leave blank to show `—`. | text | staff |
 | R | `khd` | **optional, public** — the **Kehadiran score** (0–100), a weighted formula computed from the `Absensi` tab (§2f). Blank → app derives a simple presence %. | number | formula |
-| S+ | `wali`, `nohp`, `alamat`, `status`, `catatan_musyrif`, `catatan_mudir`, … | **PRIVATE — never mirrored** | any | staff |
+| S | `curjuzpct` | **optional, public** — ayah-precise % into the frontier juz (§2i). Blank → app uses the page fraction from `curpg`. Only if you set up ayah accuracy; then mirror `A:S`. | number | formula |
+| T+ | `wali`, `nohp`, `alamat`, `status`, `catatan_musyrif`, `catatan_mudir`, … | **PRIVATE — never mirrored** | any | staff |
 
-> ⚠️ **Columns Q–R are reserved for the optional public `nis` / `khd`.** Start any **private** columns
-> at **S** — the mirror (§3) imports `A:R`, so anything in Q–R becomes public.
+> ⚠️ **Columns Q–S are reserved for the optional public `nis` / `khd` / `curjuzpct`.** Start any
+> **private** columns at **T** if you use `curjuzpct` (mirror `A:S`), else at **S** (mirror `A:R`) — the
+> mirror (§3) imports only up to its declared column, so anything before it becomes public.
 > *(Daily absences live in their own `Absensi` tab, §2f; `khd` is just the computed score.)*
 
 > The score columns (G–M) are what the app's **Profil Kemampuan** radar/bars read. Type them
@@ -754,11 +756,37 @@ juz:                                =MATCH(gIdx, Quran!$F$2:$F$31, 1)
                                           ROUND((g-a+1)/(b-a)*100))
 ```
 
-#### (D) Plug into progress
-In `Ringkasan` (§2h), when a setoran's frontier row has `surah`+`ayat_ke`, use the **ayah-precise %**
-above for the current-juz fraction; otherwise fall back to the **page %** from the `Quran` juz table.
-`juzct` (whole juz done) still comes from the page `Grid` — the ayah refinement only sharpens the
-*fraction of the juz currently in progress*, which is exactly where mid-page precision matters.
+#### (D) Wire it into progress — the `curjuzpct` column
+`juzct` (whole juz done) stays page-driven (§2h). Ayah precision only sharpens the **fraction of the juz
+currently in progress**. The app reads a Master column **`curjuzpct`** (0–100, ayah-precise % into the
+frontier juz); when present it overrides the page-based fraction, else it falls back to `curpg`.
+
+**(i) `Setoran` — one helper column `gidx`** (global index of the stopping ayah). Assume `surah`=col G,
+`ayat_ke`=col I. In the first free column (e.g. **L**), header `gidx`, **L2**:
+```
+=ARRAYFORMULA(IFERROR(VLOOKUP(G2:G, Surah!$A:$D, 4, FALSE) + I2:I - 1, ""))
+```
+
+**(ii) `Ringkasan` — a `curjuzpct` row** (e.g. **F35**, fill right per santri; `F33`=`juzct`):
+```
+=IF(F33>=30, "", LET(
+   fr,      INDEX($B$2:$B$31, F33+1),
+   idxfr,   VLOOKUP(fr, Quran!$A:$F, 6, FALSE),
+   idxnext, IF(fr=30, 6237, VLOOKUP(fr+1, Quran!$A:$F, 6, FALSE)),
+   maxa,    MAXIFS(Setoran!$L:$L, Setoran!$B:$B, F$1, Setoran!$D:$D, "Ziyadah",
+                   Setoran!$L:$L, ">="&idxfr, Setoran!$L:$L, "<"&idxnext),
+   IF(maxa=0, "", ROUND((maxa - idxfr + 1)/(idxnext - idxfr)*100)) ))
+```
+Takes the **furthest Ziyadah ayah inside the frontier juz** → % of that juz. Blank when the santri hasn't
+logged a `surah:ayat` in the frontier juz → the app uses the page fraction instead.
+
+**(iii) `Master` col `curjuzpct`** (put it at **S**, header `curjuzpct`):
+```
+S2 =INDEX(Ringkasan!$F$35:$AZ$35, MATCH(A2, Ringkasan!$F$1:$AZ$1, 0))
+```
+
+**(iv) Extend the mirror** (§3) from `Master!A1:R` → **`Master!A1:S`** so `curjuzpct` reaches the app.
+The app prefers `curjuzpct` for the ring's in-progress-juz fraction, so a mid-page stop reads precisely.
 
 ---
 
