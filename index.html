@@ -51,9 +51,9 @@ body{margin:0;background:#0a4631;}
 input::placeholder,textarea::placeholder{color:#a99f86;}
 @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 @keyframes rtaPing{0%{transform:translate(-50%,-50%) scale(.7);opacity:.6}70%,100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
-.asnaf-grid{grid-template-columns:repeat(2,1fr);}
+.asnaf-grid{grid-template-columns:1fr;}
+@media(min-width:520px){.asnaf-grid{grid-template-columns:repeat(2,1fr);}}
 @media(min-width:640px){.asnaf-grid{grid-template-columns:repeat(4,1fr);}}
-@media(max-width:479px){.asnaf-grid > div{padding:15px 13px!important;}}
 ::selection{background:#c6a052;color:#093526;}
 .form-field:focus{border-color:#c6a052!important;outline:none;}
 @media(max-width:479px){
