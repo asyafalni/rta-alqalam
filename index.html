@@ -74,6 +74,15 @@ input::placeholder,textarea::placeholder{color:#a99f86;}
   .amt-grid > div{padding:14px 10px!important;}
   .amt-grid > div > div:first-child{font-size:16px!important;}
 }
+/* Galeri Kegiatan carousel */
+.gk-stage{perspective:1400px;}
+.gk-arrow{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;border:1px solid rgba(230,207,142,.4);background:rgba(6,42,29,.55);color:#e6cf8e;cursor:pointer;display:grid;place-items:center;z-index:9;padding:0;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);transition:background .2s,border-color .2s;}
+.gk-arrow:hover{background:rgba(6,42,29,.82);border-color:#c6a052;}
+.gk-on{animation:gkzoom 11s ease-in-out infinite alternate;}
+@keyframes gkzoom{from{transform:scale(1)}to{transform:scale(1.08)}}
+#galeri button:focus-visible{outline:2px solid #e6cf8e;outline-offset:3px;}
+@media(max-width:640px){ .gk-arrow{width:38px;height:38px;} }
+@media(prefers-reduced-motion:reduce){ .gk-on{animation:none;} .gk-stage > div{transition:none!important;} }
 </style>
 </helmet>
 <div style="background:#f6efe0;font-family:'Plus Jakarta Sans',sans-serif;color:#26302a;overflow-x:hidden;">
@@ -332,6 +341,33 @@ input::placeholder,textarea::placeholder{color:#a99f86;}
 
   </div>
 </section>
+
+<!-- ===== GALERI KEGIATAN ===== -->
+<sc-if value="{{ galeriHasImages }}" hint-placeholder-val="{{ true }}">
+<section id="galeri" data-screen-label="Galeri Kegiatan" style="padding:92px 26px;background:radial-gradient(120% 90% at 50% 0%,#0e5a3c 0%,#0a4631 48%,#063626 100%);color:#ecdfc2;position:relative;overflow:hidden;">
+  <div style="max-width:1000px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:40px;">
+      <div style="color:#d4b56a;font-size:12.5px;letter-spacing:.26em;text-transform:uppercase;font-weight:700;margin-bottom:14px;">Galeri Kegiatan</div>
+      <h2 style="font-family:Marcellus,serif;font-weight:400;font-size:clamp(28px,4.4vw,44px);margin:0;color:#fbf3df;">Keseharian Santri di RTA Al-Qalam</h2>
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:16px;"><span style="width:46px;height:1px;background:linear-gradient(90deg,transparent,#c6a052);"></span><span style="width:7px;height:7px;background:#c6a052;transform:rotate(45deg);flex:none;"></span><span style="width:46px;height:1px;background:linear-gradient(90deg,#c6a052,transparent);"></span></div>
+    </div>
+    <div class="gk-stage" style="position:relative;height:clamp(230px,44vw,430px);">
+      <sc-for list="{{ galeri }}" as="g" hint-placeholder-count="3">
+        <div style="{{ g.style }}"><img src="{{ g.src }}" alt="Kegiatan santri RTA Al-Qalam" loading="lazy" class="{{ g.imgClass }}" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      </sc-for>
+      <sc-if value="{{ galeriMulti }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ galeriPrev }}" aria-label="Foto sebelumnya" class="gk-arrow" style="left:clamp(4px,3vw,22px);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button onClick="{{ galeriNext }}" aria-label="Foto berikutnya" class="gk-arrow" style="right:clamp(4px,3vw,22px);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      </sc-if>
+    </div>
+    <sc-if value="{{ galeriMulti }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;gap:14px;justify-content:center;margin-top:32px;flex-wrap:wrap;">
+        <sc-for list="{{ galeriDots }}" as="d" hint-placeholder-count="5"><button onClick="{{ d.onClick }}" aria-label="Foto" style="{{ d.style }}"></button></sc-for>
+      </div>
+    </sc-if>
+  </div>
+</section>
+</sc-if>
 
 <!-- ===== YANG ANDA TANGGUNG ===== -->
 <section data-screen-label="Cakupan Donasi" style="padding:84px 26px;background:#fbf7ec;border-top:1px solid #ece3cf;">
@@ -664,6 +700,7 @@ class Component extends DCLogic {
     openFaq: 0,
     nameError: '', phoneError: '',
     copied: false,
+    galeri: [], galeriIdx: 0, gNarrow: false,
   };
   REK = '7346774112';
 
@@ -682,6 +719,53 @@ class Component extends DCLogic {
   };
   amountOption = { '100': 'Rp. 100000', '250': 'Rp. 250000', '500': 'Rp. 500000', '750': 'Rp. 750000' };
   _lastSubmit = 0;
+
+  // ---- Galeri Kegiatan: dynamically read assets/img/manifest.json → coverflow "plate" carousel ----
+  _loadGaleri() {
+    const self = this;
+    function syncNarrow() { const n = window.innerWidth <= 640; if (n !== self.state.gNarrow) self.setState({ gNarrow: n }); }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', syncNarrow); setTimeout(syncNarrow, 0);
+      // swipe via document delegation so it survives DC re-renders
+      let x0 = null;
+      document.addEventListener('touchstart', (e) => { const st = e.target.closest && e.target.closest('.gk-stage'); x0 = st ? e.touches[0].clientX : null; }, { passive: true });
+      document.addEventListener('touchend', (e) => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40) self.galeriGo(self.state.galeriIdx + (dx < 0 ? 1 : -1)); x0 = null; });
+    }
+    fetch('assets/img/manifest.json').then((r) => r.json()).then((list) => {
+      if (Array.isArray(list) && list.length) { self.setState({ galeri: list }); self._gStart(); }
+    }).catch(() => {});
+  }
+  _gStart() {
+    clearInterval(this._gTimer);
+    if ((this.state.galeri || []).length > 1) {
+      this._gTimer = setInterval(() => {
+        const n = this.state.galeri.length;
+        if (n) this.setState({ galeriIdx: (this.state.galeriIdx + 1) % n });
+      }, 5200);
+    }
+  }
+  galeriGo(i) {
+    const n = (this.state.galeri || []).length; if (!n) return;
+    this.setState({ galeriIdx: ((i % n) + n) % n });
+    this._gStart();
+  }
+  // coverflow: each plate placed by its offset from the active index
+  galeriSlideStyle(o, narrow) {
+    const abs = Math.abs(o);
+    let tx = 0, sc = 1, op = 1, z = 5, blur = 0, bright = 1;
+    if (o !== 0) {
+      if (narrow || abs >= 2) { tx = o > 0 ? 130 : -130; sc = .72; op = 0; z = 1; }
+      else { tx = o > 0 ? 55 : -55; sc = .82; op = .4; z = 3; blur = .5; bright = .55; }
+    }
+    const w = narrow ? '90%' : 'min(600px,84%)';
+    const frame = o === 0
+      ? 'box-shadow:0 0 0 1px rgba(230,207,142,.6),0 0 0 8px rgba(230,207,142,.06),0 46px 84px -34px rgba(0,0,0,.78);'
+      : 'box-shadow:0 24px 50px -30px rgba(0,0,0,.7);';
+    return 'position:absolute;left:50%;top:50%;width:' + w + ';aspect-ratio:16/10;border-radius:6px;overflow:hidden;'
+      + 'transform:translate(-50%,-50%) translateX(' + tx + '%) scale(' + sc + ');'
+      + 'opacity:' + op + ';z-index:' + z + ';filter:blur(' + blur + 'px) brightness(' + bright + ');'
+      + 'transition:transform .6s cubic-bezier(.25,.85,.35,1),opacity .55s ease,filter .55s ease;' + frame;
+  }
 
   validatePhone(phone) {
     const digits = phone.replace(/[\s\-\+\.()]/g, '');
@@ -851,6 +935,7 @@ class Component extends DCLogic {
 
   renderVals() {
     const s = this.state;
+    if (!this._gInit) { this._gInit = true; this._loadGaleri(); }
     const fmt = this.fmt.bind(this);
     const mv = this.monthlyValue();
     const months = s.months;
@@ -939,8 +1024,26 @@ class Component extends DCLogic {
       };
     }
 
+    const gl = s.galeri || [];
+    const gIdx = gl.length ? (s.galeriIdx % gl.length) : 0;
+    const galeri = gl.map((name, i) => ({
+      src: 'assets/img/' + name,
+      style: this.galeriSlideStyle(i - gIdx, s.gNarrow),
+      imgClass: i === gIdx ? 'gk-on' : '',
+    }));
+    const galeriDots = gl.map((_, i) => ({
+      onClick: () => this.galeriGo(i),
+      style: 'width:11px;height:11px;transform:rotate(45deg);border-radius:2px;border:1px solid rgba(230,207,142,.5);cursor:pointer;padding:0;transition:.3s;'
+        + (i === gIdx ? 'background:#e6cf8e;box-shadow:0 0 12px rgba(230,207,142,.65);' : 'background:transparent;'),
+    }));
+
     return {
       durations, amounts,
+      galeri, galeriDots,
+      galeriHasImages: gl.length > 0,
+      galeriMulti: gl.length > 1,
+      galeriPrev: () => this.galeriGo(gIdx - 1),
+      galeriNext: () => this.galeriGo(gIdx + 1),
       showCustom: s.amountKey === 'custom',
       customAmount: customDisplay,
       onCustom: (e) => this.onCustom(e),
