@@ -156,8 +156,9 @@ Send yourself one test submission through each form and confirm a row lands in t
 1. In your **PUBLIC** sheet, add a **`Config`** tab (`key` | `value`) with `sheet_id` (blank = this
    sheet), `setoran`, `nilai`, `absensi` — see §6.
 2. Put that sheet's ID into **`CONFIG_ID`** near the top of `tracker/index.html`'s `<script>` (once).
-3. Open `/tracker/` → **Masuk Staff** → **⚙️ Konfigurasi** shows each connection ✓/– and the data
-   status. The panel is **read-only** — edit the `Config` tab and press **↻ Muat Ulang** to apply.
+3. Open `/tracker/` → **Masuk Staff** (as **Admin** — the ⚙️ button is admin-only) → **⚙️ Konfigurasi**
+   shows each connection ✓/– and the data status. The panel is **read-only** — edit the `Config` tab
+   and press **↻ Muat Ulang** to apply.
 
 ### Step 8 — Verify
 - Gallery/dashboard show your real santri (not the demo names).
@@ -938,8 +939,8 @@ what's active — to change anything, you edit the sheet and press **↻ Muat Ul
 
 2. Put the **Config sheet's ID** into `CONFIG_ID` in the code (it can be the same public sheet that
    holds `Roster`/`Nilai`/… — then leave `sheet_id` blank).
-3. Open `/tracker/` → **Masuk Staff** → **⚙️ Konfigurasi** shows each connection with a ✓/–. Data
-   status flips to **Live · Google Sheet**.
+3. Open `/tracker/` → **Masuk Staff** (as **Admin** — only the admin role sees the ⚙️ button) →
+   **⚙️ Konfigurasi** shows each connection with a ✓/–. Data status flips to **Live · Google Sheet**.
 
 From the resolved **data** Sheet ID the tracker reads six tabs via GViz — **`Roster`** (santri),
 **`Nilai`** (tests), **`Mapel`** (subjects), **`Halaqah`** (circles), **`Setoran`** (daily log),
