@@ -1393,7 +1393,12 @@ class Component extends DCLogic {
     // dashboard roster (for now all staff roles see every halaqah; musyrif scope TODO)
     let roster=all.filter(groupMatch);
     const sk=st.sortKey||'juz', sd=st.sortDir||'desc';
-    const cmpBy={ nick:(a,b)=>a.nick.localeCompare(b.nick), juz:(a,b)=>a.juz-b.juz, kota:(a,b)=>(a.kota||'').localeCompare(b.kota||''), overall:(a,b)=>a.overall-b.overall };
+    // "Progres Hafalan" renders BOTH "N/15 Juz" and the %, so sort by the same measure the column
+    // shows — whole juz plus the in-progress fraction (juzPct). Comparing a.juz alone tied every
+    // santri on the same juz count and left them in load order (Barkan 7% above Azka 12%).
+    const cmpBy={ nick:(a,b)=>a.nick.localeCompare(b.nick),
+      juz:(a,b)=>(a.juzPct-b.juzPct)||(a.juz-b.juz)||a.nick.localeCompare(b.nick),
+      kota:(a,b)=>(a.kota||'').localeCompare(b.kota||''), overall:(a,b)=>a.overall-b.overall };
     const cmp=cmpBy[sk]||cmpBy.juz;
     roster.sort((a,b)=>sd==='asc'?cmp(a,b):-cmp(a,b));
     const totalJuz=roster.reduce((a,s)=>a+s.juz,0);
