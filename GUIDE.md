@@ -102,6 +102,17 @@ driver (§2h); there is **no `juz` field** (derived from the page).
   prevents typos and keeps the link to `Master` exact.
 - Make **`tanggal`** a **Date** question; **`jenis`** a Dropdown (`Ziyadah` / `Muroja'ah` / `Tahsin`).
 
+> ⚠️ **Two silent-drop traps — the app POSTs with `no-cors`, so a rejected submission looks successful.**
+> Google Forms rejects the **whole response** (no row at all) if either is violated:
+> 1. **Choice values must match byte-for-byte.** Type `Muroja'ah` with a **straight** apostrophe
+>    (`'`, U+0027) — *not* the curly `’` (U+2019) that Docs/Word autocorrect inserts. The app sends the
+>    straight form (`tracker/index.html`, `sJenisChips`). Same rule for the `id` dropdown.
+> 2. **Every question marked *Required* must be filled.** If you mark `nilai` required, staff must tap a
+>    1–5 rating or the setoran is discarded; the app blocks submit in that case rather than lose it.
+>
+> Keep the **`id` dropdown options in step with the roster** — a santri missing from the list (e.g. you
+> add `s10` but the form still stops at `s9`) has *every* setoran silently dropped.
+
 **Form B — `Nilai Ujian/Tes`** (exams). Title the questions exactly:
 `id`, `tanggal`, `mapel`, `jenis`, `nilai`.
 - **`id`** Dropdown (same santri ids). **`mapel`** **Short answer** — it receives the Mapel **`id`**

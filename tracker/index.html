@@ -602,10 +602,9 @@
           <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:12px">Mata Pelajaran
             <select value="{{ nMapel }}" onChange="{{ setNMapel }}" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d"><option value="">— pilih mapel —</option><sc-for list="{{ nMapelOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
           </label>
-          <div style="display:flex;gap:10px;margin-bottom:14px">
-            <label style="flex:1;font-size:11.5px;color:#6b7280">Jenis<input value="{{ nJenis }}" onInput="{{ setNJenis }}" placeholder="Tes / Kuis" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
-            <label style="flex:1;font-size:11.5px;color:#6b7280">Nilai (0–100)<input value="{{ nNilai }}" onInput="{{ setNNilai }}" placeholder="88" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
-          </div>
+          <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">Jenis</div>
+          <div style="display:flex;gap:6px;margin-bottom:12px"><sc-for list="{{ nJenisChips }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.onPick }}" style="{{ c.style }}">{{ c.v }}</button></sc-for></div>
+          <label style="font-size:11.5px;color:#6b7280;display:block;margin-bottom:14px">Nilai (0–100)<input value="{{ nNilai }}" onInput="{{ setNNilai }}" inputmode="numeric" placeholder="88" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;border:1px solid #e6e1d5;background:#f7f6f2;font-size:13px;color:#16264d" /></label>
           <button onClick="{{ saveNilai }}" style="width:100%;padding:12px;border-radius:10px;border:none;background:#0a4631;color:#fff;font-weight:800;font-size:13.5px;cursor:pointer">Simpan Nilai</button>
           <div style="min-height:16px;margin-top:8px;font-size:11.5px;font-weight:700;color:#0a4631;text-align:center">{{ nMsg }}</div>
           <sc-if value="{{ nilaiNotReady }}" hint-placeholder-val="{{ false }}"><p style="font-size:11px;color:#b58a3a;background:#fbf5e4;border:1px solid #ecdcae;border-radius:8px;padding:8px 11px;margin-top:10px;line-height:1.5">Form Nilai belum berupa <b>pre-filled link</b> — isi di Config sheet agar tersimpan ke Google (GUIDE §5).</p></sc-if>
@@ -699,6 +698,23 @@
         <sc-if value="{{ kehNotConfigured }}" hint-placeholder-val="{{ false }}">
           <p style="font-size:11px;color:#b58a3a;background:#fbf5e4;border:1px solid #ecdcae;border-radius:8px;padding:8px 11px;margin-top:12px;line-height:1.5">Form absensi belum dikonfigurasi (Konfigurasi → pre-filled link). Entri di sini hanya tersimpan sesi ini dan belum tertulis ke sheet.</p>
         </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ SUBMIT TOAST ============ -->
+  <!-- Sits above the slide-over (z 71) and the rapor overlay (z 80): the entry panel closes on
+       submit and this reports the verified outcome (see submitVerified). Tap to dismiss. -->
+  <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:0;right:0;bottom:24px;z-index:90;display:flex;justify-content:center;padding:0 16px;pointer-events:none">
+      <div onClick="{{ closeToast }}" style="pointer-events:auto;display:flex;align-items:center;gap:10px;max-width:min(440px,100%);padding:12px 16px;border-radius:12px;background:{{ toastBg }};border:1px solid {{ toastBd }};color:#fff;box-shadow:0 16px 38px rgba(10,30,20,.32);font-size:12.5px;font-weight:700;line-height:1.45;cursor:pointer;animation:dcUp .22s ease">
+        <sc-if value="{{ toastPending }}" hint-placeholder-val="{{ true }}">
+          <span class="dc-spin" style="flex:none;width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,.3);border-top-color:#fff"></span>
+        </sc-if>
+        <sc-if value="{{ toastDone }}" hint-placeholder-val="{{ false }}">
+          <span style="flex:none;font-size:14px;line-height:1">{{ toastIcon }}</span>
+        </sc-if>
+        <span style="flex:1">{{ toastMsg }}</span>
       </div>
     </div>
   </sc-if>
@@ -878,6 +894,12 @@ function buildFormBody(cfg, rec){
 }
 // Post a record to a form via its parsed config (no-cors); returns whether it was configured.
 function postForm(cfg, rec){ if(!cfg) return false; try{ fetch(cfg.action,{method:'POST',mode:'no-cors',body:buildFormBody(cfg,rec)}); }catch(e){ console.error('postForm failed',e); } return true; }
+// Values the Nilai form accepts for its REQUIRED `jenis` choice question. Like the Setoran `jenis`
+// chips these are POSTed verbatim and must match the form's options BYTE-FOR-BYTE — a free-typed
+// value makes Forms reject the whole response, invisibly under no-cors. GUIDE §5.
+const NILAI_JENIS = ['Tes / Kuis','UTS','UAS','Praktikum'];
+const eqv = (a,b) => String(a==null?'':a).trim() === String(b==null?'':b).trim();
+const numv = x => { const n=Number(x); return isFinite(n)?n:NaN; };
 const PILLARS = [
   {key:'haf', abbr:'HAF', label:'Hafalan', grp:'diniyah'},
   {key:'tah', abbr:'TAH', label:'Tahsin', grp:'diniyah'},
@@ -964,6 +986,8 @@ class Component extends DCLogic {
     // Custom Setoran / Nilai input forms
     sSantri:'', sDate:'', sJenis:'Ziyadah', sHalDari:'', sHalKe:'', sSurah:'', sAyatDari:'', sAyatKe:'', sRating:0, sCatatan:'', sMsg:'',
     nSantri:'', nDate:'', nBidang:'Diniyah', nMapel:'', nJenis:'Tes / Kuis', nNilai:'', nMsg:'',
+    // Submit feedback toast: kind = '' | 'pending' | 'ok' | 'err' | 'warn'
+    toastKind:'', toastMsg:'',
   };
 
   // ---- Read path: Google Sheet via GViz JSON (no API key). Falls back to
@@ -1073,6 +1097,48 @@ class Component extends DCLogic {
           nilai:num(o.nilai!=null?o.nilai:o.rating), catatan:o.catatan!=null?String(o.catatan):''}; }).filter(x=>x.id&&x.jenis);
       this.setState({setoran:rows.length?rows:null});
     }catch(e){ console.error('loadSetoran failed', e); this.setState({setoran:null}); }
+  }
+
+  // ---- Verified submit -------------------------------------------------------------------
+  // We POST with mode:'no-cors', so the HTTP status is unreadable — a rejected submission looks
+  // exactly like an accepted one. (Forms drops the WHOLE response when a required field is missing
+  // or a choice value doesn't match byte-for-byte.) The only honest success signal is the row
+  // actually appearing, so we count matching rows, POST, then poll the sheet until it shows up.
+  setToast(kind, msg, ms){
+    clearTimeout(this._toastTimer);
+    this.setState({toastKind:kind, toastMsg:msg});
+    if(ms) this._toastTimer=setTimeout(()=>this.setState({toastKind:'', toastMsg:''}), ms);
+  }
+  async _gvizRows(tab){
+    const id=(this.state.sheetId||'').trim(); if(!id) return null;
+    const url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&headers=1&sheet='+encodeURIComponent(tab)+'&_='+Date.now();
+    const text=await (await fetch(url)).text();
+    const json=JSON.parse(text.replace(/^[\s\S]*?setResponse\(/,'').replace(/\);?\s*$/,''));
+    const cols=(json.table.cols||[]).map(c=>String(c.label||c.id||'').trim().toLowerCase());
+    return (json.table.rows||[]).map(r=>{ const o={}; (r.c||[]).forEach((cell,i)=>{ o[cols[i]]=cell?cell.v:null; }); return o; });
+  }
+  async _matchCount(tab, pred){
+    try{ const rows=await this._gvizRows(tab); return rows ? rows.filter(pred).length : null; }
+    catch(e){ return null; }
+  }
+  // o: {tab, label, pred, doPost, reload}
+  async submitVerified(o){
+    this.setToast('pending','Menyimpan '+o.label+'…', 0);
+    // Snapshot first, raced against a timeout so a slow sheet can never block the POST itself.
+    let before=null;
+    try{ before=await Promise.race([ this._matchCount(o.tab,o.pred), new Promise(r=>setTimeout(()=>r(null),4000)) ]); }catch(e){ before=null; }
+    if(!o.doPost()){ this.setToast('err','Belum tersimpan — form '+o.label+' belum punya pre-filled link (Konfigurasi, GUIDE §5).', 10000); return; }
+    const target=(before==null?1:before+1);
+    let sawSheet=(before!=null);
+    for(const w of [1500,2000,2500,3000,4000]){
+      await new Promise(r=>setTimeout(r,w));
+      const n=await this._matchCount(o.tab,o.pred);
+      if(n!=null){ sawSheet=true; if(n>=target){ this.setToast('ok', o.label+' tersimpan ✓', 5000); if(o.reload) o.reload(); return; } }
+    }
+    // Separate "the sheet is readable and the row is genuinely absent" from "we never could read it".
+    this.setToast(sawSheet?'err':'warn',
+      sawSheet ? ('Gagal — '+o.label+' tidak masuk ke sheet. Periksa Konfigurasi lalu coba lagi.')
+               : ('Terkirim, tapi belum bisa diverifikasi — sheet tidak terbaca. Periksa lagi nanti.'), 12000);
   }
 
   async loadKehadiran(){
@@ -1412,13 +1478,23 @@ class Component extends DCLogic {
 
     // ---- Custom Setoran / Nilai input forms (POST to their pre-filled-link forms) ----
     const santriOpts = kehSantriOpts; // shared santri dropdown
-    const sJenisCol={'Ziyadah':'#2f8f3a','Muroja’ah':'#cfa02c','Tahsin':'#3f6fa8'};
-    const sJenisChips=['Ziyadah','Muroja’ah','Tahsin'].map(vv=>{ const active=(st.sJenis||'Ziyadah')===vv, c=sJenisCol[vv]; return {v:vv, style:'flex:1;padding:9px 6px;border-radius:9px;border:1px solid '+(active?c:'#e6e1d5')+';background:'+(active?c:'#fff')+';color:'+(active?'#fff':'#16264d')+';font-weight:700;font-size:12px;cursor:pointer', onPick:()=>this.setState({sJenis:vv})}; });
+    // NOTE: these strings are POSTed verbatim into the Google Form's required `jenis` choice question.
+    // They must match its options BYTE-FOR-BYTE (straight ASCII apostrophe U+0027, not the curly U+2019)
+    // — Forms rejects the WHOLE response on any mismatch, and no-cors hides the failure. GUIDE §5.
+    const sJenisCol={'Ziyadah':'#2f8f3a',"Muroja'ah":'#cfa02c','Tahsin':'#3f6fa8'};
+    const sJenisChips=['Ziyadah',"Muroja'ah",'Tahsin'].map(vv=>{ const active=(st.sJenis||'Ziyadah')===vv, c=sJenisCol[vv]; return {v:vv, style:'flex:1;padding:9px 6px;border-radius:9px;border:1px solid '+(active?c:'#e6e1d5')+';background:'+(active?c:'#fff')+';color:'+(active?'#fff':'#16264d')+';font-weight:700;font-size:12px;cursor:pointer', onPick:()=>this.setState({sJenis:vv})}; });
     const sRating=st.sRating||0;
     const sStars=[1,2,3,4,5].map(n=>({n, star:(n<=sRating?'★':'☆'), col:(n<=sRating?'#e0a92c':'#d8d5cc'), onPick:()=>this.setState({sRating:n})}));
     const nBidangChips=['Diniyah','Umum','Ekstrakurikuler'].map(vv=>{ const active=(st.nBidang||'Diniyah')===vv, c='#0a4631'; return {v:vv, style:'flex:1;padding:9px 5px;border-radius:9px;border:1px solid '+(active?c:'#e6e1d5')+';background:'+(active?c:'#fff')+';color:'+(active?'#fff':'#16264d')+';font-weight:700;font-size:11px;cursor:pointer', onPick:()=>this.setState({nBidang:vv, nMapel:''})}; });
     const nMapelOpts=activeMapel.filter(d=>normBidang(d.bidang)===(st.nBidang||'Diniyah')).map(d=>({v:d.id||d.mapel, label:d.mapel}));
+    // Same byte-for-byte rule as sJenisChips — a free-typed jenis loses the whole entry (GUIDE §5).
+    const nJenisChips=NILAI_JENIS.map(vv=>{ const active=(st.nJenis||NILAI_JENIS[0])===vv, c='#16264d'; return {v:vv, style:'flex:1;padding:9px 5px;border-radius:9px;border:1px solid '+(active?c:'#e6e1d5')+';background:'+(active?c:'#fff')+';color:'+(active?'#fff':'#16264d')+';font-weight:700;font-size:11px;cursor:pointer;white-space:nowrap', onPick:()=>this.setState({nJenis:vv})}; });
     const setoranReady=!!parseFormLink(st.setoranFormId, SETORAN_KEYS), nilaiReady=!!parseFormLink(st.nilaiFormId, NILAI_KEYS);
+    // ---- Submit toast ----
+    const tk=st.toastKind||'';
+    const TOAST={pending:{bg:'#16264d',bd:'#16264d',icon:''}, ok:{bg:'#0a4631',bd:'#0a4631',icon:'✓'},
+                 err:{bg:'#8f2f2f',bd:'#8f2f2f',icon:'✕'}, warn:{bg:'#b58a3a',bd:'#b58a3a',icon:'!'}};
+    const tsty=TOAST[tk]||TOAST.pending;
 
     return {
       view:v, role:st.role, roleLabel, userName:st.userName, greeting: st.userName?('Halo, '+st.userName):'',
@@ -1524,18 +1600,34 @@ class Component extends DCLogic {
       setSCatatan:(e)=>this.setState({sCatatan:e.target.value}),
       saveSetoran:()=>{ const s=this.state; const id=(s.sSantri||'').trim(); if(!id){ this.setState({sMsg:'Pilih santri dahulu.'}); return; }
         if(!String(s.sHalDari||'').trim()){ this.setState({sMsg:'Isi halaman (dari) dahulu.'}); return; }
+        // `nilai` is a REQUIRED question on the Setoran form — posting without it makes Forms reject the
+        // whole response (silently, under no-cors). Block here so staff see a real error, not a false ✓.
+        if(!s.sRating){ this.setState({sMsg:'Beri nilai (1–5) dahulu.'}); return; }
         const hd=String(s.sHalDari||'').trim(), hk=String(s.sHalKe||'').trim()||hd;   // ke kosong → satu halaman
-        const rec={ id, tanggal:(s.sDate||todayStr()), jenis:s.sJenis||'Ziyadah', hal_dari:hd, hal_ke:hk, surah:String(s.sSurah||'').trim(), ayat_dari:String(s.sAyatDari||'').trim(), ayat_ke:String(s.sAyatKe||'').trim(), nilai:(s.sRating?String(s.sRating):''), catatan:String(s.sCatatan||'').trim() };
-        const ok=postForm(parseFormLink(s.setoranFormId, SETORAN_KEYS), rec);
-        this.setState({ sHalDari:'', sHalKe:'', sSurah:'', sAyatDari:'', sAyatKe:'', sRating:0, sCatatan:'', sMsg: ok?'Setoran tersimpan ✓':'Belum tersimpan — form Setoran perlu pre-filled link (Konfigurasi, GUIDE §5).' }); },
+        const rec={ id, tanggal:(s.sDate||todayStr()), jenis:s.sJenis||'Ziyadah', hal_dari:hd, hal_ke:hk, surah:String(s.sSurah||'').trim(), ayat_dari:String(s.sAyatDari||'').trim(), ayat_ke:String(s.sAyatKe||'').trim(), nilai:String(s.sRating), catatan:String(s.sCatatan||'').trim() };
+        const cfg=parseFormLink(s.setoranFormId, SETORAN_KEYS);
+        // Close the panel straight away; the toast carries the outcome from here.
+        this.setState({ entryOpen:false, sHalDari:'', sHalKe:'', sSurah:'', sAyatDari:'', sAyatKe:'', sRating:0, sCatatan:'', sMsg:'' });
+        this.submitVerified({ tab:'Setoran', label:'Setoran', doPost:()=>postForm(cfg, rec), reload:()=>this.loadSetoran(),
+          pred:r=>eqv(r.id,rec.id)&&eqv(r.jenis,rec.jenis)&&numv(r.hal_dari)===numv(rec.hal_dari)&&numv(r.hal_ke)===numv(rec.hal_ke) }); },
       // Nilai form
-      nSantri:st.nSantri, nDate:st.nDate||todayStr(), nBidangChips, nMapel:st.nMapel, nMapelOpts, nJenis:st.nJenis, nNilai:st.nNilai, nMsg:st.nMsg, nilaiReady, nilaiNotReady:!nilaiReady,
+      nSantri:st.nSantri, nDate:st.nDate||todayStr(), nBidangChips, nMapel:st.nMapel, nMapelOpts, nJenis:st.nJenis, nJenisChips, nNilai:st.nNilai, nMsg:st.nMsg, nilaiReady, nilaiNotReady:!nilaiReady,
+      // Submit toast
+      toastOn:!!tk, toastPending:tk==='pending', toastDone:(tk!=='' && tk!=='pending'),
+      toastMsg:st.toastMsg, toastIcon:tsty.icon, toastBg:tsty.bg, toastBd:tsty.bd,
+      closeToast:()=>{ clearTimeout(this._toastTimer); this.setState({toastKind:'', toastMsg:''}); },
       setNSantri:(e)=>this.setState({nSantri:e.target.value}), setNDate:(e)=>this.setState({nDate:e.target.value}),
       setNMapel:(e)=>this.setState({nMapel:e.target.value}), setNJenis:(e)=>this.setState({nJenis:e.target.value}), setNNilai:(e)=>this.setState({nNilai:e.target.value}),
       saveNilai:()=>{ const s=this.state; const id=(s.nSantri||'').trim(); if(!id){ this.setState({nMsg:'Pilih santri dahulu.'}); return; } if(!(s.nMapel||'').trim()){ this.setState({nMsg:'Pilih mapel dahulu.'}); return; }
-        const rec={ id, tanggal:(s.nDate||todayStr()), mapel:s.nMapel, jenis:s.nJenis||'Tes / Kuis', nilai:String(s.nNilai||'').trim() };
-        const ok=postForm(parseFormLink(s.nilaiFormId, NILAI_KEYS), rec);
-        this.setState({ nMapel:'', nNilai:'', nMsg: ok?'Nilai tersimpan ✓':'Belum tersimpan — form Nilai perlu pre-filled link (Konfigurasi, GUIDE §5).' }); },
+        // `nilai` is REQUIRED on the Nilai form — posting it blank makes Forms discard the whole
+        // response, invisibly under no-cors. Block here so the teacher sees a real error.
+        const skor=String(s.nNilai||'').trim();
+        if(!skor){ this.setState({nMsg:'Isi nilai (0–100) dahulu.'}); return; }
+        const rec={ id, tanggal:(s.nDate||todayStr()), mapel:s.nMapel, jenis:s.nJenis||'Tes / Kuis', nilai:skor };
+        const cfg=parseFormLink(s.nilaiFormId, NILAI_KEYS);
+        this.setState({ entryOpen:false, nMapel:'', nNilai:'', nMsg:'' });
+        this.submitVerified({ tab:'Nilai', label:'Nilai', doPost:()=>postForm(cfg, rec), reload:()=>this.loadNilai(),
+          pred:r=>eqv(r.id,rec.id)&&eqv(r.mapel,rec.mapel)&&numv(r.nilai)===numv(rec.nilai) }); },
       setoranFormId:st.setoranFormId, nilaiFormId:st.nilaiFormId,
       dataStatus, sheetId:st.sheetId,
       forceDemo:!!st.forceDemo, demoBg:(st.forceDemo?'#eef4ee':'#f7f6f2'), demoBd:(st.forceDemo?'#0a4631':'#e6e1d5'),
