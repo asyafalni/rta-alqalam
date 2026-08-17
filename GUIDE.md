@@ -540,6 +540,17 @@ Muroja'ah is additive. Google's engine recomputes on every new row; the app just
 **Cell meaning** (per mushaf page): **blank** = not memorized · **0** = memorized (Ziyadah), 0 muraja'ah ·
 **N** = reviewed N times. So *coverage* = non-blank pages, *strength* = the numbers.
 
+> ### The progress model: **high-water mark**, not coverage
+> A juz counts as done once the santri's **furthest reported page reaches its last page** — not once
+> every page in it has been logged individually. Within a juz the manhaj runs front-to-back, so a page
+> nobody logged is treated as a **reporting** gap (the musyrif didn't write it down), not a memorization
+> gap. This is a deliberate client decision; both `juzct` and the in-progress fraction follow it.
+>
+> *Example:* a santri logs pages 582–583 then 590–604. Pages 584–589 were never logged. Coverage would
+> say 17/23 of juz 30 → `juzct` 0. High-water says his furthest page is 604, the last page of juz 30 →
+> **`juzct` 1**. The `Grid` still records exactly which pages were reported (useful on its own); only the
+> roll-up in §2h(3) applies the high-water rule.
+
 #### (1) `Quran` reference tab — juz ↔ page ranges (auto-generated, one-time)
 **Where it lives:** on the **PRIVATE / computation side** — in the *same file* that runs the `Grid` +
 `Ringkasan` formulas. It's pure reference (no santri data) and the app never reads it, so it does **not**
@@ -581,11 +592,20 @@ A 30-row helper in **program order** + one column per santri, then two summary r
   (`30,29,28,27,26,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25`).
 - **C2** `=VLOOKUP($B2,Quran!$A:$C,2,FALSE)` · **D2** `=VLOOKUP($B2,Quran!$A:$C,3,FALSE)` · **E2** `=D2-C2+1` (fill down).
 - **F1** `=TRANSPOSE(FILTER(Master!$A$2:$A,Master!$A$2:$A<>""))` — santri ids.
-- **F2** (pages memorized in that juz, per santri) — fill right + down to row 31:
+- **F2** (**pages credited** in that juz, per santri) — fill right + down to row 31. This is the
+  **high-water** rule: the furthest page reported inside the juz, counted from the juz's first page.
 ```
-=COUNTIFS(Grid!$A$2:$A$605,">="&$C2, Grid!$A$2:$A$605,"<="&$D2,
-          INDEX(Grid!$B$2:$AE$605,0,MATCH(F$1,Grid!$B$1:$AE$1,0)),">=0")
+=LET(mx, IFERROR(MAXIFS(Grid!$A$2:$A$605,
+           INDEX(Grid!$B$2:$AE$605, 0, MATCH(F$1, Grid!$B$1:$AE$1, 0)), ">=0",
+           Grid!$A$2:$A$605, ">="&$C2,
+           Grid!$A$2:$A$605, "<="&$D2), 0),
+     IF(mx=0, 0, mx-$C2+1))
 ```
+> Counting **reported** pages instead (`COUNTIFS(… ">=0")` over the same range) gives *coverage*, which
+> under-reports whenever a musyrif skips a log — see the box in §2h. If you ever want coverage as a
+> separate diagnostic ("how much was actually written down"), put it in a spare row rather than F2:F31,
+> because `juzct` and `curjuzpct` both read this range.
+
 - **F33 `juzct`** (leading run of full juz): `=IFERROR(MATCH(FALSE, ARRAYFORMULA(F2:F31>=$E2:$E31), 0)-1, 30)`
 - **F34 `curpg`** (furthest page in the frontier juz):
 ```
@@ -603,9 +623,12 @@ N2 =INDEX(Ringkasan!$F$33:$AZ$33, MATCH(A2, Ringkasan!$F$1:$AZ$1, 0))
 O2 =INDEX(Ringkasan!$F$34:$AZ$34, MATCH(A2, Ringkasan!$F$1:$AZ$1, 0))
 ```
 The app reads `juzct`/`curpg` → the ring, %, "N/15 Juz", and the roadmap frontier juz all update
-automatically on each setoran. The app owns the ring math; the sheet only supplies these two numbers.
+automatically on each setoran. The app owns the ring math; the sheet supplies these two numbers (plus the
+optional `curjuzpct` from §2i). The ring is `(juzct + fraction-into-frontier-juz) / 15`, and the dashboard
+sorts on that same figure — so a santri with more of the current juz ranks above one with less, even at an
+equal `juzct`.
 
-> **Scale:** ~30 santri in one file = 604×30 `Grid` + 30×30 `Ringkasan` COUNTIFS cells — fine for Google.
+> **Scale:** ~30 santri in one file = 604×30 `Grid` + 30×30 `Ringkasan` lookup cells — fine for Google.
 > Past ~60 santri, split the `Grid` into per-student files (each recalcs independently) and mirror their
 > `juzct`/`curpg` into the central `Master`.
 
@@ -771,13 +794,32 @@ juz:                                =MATCH(gIdx, Quran!$F$2:$F$31, 1)
 #### (D) Wire it into progress — the `curjuzpct` column
 `juzct` (whole juz done) stays page-driven (§2h). Ayah precision only sharpens the **fraction of the juz
 currently in progress**. The app reads a Master column **`curjuzpct`** (0–100, ayah-precise % into the
-frontier juz); when present it overrides the page-based fraction, else it falls back to `curpg`.
+frontier juz).
 
-**(i) `Setoran` — one helper column `gidx`** (global index of the stopping ayah). Assume `surah`=col G,
-`ayat_ke`=col I. In the first free column (e.g. **L**), header `gidx`, **L2**:
+> **The app takes `max(page fraction, curjuzpct)` — it does not let `curjuzpct` override.**
+> Both are *high-water* readings of the same thing ("reached at least page X" / "reached at least ayah
+> Y"), so the larger is the better lower bound. This matters because `curjuzpct` only sees rows where
+> `surah`+`ayat_ke` were filled in: a santri with one tagged entry followed by five page-only entries
+> would otherwise read far too low. Partial ayah tagging can only sharpen the estimate, never shrink it.
+> Blank `curjuzpct` simply means "no ayah data" — the page reading carries it.
+
+**(i) `Setoran` — one helper column `gidx`** (global index of the stopping ayah). **Check your own column
+letters**: with the Form-A question order in §Step 4 the response tab is
+`A Timestamp · B id · C tanggal · D jenis · E hal_dari · F hal_ke · G nilai · H catatan · I surah ·
+J ayat_dari · K ayat_ke`, so `surah`=**I** and `ayat_ke`=**K**. (Forms appends questions added later to
+the *end* of the sheet, so the order can differ from the form — always read row 1.) In the first free
+column (e.g. **L**), header `gidx`, **L2**:
 ```
-=ARRAYFORMULA(IFERROR(VLOOKUP(G2:G, Surah!$A:$D, 4, FALSE) + I2:I - 1, ""))
+=ARRAYFORMULA(IFERROR(VLOOKUP(I2:I, Surah!$A:$D, 4, FALSE) + K2:K - 1, ""))
 ```
+> ⚠️ **One cell only — never fill this down.** The single `ARRAYFORMULA` in L2 covers every existing row
+> *and* every future form response. Copying it down puts an array formula in each row, and each one is
+> blocked by the row beneath it: every cell shows `#REF!` — *"Array result was not expanded because it
+> would overwrite data in L23."* To recover: click **L2**, `Ctrl+Shift+↓`, **Delete**, then paste the
+> formula into L2 alone.
+>
+> Sanity check: a row with `surah`=78, `ayat_ke`=40 must give **5712** (An-Naba starts at global index
+> 5673). Rows without a surah stay blank — that's correct, not an error.
 
 **(ii) `Ringkasan` — a `curjuzpct` row** (e.g. **F35**, fill right per santri; `F33`=`juzct`):
 ```
@@ -792,13 +834,25 @@ frontier juz); when present it overrides the page-based fraction, else it falls 
 Takes the **furthest Ziyadah ayah inside the frontier juz** → % of that juz. Blank when the santri hasn't
 logged a `surah:ayat` in the frontier juz → the app uses the page fraction instead.
 
+> Note the tab name: this reads **`Setoran!$L:$L`**. If your form writes to a differently-named tab
+> (Google may call it `Form_Responses`) and `Setoran` is a copy of it, make sure the `gidx` column exists
+> on **whichever tab this formula points at** — fixing it on the other one leaves this reading blanks.
+
 **(iii) `Master` col `curjuzpct`** (put it at **S**, header `curjuzpct`):
 ```
 S2 =INDEX(Ringkasan!$F$35:$AZ$35, MATCH(A2, Ringkasan!$F$1:$AZ$1, 0))
 ```
 
 **(iv) Extend the mirror** (§3) from `Master!A1:R` → **`Master!A1:S`** so `curjuzpct` reaches the app.
-The app prefers `curjuzpct` for the ring's in-progress-juz fraction, so a mid-page stop reads precisely.
+The app combines it with the page reading (see the box in (D)), so a mid-page stop reads precisely while
+untagged setoran still count.
+
+> **`gidx` is computation-side only — the app never reads it.** `loadSetoran` maps exactly
+> `id, tanggal, jenis, hal_dari, hal_ke, surah, ayat_dari, ayat_ke, nilai, catatan`; anything else in the
+> tab is ignored. What reaches the app is the finished `curjuzpct`, via `Roster`. So the public `Setoran`
+> mirror can stop at the last data column (`…A1:K`) — that keeps a broken helper formula from showing
+> `#REF!` on the public sheet. Do **not** drop `surah`/`ayat_dari`/`ayat_ke` themselves: the santri detail
+> renders them as "QS 78:1–40" in Riwayat Setoran Harian.
 
 ---
 
