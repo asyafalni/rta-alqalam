@@ -1255,11 +1255,14 @@ class Component extends DCLogic {
     const nextJuz = nextProgramJuz(doneSet);          // the juz being memorized now (roadmap frontier)
     const curJuz = pInfo ? pInfo.juz : nextJuz;
     // partial credit only when curpg sits inside that frontier juz (and the 30-juz cap isn't hit)
-    // Fraction into the juz being memorized now. Prefer the sheet's ayah-precise `curjuzpct` (0-100)
-    // when present; else fall back to the page-position from curpg.
-    const juzFrac = (juzCount>=30) ? 0
-      : (r.curjuzpct!=null) ? Math.min(0.999, Math.max(0, r.curjuzpct/100))
-      : ((pInfo && pInfo.juz===nextJuz) ? Math.min(0.999, Math.max(0, pInfo.pctJuz/100)) : 0);
+    // Fraction into the juz being memorized now. Page-position (curpg) and the sheet's ayah-precise
+    // `curjuzpct` are both LOWER BOUNDS on how far in the santri is — "reached page X" / "reached ayah
+    // Y" — so take whichever is further along. Never let curjuzpct override a higher page reading:
+    // when only some setoran carry surah/ayat, MAXIFS sees just those rows and reports far too little
+    // (a santri logging pages 590-604 untagged after one tagged entry would read 7% instead of ~100%).
+    const pageFrac = (pInfo && pInfo.juz===nextJuz) ? Math.min(0.999, Math.max(0, pInfo.pctJuz/100)) : 0;
+    const ayahFrac = (r.curjuzpct!=null) ? Math.min(0.999, Math.max(0, r.curjuzpct/100)) : 0;
+    const juzFrac = (juzCount>=30) ? 0 : Math.max(pageFrac, ayahFrac);
     // Completion vs the 15-juz TARGET; over-achievers (bonus juz 11..25) can reach 200%.
     const hafPct=Math.min(200, Math.round((juzCount+juzFrac)/TARGET_JUZ*100));
     const barBase=Math.min(100, hafPct), barOver=Math.max(0, hafPct-100), overTarget=hafPct>100;
